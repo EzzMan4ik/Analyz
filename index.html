@@ -77,6 +77,15 @@
         .section-title { font-size: 1.8rem; font-weight: bold; color: var(--dark-gold); margin-bottom: 24px; }
         .section-desc { color: #bbb; font-size: 1.05rem; margin-bottom: 30px; max-width: 700px; line-height: 1.8; }
 
+        /* КНОПКА "НА ГЛАВНУЮ" */
+        .back-home-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px;
+            padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem;
+            transition: all 0.3s; margin-bottom: 24px;
+        }
+        .back-home-btn:hover { border-color: var(--dark-gold); color: var(--dark-gold); }
+
         /* ФИЧИ */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
         .feature-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; transition: transform 0.3s, box-shadow 0.3s; }
@@ -102,9 +111,39 @@
         .current-badge { display: none; text-align: center; color: var(--dark-gold); font-size: 0.85rem; font-weight: 600; margin-top: 8px; }
         .current-badge.visible { display: block; }
 
-        /* ИГРОВЫЕ БЛОКИ */
-        .game-block { max-width: 600px; }
-        .game-icon { font-size: 3rem; margin-bottom: 16px; }
+        /* ИГРОВЫЕ БЛОКИ — ЦЕНТРИРОВАНИЕ */
+        .game-block { max-width: 700px; margin: 0 auto; }
+        .game-icon { font-size: 3rem; margin-bottom: 16px; text-align: center; }
+        .game-icon img, .game-icon span { display: inline-block; }
+
+        /* ТИР-ЛИСТ НАВ-ВКЛАДКА */
+        .tierlist-nav-tab {
+            display: flex; align-items: center; gap: 12px;
+            background: linear-gradient(135deg, rgba(197,160,40,0.12), rgba(197,160,40,0.04));
+            border: 1px solid rgba(197,160,40,0.4); border-radius: 10px;
+            padding: 16px 24px; cursor: pointer; transition: all 0.3s ease;
+            margin-bottom: 30px; max-width: 320px;
+        }
+        .tierlist-nav-tab:hover { background: linear-gradient(135deg, rgba(197,160,40,0.22), rgba(197,160,40,0.08)); border-color: var(--dark-gold); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(197,160,40,0.2); }
+        .tierlist-nav-tab-icon { font-size: 1.6rem; }
+        .tierlist-nav-tab-text { color: var(--dark-gold); font-weight: 600; font-size: 1.05rem; }
+        .tierlist-nav-tab-arrow { margin-left: auto; color: var(--dark-gold); font-size: 1.2rem; }
+
+        /* ТИР-ЛИСТ ВНУТРЕННИЕ ВКЛАДКИ */
+        .dota-subtabs { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+        .dota-subtab {
+            display: flex; align-items: center; gap: 10px;
+            background-color: var(--card-bg); border: 2px solid #333; border-radius: 10px;
+            padding: 14px 28px; cursor: pointer; transition: all 0.3s ease;
+        }
+        .dota-subtab:hover { border-color: #555; transform: translateY(-2px); }
+        .dota-subtab.active { border-color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); background-color: rgba(197,160,40,0.08); }
+        .dota-subtab-icon { font-size: 1.4rem; }
+        .dota-subtab-text { color: #aaa; font-weight: 600; font-size: 1rem; }
+        .dota-subtab.active .dota-subtab-text { color: var(--dark-gold); }
+        .dota-subcontent { display: none; }
+        .dota-subcontent.active { display: block; animation: fadeIn 0.4s ease; }
+
         .link-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
         .link-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
         .link-input:focus { border-color: var(--dark-gold); box-shadow: 0 0 0 2px rgba(197,160,40,0.2); }
@@ -165,33 +204,8 @@
         .player-select-dropdown { width: 100%; max-width: 400px; padding: 12px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; cursor: pointer; }
         .player-select-dropdown:focus { border-color: var(--dark-gold); }
 
-        /* ============================== */
-        /* === ТИР-ЛИСТ ГЕРОЕВ ========== */
-        /* ============================== */
-
-        .tierlist-nav-tab {
-            display: flex; align-items: center; gap: 12px;
-            background: linear-gradient(135deg, rgba(197,160,40,0.12), rgba(197,160,40,0.04));
-            border: 1px solid rgba(197,160,40,0.4); border-radius: 10px;
-            padding: 16px 24px; cursor: pointer; transition: all 0.3s ease;
-            margin-bottom: 30px; max-width: 320px;
-        }
-        .tierlist-nav-tab:hover { background: linear-gradient(135deg, rgba(197,160,40,0.22), rgba(197,160,40,0.08)); border-color: var(--dark-gold); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(197,160,40,0.2); }
-        .tierlist-nav-tab-icon { font-size: 1.6rem; }
-        .tierlist-nav-tab-text { color: var(--dark-gold); font-weight: 600; font-size: 1.05rem; }
-        .tierlist-nav-tab-arrow { margin-left: auto; color: var(--dark-gold); font-size: 1.2rem; }
-
-        .tierlist-back-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px;
-            padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem;
-            transition: all 0.3s; margin-bottom: 24px;
-        }
-        .tierlist-back-btn:hover { border-color: var(--dark-gold); color: var(--dark-gold); }
-
-        .rank-selector {
-            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px;
-        }
+        /* === ТИР-ЛИСТ === */
+        .rank-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
         .rank-badge {
             display: flex; flex-direction: column; align-items: center; gap: 4px;
             padding: 10px 18px; border-radius: 10px; cursor: pointer;
@@ -205,16 +219,8 @@
         .rank-badge.active .rank-badge-name { color: var(--dark-gold); }
 
         .tier-table { display: flex; flex-direction: column; gap: 12px; }
-        .tier-row {
-            display: flex; gap: 12px; align-items: stretch;
-            background-color: var(--card-bg); border-radius: 10px; padding: 16px;
-            border: 1px solid #333; min-height: 80px;
-        }
-        .tier-label {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            min-width: 70px; border-radius: 8px; font-weight: 800; font-size: 1.6rem;
-            padding: 8px; flex-shrink: 0;
-        }
+        .tier-row { display: flex; gap: 12px; align-items: stretch; background-color: var(--card-bg); border-radius: 10px; padding: 16px; border: 1px solid #333; min-height: 80px; }
+        .tier-label { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 70px; border-radius: 8px; font-weight: 800; font-size: 1.6rem; padding: 8px; flex-shrink: 0; }
         .tier-label.s { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
         .tier-label.a { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
         .tier-label.b { background: linear-gradient(135deg, #f1c40f, #d4ac0d); color: #333; }
@@ -222,22 +228,12 @@
         .tier-label.d { background: linear-gradient(135deg, #7f8c8d, #636e72); color: #ccc; }
         .tier-label-desc { font-size: 0.6rem; font-weight: 500; margin-top: 2px; text-align: center; line-height: 1.2; }
         .tier-heroes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1; }
-        .hero-card {
-            position: relative; width: 52px; height: 52px; border-radius: 8px;
-            overflow: hidden; cursor: pointer; border: 2px solid #333;
-            transition: all 0.25s ease;
-        }
+        .hero-card { position: relative; width: 52px; height: 52px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid #333; transition: all 0.25s ease; }
         .hero-card:hover { border-color: var(--dark-gold); transform: translateY(-3px) scale(1.08); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .hero-card img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-card-tooltip {
-            position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
-            background-color: #111; border: 1px solid var(--dark-gold); border-radius: 6px;
-            padding: 6px 10px; white-space: nowrap; font-size: 0.78rem; color: #fff;
-            opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 20;
-        }
+        .hero-card-tooltip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background-color: #111; border: 1px solid var(--dark-gold); border-radius: 6px; padding: 6px 10px; white-space: nowrap; font-size: 0.78rem; color: #fff; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 20; }
         .hero-card:hover .hero-card-tooltip { opacity: 1; }
         .hero-card-winrate { position: absolute; bottom: 0; left: 0; right: 0; font-size: 0.62rem; text-align: center; background: rgba(0,0,0,0.75); color: #fff; font-weight: 600; }
-
         .tierlist-loading { text-align: center; padding: 60px 0; color: #888; }
         .tierlist-loading-spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid #333; border-top-color: var(--dark-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -261,6 +257,7 @@
             .tier-row { flex-direction: column; }
             .tier-label { min-width: 100%; flex-direction: row; justify-content: center; gap: 10px; padding: 12px; }
             .hero-card { width: 44px; height: 44px; }
+            .game-block { max-width: 100%; }
         }
     </style>
 </head>
@@ -306,7 +303,6 @@
             <div class="sidebar-item" data-section="subscriptions"><span class="icon">⭐</span> Подписки</div>
             <div class="sidebar-divider"></div>
             <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
-            <div class="sidebar-item" data-section="tierlist"><span class="icon">📊</span> Тир-лист героев</div>
             <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
         </div>
 
@@ -327,12 +323,13 @@
                     <div class="feature-card"><div class="feature-icon">💡</div><div class="feature-title">Рекомендации по тренировке</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
                     <div class="feature-card"><div class="feature-icon">🏆</div><div class="feature-title">Определение роли</div><div class="feature-text">ИИ определяет вашу идеальную роль на основе 20+ параметров поведения в матче.</div></div>
                     <div class="feature-card"><div class="feature-icon">📈</div><div class="feature-title">Отслеживание прогресса</div><div class="feature-text">История разборов и графики роста по неделям — следите за улучшениями.</div></div>
-                    <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальный тир-лист по рангам — от Рекрута до Бессмертного. На основе статистики OpenDota.</div></div>
+                    <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальный тир-лист по рангам — от Рекрута до Бессмертного. На основе статистики.</div></div>
                 </div>
             </div>
 
             <!-- ПОДПИСКИ -->
             <div class="section" id="section-subscriptions">
+                <button class="back-home-btn" data-back="home">← На главную страницу</button>
                 <div class="section-title">Тарифы и подписки</div>
                 <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
                 <div class="subscription-cards">
@@ -358,63 +355,66 @@
                 </div>
             </div>
 
-            <!-- DOTA 2 -->
+            <!-- DOTA 2 (с тир-листом внутри) -->
             <div class="section" id="section-dota2">
-                <div class="game-block" id="dotaGameBlock">
-                    <!-- КЛИКАБЕЛЬНАЯ ВКЛАДКА ТИР-ЛИСТА -->
-                    <div class="tierlist-nav-tab" id="goToTierlist">
-                        <span class="tierlist-nav-tab-icon">📋</span>
-                        <span class="tierlist-nav-tab-text">Тир-лист героев</span>
-                        <span class="tierlist-nav-tab-arrow">→</span>
-                    </div>
+                <button class="back-home-btn" data-back="home">← На главную страницу</button>
 
-                    <div class="game-icon">⚔️</div>
-                    <div class="section-title">Анализ матча Dota 2</div>
-                    <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор.</div>
-                    <div class="link-form">
-                        <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink" />
-                        <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
+                <!-- ВНУТРЕННИЕ ВКЛАДКИ -->
+                <div class="dota-subtabs">
+                    <div class="dota-subtab active" data-subtab="analysis">
+                        <span class="dota-subtab-icon">⚔️</span>
+                        <span class="dota-subtab-text">Анализ матча</span>
                     </div>
-                    <div class="progress-wrapper" id="dotaProgress">
-                        <div class="progress-bar"><div class="progress-fill" id="dotaProgressFill"></div></div>
-                        <div class="progress-text" id="dotaProgressText">В очереди...</div>
+                    <div class="dota-subtab" data-subtab="tierlist">
+                        <span class="dota-subtab-icon">📋</span>
+                        <span class="dota-subtab-text">Тир-лист героев</span>
                     </div>
-                    <div class="results-wrapper" id="dotaResults"></div>
-                </div>
-            </div>
-
-            <!-- ТИР-ЛИСТ ГЕРОЕВ -->
-            <div class="section" id="section-tierlist">
-                <button class="tierlist-back-btn" id="backToDota">← Назад к анализу</button>
-                <div class="section-title">Тир-лист героев Dota 2</div>
-                <div class="section-desc">Актуальный тир-лист на основе статистики OpenDota. Данные обновляются автоматически — рейтинг героев строится по проценту побед в каждом ранговом диапазоне.</div>
-
-                <div class="tier-info-block">
-                    <div class="tier-info-title">Расшифровка тиров</div>
-                    <div class="tier-info-item"><span class="tier-info-letter s">S</span> Очень метовые и сильные — лучший выбор в текущей мете</div>
-                    <div class="tier-info-item"><span class="tier-info-letter a">A</span> Сильные, чуть уступают S-тиру, но всё ещё отличный выбор</div>
-                    <div class="tier-info-item"><span class="tier-info-letter b">B</span> Ситуативные — нужны под конкретный пик</div>
-                    <div class="tier-info-item"><span class="tier-info-letter c">C</span> Объективно слабые — пикайте, только если вы задрот на этом герое</div>
-                    <div class="tier-info-item"><span class="tier-info-letter d">D</span> Мусор — не стоит брать в нынешней мете</div>
                 </div>
 
-                <!-- СЕЛЕКТОР РАНГОВ -->
-                <div class="rank-selector" id="rankSelector"></div>
+                <!-- Подвкладка: Анализ -->
+                <div class="dota-subcontent active" id="dotaSub-analysis">
+                    <div class="game-block">
+                        <div class="game-icon">⚔️</div>
+                        <div class="section-title">Анализ матча Dota 2</div>
+                        <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор.</div>
+                        <div class="link-form">
+                            <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink" />
+                            <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
+                        </div>
+                        <div class="progress-wrapper" id="dotaProgress">
+                            <div class="progress-bar"><div class="progress-fill" id="dotaProgressFill"></div></div>
+                            <div class="progress-text" id="dotaProgressText">В очереди...</div>
+                        </div>
+                        <div class="results-wrapper" id="dotaResults"></div>
+                    </div>
+                </div>
 
-                <div class="tierlist-updated" id="tierlistUpdated"></div>
+                <!-- Подвкладка: Тир-лист -->
+                <div class="dota-subcontent" id="dotaSub-tierlist">
+                    <div class="section-title">Тир-лист героев Dota 2</div>
+                    <div class="section-desc">Актуальный тир-лист героев. Данные обновляются автоматически — рейтинг строится по проценту побед в каждом ранговом диапазоне.</div>
 
-                <!-- ТАБЛИЦА ТИРОВ -->
-                <div id="tierlistContent">
-                    <div class="tierlist-loading">
-                        <div class="tierlist-loading-spinner"></div>
-                        <div>Загрузка данных героев...</div>
+                    <div class="tier-info-block">
+                        <div class="tier-info-title">Расшифровка тиров</div>
+                        <div class="tier-info-item"><span class="tier-info-letter s">S</span> Очень метовые и сильные — лучший выбор в текущей мете</div>
+                        <div class="tier-info-item"><span class="tier-info-letter a">A</span> Сильные, чуть уступают S-тиру, но всё ещё отличный выбор</div>
+                        <div class="tier-info-item"><span class="tier-info-letter b">B</span> Ситуативные — нужны под конкретный пик</div>
+                        <div class="tier-info-item"><span class="tier-info-letter c">C</span> Объективно слабые — пикайте, только если вы задрот на этом герое</div>
+                        <div class="tier-info-item"><span class="tier-info-letter d">D</span> Мусор — не стоит брать в нынешней мете</div>
+                    </div>
+
+                    <div class="rank-selector" id="rankSelector"></div>
+                    <div class="tierlist-updated" id="tierlistUpdated"></div>
+                    <div id="tierlistContent">
+                        <div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div>
                     </div>
                 </div>
             </div>
 
             <!-- CS 2 -->
             <div class="section" id="section-cs2">
-                <div class="game-block" id="csGameBlock">
+                <button class="back-home-btn" data-back="home">← На главную страницу</button>
+                <div class="game-block">
                     <div class="game-icon">🔫</div>
                     <div class="section-title">Анализ матча CS 2</div>
                     <div class="section-desc">Вставьте ссылку на матч или загрузите .dem файл — сервис проанализирует демку и выдаст разбор по гранатам, спотам и роли.</div>
@@ -539,12 +539,34 @@
                 const section = document.getElementById('section-' + target);
                 if (section) section.classList.add('active');
                 if (target === 'subscriptions') revealCards();
-                if (target === 'tierlist' && !tierlistData) loadTierlist();
                 if (window.innerWidth < 768) closeSidebar();
             });
         });
 
         function revealCards() { subscriptionCards.forEach((card, index) => { card.classList.remove('visible'); setTimeout(() => { card.classList.add('visible'); }, index * 150); }); }
+
+        // === КНОПКИ "НА ГЛАВНУЮ" ===
+        document.querySelectorAll('.back-home-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                sidebarItems.forEach(i => i.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById('section-home').classList.add('active');
+                const homeItem = document.querySelector('.sidebar-item[data-section="home"]');
+                if (homeItem) homeItem.classList.add('active');
+            });
+        });
+
+        // === ВНУТРЕННИЕ ВКЛАДКИ DOTA 2 ===
+        document.querySelectorAll('.dota-subtab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.dota-subtab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.dota-subcontent').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                const target = tab.getAttribute('data-subtab');
+                document.getElementById('dotaSub-' + target).classList.add('active');
+                if (target === 'tierlist' && !tierlistData) loadTierlist();
+            });
+        });
 
         // ВСПОМ.
         function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
@@ -552,65 +574,37 @@
         function showSuccess(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
         function hideSuccess(id) { const el = document.getElementById(id); el.classList.remove('visible'); }
 
-        // === НАВИГАЦИЯ ТИР-ЛИСТА ===
-        document.getElementById('goToTierlist').addEventListener('click', () => {
-            sidebarItems.forEach(i => i.classList.remove('active'));
-            sections.forEach(s => s.classList.remove('active'));
-            document.getElementById('section-tierlist').classList.add('active');
-            // Подсветить пункт в сайдбаре
-            const tierItem = document.querySelector('.sidebar-item[data-section="tierlist"]');
-            if (tierItem) tierItem.classList.add('active');
-            if (!tierlistData) loadTierlist();
-            document.getElementById('section-tierlist').scrollIntoView({ behavior: 'smooth' });
-        });
-
-        document.getElementById('backToDota').addEventListener('click', () => {
-            sidebarItems.forEach(i => i.classList.remove('active'));
-            sections.forEach(s => s.classList.remove('active'));
-            document.getElementById('section-dota2').classList.add('active');
-            const dotaItem = document.querySelector('.sidebar-item[data-section="dota2"]');
-            if (dotaItem) dotaItem.classList.add('active');
-        });
-
         // =============================================
         // === ТИР-ЛИСТ ГЕРОЕВ =========================
         // =============================================
 
         const RANKS = [
-            { num: 1, name: 'Рекрут',      color: '#7d7d7d', icon: '🪙' },
-            { num: 2, name: 'Страж',       color: '#4a9d4a', icon: '🛡️' },
-            { num: 3, name: 'Рыцарь',      color: '#b8860b', icon: '⚔️' },
-            { num: 4, name: 'Жрец',        color: '#b0b0b0', icon: '🔮' },
-            { num: 5, name: 'Легенда',     color: '#4a90d9', icon: '💎' },
-            { num: 6, name: 'Древний',     color: '#8b5cf6', icon: '🗿' },
-            { num: 7, name: 'Божественный',color: '#06b6d4', icon: '🌟' },
-            { num: 8, name: 'Бессмертный', color: '#ef4444', icon: '👑' },
+            { num: 1, name: 'Рекрут',       color: '#7d7d7d', icon: '🪙' },
+            { num: 2, name: 'Страж',        color: '#4a9d4a', icon: '🛡️' },
+            { num: 3, name: 'Рыцарь',       color: '#b8860b', icon: '⚔️' },
+            { num: 4, name: 'Жрец',         color: '#b0b0b0', icon: '🔮' },
+            { num: 5, name: 'Легенда',      color: '#4a90d9', icon: '💎' },
+            { num: 6, name: 'Древний',      color: '#8b5cf6', icon: '🗿' },
+            { num: 7, name: 'Божественный', color: '#06b6d4', icon: '🌟' },
+            { num: 8, name: 'Бессмертный',  color: '#ef4444', icon: '👑' },
         ];
 
-        let tierlistData = null;       // кэш данных API
-        let currentRank = 7;            // по умолчанию Divine
+        let tierlistData = null;
+        let currentRank = 7;
 
         async function loadTierlist() {
             const content = document.getElementById('tierlistContent');
-            content.innerHTML = '<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных героев с OpenDota...</div></div>';
-
+            content.innerHTML = '<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных героев...</div></div>';
             try {
                 const response = await fetch('https://api.opendota.com/api/heroStats');
-                if (!response.ok) throw new Error('API недоступен');
+                if (!response.ok) throw new Error('Данные недоступны');
                 tierlistData = await response.json();
-
-                // Отрисовать селектор рангов
                 renderRankSelector();
-
-                // Отрисовать тир-лист для текущего ранга
                 renderTierlist(currentRank);
-
-                // Дата обновления
                 const now = new Date();
-                document.getElementById('tierlistUpdated').textContent =
-                    'Данные обновлены: ' + now.toLocaleDateString('ru-RU') + ' в ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) + ' (источник: OpenDota API)';
+                document.getElementById('tierlistUpdated').textContent = 'Данные обновлены: ' + now.toLocaleDateString('ru-RU') + ' в ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             } catch (err) {
-                content.innerHTML = '<div class="tierlist-error">Ошибка загрузки: ' + err.message + '<br><br>Попробуйте обновить страницу или проверить соединение.</div>';
+                content.innerHTML = '<div class="tierlist-error">Ошибка загрузки: ' + err.message + '<br><br>Попробуйте обновить страницу.</div>';
             }
         }
 
@@ -622,7 +616,6 @@
                     <div class="rank-badge-name">${r.name}</div>
                 </div>
             `).join('');
-
             selector.querySelectorAll('.rank-badge').forEach(badge => {
                 badge.addEventListener('click', () => {
                     currentRank = parseInt(badge.dataset.rank);
@@ -636,50 +629,25 @@
         function renderTierlist(rankNum) {
             if (!tierlistData) return;
             const content = document.getElementById('tierlistContent');
-
-            // Считаем винрейт для каждого героя в выбранном ранге
             const heroes = tierlistData.map(h => {
-                const pickKey = rankNum + '_pick';
-                const winKey  = rankNum + '_win';
-                const picks   = h[pickKey] || 0;
-                const wins    = h[winKey] || 0;
+                const picks = h[rankNum + '_pick'] || 0;
+                const wins  = h[rankNum + '_win'] || 0;
                 const winRate = picks > 0 ? (wins / picks * 100) : 0;
-                return {
-                    id: h.hero_id,
-                    name: h.localized_name,
-                    img: 'https://api.opendota.com' + h.img,
-                    icon: 'https://api.opendota.com' + h.icon,
-                    primaryAttr: h.primary_attr,
-                    roles: h.roles || [],
-                    picks: picks,
-                    wins: wins,
-                    winRate: winRate,
-                };
+                return { id: h.hero_id, name: h.localized_name, icon: 'https://api.opendota.com' + h.icon, picks, winRate };
             });
-
-            // Фильтруем героев с недостатком данных (< 50 игр) — ставим в D
             const heroesWithData = heroes.filter(h => h.picks >= 50);
-            const heroesNoData    = heroes.filter(h => h.picks < 50);
-
-            // Сортируем по винрейту
+            const heroesNoData = heroes.filter(h => h.picks < 50);
             heroesWithData.sort((a, b) => b.winRate - a.winRate);
-
-            // Разбиваем на 5 тиров по 20%
             const total = heroesWithData.length;
             const sCount = Math.ceil(total * 0.15);
             const aCount = Math.ceil(total * 0.20);
             const bCount = Math.ceil(total * 0.25);
             const cCount = Math.ceil(total * 0.25);
-
             const sHeroes = heroesWithData.slice(0, sCount);
             const aHeroes = heroesWithData.slice(sCount, sCount + aCount);
             const bHeroes = heroesWithData.slice(sCount + aCount, sCount + aCount + bCount);
             const cHeroes = heroesWithData.slice(sCount + aCount + bCount, sCount + aCount + bCount + cCount);
-            let dHeroes = heroesWithData.slice(sCount + aCount + bCount + cCount);
-
-            // Герои без данных тоже идут в D
-            dHeroes = dHeroes.concat(heroesNoData);
-
+            let dHeroes = heroesWithData.slice(sCount + aCount + bCount + cCount).concat(heroesNoData);
             const tiers = [
                 { label: 'S', class: 's', heroes: sHeroes, desc: 'META' },
                 { label: 'A', class: 'a', heroes: aHeroes, desc: 'STRONG' },
@@ -687,15 +655,11 @@
                 { label: 'C', class: 'c', heroes: cHeroes, desc: 'WEAK' },
                 { label: 'D', class: 'd', heroes: dHeroes, desc: 'AVOID' },
             ];
-
             content.innerHTML = `
                 <div class="tier-table">
                     ${tiers.map(tier => `
                         <div class="tier-row">
-                            <div class="tier-label ${tier.class}">
-                                ${tier.label}
-                                <div class="tier-label-desc">${tier.desc}</div>
-                            </div>
+                            <div class="tier-label ${tier.class}">${tier.label}<div class="tier-label-desc">${tier.desc}</div></div>
                             <div class="tier-heroes">
                                 ${tier.heroes.map(h => `
                                     <div class="hero-card" title="${h.name}">
@@ -718,10 +682,7 @@
 
         function generateDotaResults() {
             return `
-                <div class="result-header">
-                    <div class="result-header-info"><h2>Axe — Оффлейнер</h2><div class="result-header-meta">Длительность: 38:14 · Ранг: Legend · Линия: Hard Lane</div></div>
-                    <div class="result-badge lose">Поражение</div>
-                </div>
+                <div class="result-header"><div class="result-header-info"><h2>Axe — Оффлейнер</h2><div class="result-header-meta">Длительность: 38:14 · Ранг: Legend · Линия: Hard Lane</div></div><div class="result-badge lose">Поражение</div></div>
                 <div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Blink Dagger куплен на 19-й минуте — на 5 минут позже медианы про-сцены (14:00). Команда потеряла 2 ключевых драки из-за отсутствия инициации.</div></div>
                 <div class="metrics-grid">
                     <div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">412</div><div class="metric-sub bad">Про-медиана: 520</div></div>
@@ -747,10 +708,7 @@
 
         function generateCsResults() {
             return `
-                <div class="result-header">
-                    <div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div>
-                    <div class="result-badge lose">Поражение</div>
-                </div>
+                <div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div><div class="result-badge lose">Поражение</div></div>
                 <div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Выживаемость в первых контактах — 25%. Про-энтри выживают в 45-50%. Вы двигаетесь раньше смоков на 2-3 секунды.</div></div>
                 <div class="metrics-grid">
                     <div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div>
@@ -858,15 +816,15 @@
             const text = document.getElementById(prefix + 'ProgressText');
             const resultsDiv = document.getElementById(prefix + 'Results');
             resultsDiv.classList.remove('visible'); resultsDiv.innerHTML = '';
-            wrapper.classList.add('visible'); fill.style.width = '0%'; text.textContent = 'В очереди...';
+            wrapper.classList.add('visible'); fill.style.width = '0%'; text.textContent = 'Обработка запроса...';
             try {
                 if (game === 'dota') {
-                    fill.style.width = '20%'; text.textContent = 'Запрос к OpenDota API...';
+                    fill.style.width = '20%'; text.textContent = 'Получение данных матча...';
                     const response = await fetch(`https://api.opendota.com/api/matches/${matchId}`);
                     if (!response.ok) throw new Error('Матч не найден');
-                    fill.style.width = '50%'; text.textContent = 'Анализ метрик...';
+                    fill.style.width = '50%'; text.textContent = 'Анализ игровых метрик...';
                     const data = await response.json();
-                    if (!data.players || data.players.length === 0) throw new Error('Матч ещё не распарсен');
+                    if (!data.players || data.players.length === 0) throw new Error('Матч ещё не обработан. Попробуйте другой.');
                     fill.style.width = '80%'; text.textContent = 'Формирование разбора...';
                     await new Promise(r => setTimeout(r, 600));
                     fill.style.width = '100%'; text.textContent = 'Готово!';
@@ -880,24 +838,27 @@
                     const fileInput = document.getElementById('csFile');
                     const hasFile = fileInput && fileInput.files[0];
                     if (hasFile) {
-                        fill.style.width = '50%'; text.textContent = 'Парсинг демки...';
+                        fill.style.width = '30%'; text.textContent = 'Обработка файла...';
                         try {
-                            const response = await fetch('http://localhost:8000/analyze/cs2', { method: 'POST', body: (() => { const fd = new FormData(); fd.append('file', fileInput.files[0]); return fd; })() });
-                            if (!response.ok) throw new Error('Бэкенд недоступен');
+                            const fd = new FormData(); fd.append('file', fileInput.files[0]);
+                            const response = await fetch('http://localhost:8000/analyze/cs2', { method: 'POST', body: fd });
+                            if (!response.ok) throw new Error('Сервер недоступен');
+                            fill.style.width = '70%'; text.textContent = 'Анализ игровых метрик...';
+                            await response.json();
                             fill.style.width = '100%'; text.textContent = 'Готово!';
                             await new Promise(r => setTimeout(r, 500)); wrapper.classList.remove('visible');
                             resultsDiv.innerHTML = generateCsResults();
                             resultsDiv.classList.add('visible');
                             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         } catch (apiErr) {
-                            text.textContent = 'Бэкенд недоступен — демо-данные';
+                            text.textContent = 'Сервер недоступен — показываем демонстрационные данные';
                             await new Promise(r => setTimeout(r, 2000)); wrapper.classList.remove('visible');
                             resultsDiv.innerHTML = generateCsResults();
                             resultsDiv.classList.add('visible');
                             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                     } else {
-                        fill.style.width = '60%'; text.textContent = 'Демо-режим';
+                        fill.style.width = '50%'; text.textContent = 'Формирование разбора...';
                         await new Promise(r => setTimeout(r, 1500));
                         fill.style.width = '100%'; text.textContent = 'Готово!';
                         await new Promise(r => setTimeout(r, 500)); wrapper.classList.remove('visible');
