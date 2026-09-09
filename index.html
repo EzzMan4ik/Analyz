@@ -501,19 +501,17 @@
         let currentPosition = 'all';
 
         async function loadTierlist() {
-            const content = document.getElementById('tierlistContent');
+            var content = document.getElementById('tierlistContent');
             content.innerHTML = '<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div>';
             try {
-                const [statsRes, laneRes] = await Promise.all([
-                    fetch('https://api.opendota.com/api/heroStats'),
-                    fetch('https://api.opendota.com/api/scenarios/laneRoles')
-                ]);
+                var statsRes = await fetch('https://api.opendota.com/api/heroStats');
+                var laneRes = await fetch('https://api.opendota.com/api/scenarios/laneRoles');
                 if (!statsRes.ok) throw new Error('Данные недоступны');
                 tierlistData = await statsRes.json();
                 if (laneRes.ok) {
-                    const laneData = await laneRes.json();
+                    var laneData = await laneRes.json();
                     laneRolesMap = {};
-                    const heroLaneGames = {};
+                    var heroLaneGames = {};
                     laneData.forEach(function(entry) {
                         var hid = parseInt(entry.hero_id);
                         var lane = entry.lane_role;
@@ -578,30 +576,42 @@
             var hero = tierlistData.find(function(h) { return parseInt(h.id) === id; });
             if (!hero) return null;
             var roles = hero.roles || [];
-            var hasSupport = roles.indexOf('Support') !== -1;
+            var hasSupport = roles.some(function(r) { return r.indexOf('Support') !== -1; });
             var hasCarry = roles.indexOf('Carry') !== -1;
             var hasDurable = roles.indexOf('Durable') !== -1;
             var hasInitiator = roles.indexOf('Initiator') !== -1;
             var hasNuker = roles.indexOf('Nuker') !== -1;
             var hasDisabler = roles.indexOf('Disabler') !== -1;
             var hasEscape = roles.indexOf('Escape') !== -1;
+            var hasPusher = roles.indexOf('Pusher') !== -1;
+
             var lane = laneRolesMap[id];
-            if (lane) {
-                if (lane === 1) return 1;
-                if (lane === 2) return 2;
-                if (lane === 3) {
-                    if (hasSupport) {
-                        if (hasNuker || hasDisabler || hasInitiator) return 4;
-                        return 5;
-                    }
-                    return 3;
+
+            if (lane === 2) return 2;
+
+            if (lane === 3) {
+                if (hasSupport && !hasCarry) {
+                    if (hasEscape || hasInitiator) return 4;
+                    return 5;
                 }
-                if (lane === 4) return 4;
+                return 3;
             }
-            if (hasSupport) {
-                if (hasNuker || hasDisabler || hasInitiator) return 4;
+
+            if (lane === 4) return 4;
+
+            if (hasSupport && !hasCarry) {
+                if (hasEscape || hasInitiator) return 4;
                 return 5;
             }
+
+            if (hasCarry && hasSupport) {
+                if (hasPusher && hasEscape && !hasDurable) return 1;
+                if (hasDurable && hasInitiator && !hasEscape) return 1;
+                if (hasEscape || hasInitiator) return 4;
+                return 5;
+            }
+
+            if (lane === 1) return 1;
             if (hasCarry && !hasDurable && !hasInitiator) return 1;
             if (hasDurable || hasInitiator) return 3;
             if (hasNuker) return 2;
@@ -668,7 +678,7 @@
             ];
             content.innerHTML = '<div class="tier-table">' + tiers.map(function(tier) {
                 return '<div class="tier-row"><div class="tier-label ' + tier.class + '">' + tier.label + '<div class="tier-label-desc">' + tier.desc + '</div></div><div class="tier-heroes">' + tier.heroes.map(function(h) {
-                    var wrText = h.winRate > 0 ? h.winRate.toFixed(1) + '%' : (rankNum === 8 ? 'про' : '—');
+                    var wrText = h.winRate > 0 ? h.winRate.toFixed(1) + '%' : '—';
                     var wrTooltip = h.winRate > 0 ? h.winRate.toFixed(1) + '% WR' : 'нет данных';
                     return '<div class="hero-card" title="' + h.name + '"><img src="' + h.icon + '" alt="' + h.name + '" loading="lazy" onerror="this.src=\'' + h.fallbackIcon + '\'"><div class="hero-card-winrate">' + wrText + '</div><div class="hero-card-tooltip">' + h.name + ' · ' + wrTooltip + ' · ' + h.picks + ' игр</div></div>';
                 }).join('') + '</div></div>';
