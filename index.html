@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GamerAnalyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
@@ -285,7 +286,7 @@
                 <button class="auth-btn" id="registerBtn">Зарегистрироваться</button>
                 <div class="auth-switch">Уже есть аккаунт? <a id="goToLogin">Войти</a></div>
             </div>
-            <div class="auth-hint">Данные хранятся локально в вашем браузере</div>
+            <div class="auth-hint">Данные хранятся в защищённой облачной базе</div>
         </div>
     </div>
 
@@ -436,14 +437,29 @@
     </div>
 
     <script>
-        // === ХРАНИЛИЩЕ ===
-        function getUsers() { const raw = localStorage.getItem('ga_users'); return raw ? JSON.parse(raw) : []; }
-        function saveUsers(users) { localStorage.setItem('ga_users', JSON.stringify(users)); }
-        function getCurrentUser() { const raw = localStorage.getItem('ga_current_user'); return raw ? JSON.parse(raw) : null; }
+        // =============================================
+        // === SUPABASE ПОДКЛЮЧЕНИЕ ====================
+        // =============================================
+        // ВСТАВЬ СЮДА СВОИ КЛЮЧИ ОТ SUPABASE
+        const SUPABASE_URL = 'ТВОЙ_PROJECT_URL';
+        const SUPABASE_KEY = 'ТВОЙ_ANON_KEY';
+        const supabaseClient = (SUPABASE_URL !== 'ТВОЙ_PROJECT_URL' && SUPABASE_KEY !== 'ТВОЙ_ANON_KEY')
+            ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+            : null;
+
+        async function hashPassword(password) {
+            const data = new TextEncoder().encode('ga_salt_' + password);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         function setCurrentUser(user) { localStorage.setItem('ga_current_user', JSON.stringify(user)); }
+        function getCurrentUser() { const raw = localStorage.getItem('ga_current_user'); return raw ? JSON.parse(raw) : null; }
         function clearCurrentUser() { localStorage.removeItem('ga_current_user'); }
 
-        // === DOM ===
+        // =============================================
+        // === DOM ССЫЛКИ ==============================
+        // =============================================
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -456,41 +472,61 @@
         const sections = document.querySelectorAll('.section');
         const subscriptionCards = document.querySelectorAll('.subscription-card');
 
-        // === ПЕРЕКЛЮЧЕНИЕ ФОРМ ===
+        // =============================================
+        // === ПЕРЕКЛЮЧЕНИЕ ФОРМ =======================
+        // =============================================
         document.getElementById('goToRegister').addEventListener('click', () => { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; hideError('loginError'); });
         document.getElementById('goToLogin').addEventListener('click', () => { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; hideError('regError'); hideSuccess('regSuccess'); });
 
-        // === РЕГИСТРАЦИЯ ===
-        registerBtn.addEventListener('click', () => {
-            const login = document.getElementById('regLoginInput').value.trim();
+        // =============================================
+        // === РЕГИСТРАЦИЯ (SUPABASE) ==================
+        // =============================================
+        registerBtn.addEventListener('click', async () => {
+            const login = document.getElementById('regLoginInput').value.trim().toLowerCase();
             const password = document.getElementById('regPasswordInput').value;
             const confirm = document.getElementById('regPasswordConfirm').value;
             hideError('regError'); hideSuccess('regSuccess');
             if (!login || login.length < 3) { showError('regError', 'Логин должен быть не короче 3 символов'); return; }
             if (!password || password.length < 4) { showError('regError', 'Пароль должен быть не короче 4 символов'); return; }
             if (password !== confirm) { showError('regError', 'Пароли не совпадают'); return; }
-            const users = getUsers();
-            if (users.some(u => u.login.toLowerCase() === login.toLowerCase())) { showError('regError', 'Этот логин уже занят'); return; }
-            users.push({ login, password, plan: 'free' });
-            saveUsers(users);
-            showSuccess('regSuccess', 'Аккаунт создан! Теперь войдите.');
-            document.getElementById('regLoginInput').value = ''; document.getElementById('regPasswordInput').value = ''; document.getElementById('regPasswordConfirm').value = '';
-            setTimeout(() => { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; hideSuccess('regSuccess'); document.getElementById('loginInput').value = login; }, 1500);
+            if (!supabaseClient) { showError('regError', 'База данных не настроена. Вставьте ключи Supabase.'); return; }
+            try {
+                const { data: existing } = await supabaseClient.from('users').select('login').eq('login', login).maybeSingle();
+                if (existing) { showError('regError', 'Этот логин уже занят'); return; }
+                const hashed = await hashPassword(password);
+                const { error } = await supabaseClient.from('users').insert({ login, password: hashed, plan: 'free' });
+                if (error) throw error;
+                showSuccess('regSuccess', 'Аккаунт создан! Теперь войдите.');
+                document.getElementById('regLoginInput').value = ''; document.getElementById('regPasswordInput').value = ''; document.getElementById('regPasswordConfirm').value = '';
+                setTimeout(() => { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; hideSuccess('regSuccess'); document.getElementById('loginInput').value = login; }, 1500);
+            } catch (err) { showError('regError', 'Ошибка: ' + (err.message || err)); }
         });
 
-        // === ВХОД ===
-        loginBtn.addEventListener('click', () => {
-            const login = document.getElementById('loginInput').value.trim();
+        // =============================================
+        // === ВХОД (SUPABASE) =========================
+        // =============================================
+        loginBtn.addEventListener('click', async () => {
+            const login = document.getElementById('loginInput').value.trim().toLowerCase();
             const password = document.getElementById('passwordInput').value;
             hideError('loginError');
             if (!login || !password) { showError('loginError', 'Введите логин и пароль'); return; }
-            const users = getUsers();
-            const user = users.find(u => u.login.toLowerCase() === login.toLowerCase() && u.password === password);
-            if (!user) { showError('loginError', 'Неверный логин или пароль'); return; }
-            setCurrentUser(user); enterApp();
+            if (!supabaseClient) { showError('loginError', 'База данных не настроена. Вставьте ключи Supabase.'); return; }
+            try {
+                const hashed = await hashPassword(password);
+                const { data: user } = await supabaseClient.from('users').select('*').eq('login', login).eq('password', hashed).maybeSingle();
+                if (!user) { showError('loginError', 'Неверный логин или пароль'); return; }
+                setCurrentUser({ login: user.login, plan: user.plan });
+                enterApp();
+            } catch (err) { showError('loginError', 'Ошибка входа: ' + (err.message || err)); }
         });
 
-        function enterApp() { authScreen.style.display = 'none'; setTimeout(() => { appWrapper.classList.add('active'); updateUserInfo(); updateSubscriptionUI(); }, 10); }
+        // =============================================
+        // === ВХОД В ПРИЛОЖЕНИЕ =======================
+        // =============================================
+        function enterApp() {
+            authScreen.style.display = 'none';
+            setTimeout(() => { appWrapper.classList.add('active'); updateUserInfo(); updateSubscriptionUI(); }, 10);
+        }
 
         function updateUserInfo() {
             const user = getCurrentUser(); if (!user) return;
@@ -508,28 +544,43 @@
             }
         }
 
-        // === ВЫБОР ПОДПИСКИ ===
+        // =============================================
+        // === ВЫБОР ПОДПИСКИ (SUPABASE) ===============
+        // =============================================
         document.getElementById('btn-dota').addEventListener('click', () => selectPlan('pro_dota2'));
         document.getElementById('btn-cs').addEventListener('click', () => selectPlan('pro_cs2'));
         document.getElementById('btn-premium').addEventListener('click', () => selectPlan('premium'));
-        function selectPlan(plan) {
+
+        async function selectPlan(plan) {
             const user = getCurrentUser(); if (!user) return;
             user.plan = plan; setCurrentUser(user);
-            const users = getUsers(); const idx = users.findIndex(u => u.login.toLowerCase() === user.login.toLowerCase());
-            if (idx !== -1) { users[idx].plan = plan; saveUsers(users); }
+            try { if (supabaseClient) await supabaseClient.from('users').update({ plan }).eq('login', user.login); } catch (err) { console.error('Ошибка обновления подписки:', err); }
             updateUserInfo(); updateSubscriptionUI(); revealCards();
         }
 
-        // === ВЫХОД ===
-        logoutBtn.addEventListener('click', () => { clearCurrentUser(); appWrapper.classList.remove('active'); closeSidebar(); document.getElementById('loginInput').value = ''; document.getElementById('passwordInput').value = ''; setTimeout(() => { authScreen.style.display = 'flex'; }, 300); });
+        // =============================================
+        // === ВЫХОД ===================================
+        // =============================================
+        logoutBtn.addEventListener('click', () => {
+            clearCurrentUser();
+            appWrapper.classList.remove('active');
+            closeSidebar();
+            document.getElementById('loginInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            setTimeout(() => { authScreen.style.display = 'flex'; }, 300);
+        });
 
-        // === БУРГЕР ===
+        // =============================================
+        // === БУРГЕР =================================
+        // =============================================
         burger.addEventListener('click', () => toggleSidebar());
         overlay.addEventListener('click', () => closeSidebar());
         function toggleSidebar() { sidebar.classList.toggle('open'); overlay.classList.toggle('visible'); burger.classList.toggle('open'); }
         function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); burger.classList.remove('open'); }
 
-        // === СЕКЦИИ ===
+        // =============================================
+        // === СЕКЦИИ =================================
+        // =============================================
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
                 sidebarItems.forEach(i => i.classList.remove('active'));
@@ -545,7 +596,9 @@
 
         function revealCards() { subscriptionCards.forEach((card, index) => { card.classList.remove('visible'); setTimeout(() => { card.classList.add('visible'); }, index * 150); }); }
 
-        // === КНОПКИ "НА ГЛАВНУЮ" ===
+        // =============================================
+        // === КНОПКИ "НА ГЛАВНУЮ" =====================
+        // =============================================
         document.querySelectorAll('.back-home-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 sidebarItems.forEach(i => i.classList.remove('active'));
@@ -556,7 +609,9 @@
             });
         });
 
-        // === ВНУТРЕННИЕ ВКЛАДКИ DOTA 2 ===
+        // =============================================
+        // === ВНУТРЕННИЕ ВКЛАДКИ DOTA 2 ===============
+        // =============================================
         document.querySelectorAll('.dota-subtab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.dota-subtab').forEach(t => t.classList.remove('active'));
@@ -568,7 +623,9 @@
             });
         });
 
-        // ВСПОМ.
+        // =============================================
+        // === ВСПОМОГАТЕЛЬНЫЕ =========================
+        // =============================================
         function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
         function hideError(id) { const el = document.getElementById(id); el.classList.remove('visible'); }
         function showSuccess(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
@@ -577,7 +634,6 @@
         // =============================================
         // === ТИР-ЛИСТ ГЕРОЕВ =========================
         // =============================================
-
         const RANKS = [
             { num: 1, name: 'Рекрут',       color: '#7d7d7d', icon: '🪙' },
             { num: 2, name: 'Страж',        color: '#4a9d4a', icon: '🛡️' },
@@ -677,9 +733,8 @@
         }
 
         // =============================================
-        // === ГЕНЕРАЦИЯ РЕЗУЛЬТАТОВ (ДЕМО) =============
+        // === ГЕНЕРАЦИЯ РЕЗУЛЬТАТОВ ===================
         // =============================================
-
         function generateDotaResults() {
             return `
                 <div class="result-header"><div class="result-header-info"><h2>Axe — Оффлейнер</h2><div class="result-header-meta">Длительность: 38:14 · Ранг: Legend · Линия: Hard Lane</div></div><div class="result-badge lose">Поражение</div></div>
@@ -876,8 +931,13 @@
         document.getElementById('dotaAnalyzeBtn').addEventListener('click', () => runAnalysis('dota'));
         document.getElementById('csAnalyzeBtn').addEventListener('click', () => runAnalysis('cs'));
 
-        // === АВТО-ВХОД ===
-        window.addEventListener('load', () => { const user = getCurrentUser(); if (user) enterApp(); });
+        // =============================================
+        // === АВТО-ВХОД ================================
+        // =============================================
+        window.addEventListener('load', () => {
+            const user = getCurrentUser();
+            if (user) enterApp();
+        });
     </script>
 </body>
 </html>
