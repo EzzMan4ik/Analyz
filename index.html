@@ -120,7 +120,7 @@
         .problem-block { background-color: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; }
         .problem-title { color: var(--red); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
         .problem-text { color: #ccc; font-size: 0.98rem; line-height: 1.7; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .metric-card { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 18px; text-align: center; transition: transform 0.3s, border 0.3s; }
         .metric-card:hover { transform: translateY(-3px); border-color: var(--dark-gold); }
         .metric-label { color: #888; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
@@ -143,8 +143,21 @@
         .new-analysis-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 12px rgba(197,160,40,0.4); }
         .player-select { margin: 20px 0; }
         .player-select-label { color: #888; font-size: 0.9rem; margin-bottom: 8px; }
-        .player-select-dropdown { width: 100%; max-width: 400px; padding: 12px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; cursor: pointer; }
+        .player-select-dropdown { width: 100%; max-width: 500px; padding: 12px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; cursor: pointer; }
         .player-select-dropdown:focus { border-color: var(--dark-gold); }
+        .farm-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .farm-table th { text-align: left; padding: 10px; color: #888; font-size: 0.85rem; border-bottom: 1px solid #333; text-transform: uppercase; letter-spacing: 0.5px; }
+        .farm-table td { padding: 10px; border-bottom: 1px solid #2a2a3a; }
+        .farm-table .gold-val { color: var(--dark-gold); font-weight: 700; text-align: center; }
+        .farm-table .pro-val { color: #888; text-align: center; }
+        .farm-table .diff-good { color: var(--green); text-align: center; font-size: 0.85rem; }
+        .farm-table .diff-bad { color: var(--red); text-align: center; font-size: 0.85rem; }
+        .item-timeline { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .item-chip { background: #222; padding: 8px 14px; border-radius: 6px; border: 1px solid #444; font-size: 0.9rem; }
+        .item-chip .item-time { color: var(--dark-gold); font-weight: 700; }
+        .analysis-text { color: #ccc; font-size: 0.95rem; line-height: 1.8; margin-top: 12px; }
+        .analysis-text strong { font-weight: 700; }
+        .comp-item { margin-bottom: 12px; padding-left: 16px; border-left: 2px solid var(--dark-gold); line-height: 1.7; }
         .rank-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
         .rank-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid #333; transition: all 0.3s ease; min-width: 80px; }
         .rank-badge:hover { transform: translateY(-3px); border-color: #555; }
@@ -198,6 +211,7 @@
             .tier-label { min-width: 100%; flex-direction: row; justify-content: center; gap: 10px; padding: 12px; }
             .hero-card { width: 64px; height: 36px; }
             .game-block { max-width: 100%; }
+            .farm-table th, .farm-table td { padding: 6px; font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -357,7 +371,6 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';
         const supabaseClient = (SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20)
             ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
         async function hashPassword(password) {
             const data = new TextEncoder().encode('ga_salt_' + password);
             const hash = await crypto.subtle.digest('SHA-256', data);
@@ -538,7 +551,6 @@
                 content.innerHTML = '<div class="tierlist-error">Ошибка загрузки: ' + err.message + '<br><br>Попробуйте обновить страницу.</div>';
             }
         }
-
         function renderPositionSelector() {
             var selector = document.getElementById('positionSelector');
             selector.innerHTML = POSITIONS.map(function(p) {
@@ -554,7 +566,6 @@
                 });
             });
         }
-
         function renderRankSelector() {
             var selector = document.getElementById('rankSelector');
             selector.innerHTML = RANKS.map(function(r) {
@@ -571,7 +582,6 @@
                 });
             });
         }
-
         function getHeroPosition(heroId) {
             var id = parseInt(heroId);
             var hero = tierlistData.find(function(h) { return parseInt(h.id) === id; });
@@ -585,11 +595,8 @@
             var hasDisabler = roles.indexOf('Disabler') !== -1;
             var hasEscape = roles.indexOf('Escape') !== -1;
             var hasPusher = roles.indexOf('Pusher') !== -1;
-
             var lane = laneRolesMap[id];
-
             if (lane === 2) return 2;
-
             if (lane === 3) {
                 if (hasSupport && !hasCarry) {
                     if (hasEscape || hasInitiator) return 4;
@@ -597,21 +604,17 @@
                 }
                 return 3;
             }
-
             if (lane === 4) return 4;
-
             if (hasSupport && !hasCarry) {
                 if (hasEscape || hasInitiator) return 4;
                 return 5;
             }
-
             if (hasCarry && hasSupport) {
                 if (hasPusher && hasEscape && !hasDurable) return 1;
                 if (hasDurable && hasInitiator && !hasEscape) return 1;
                 if (hasEscape || hasInitiator) return 4;
                 return 5;
             }
-
             if (lane === 1) return 1;
             if (hasCarry && !hasDurable && !hasInitiator) return 1;
             if (hasDurable || hasInitiator) return 3;
@@ -619,35 +622,18 @@
             if (hasCarry) return 1;
             return 1;
         }
-
         function renderTierlist(rankNum) {
             if (!tierlistData) return;
             var content = document.getElementById('tierlistContent');
             var heroes = tierlistData.map(function(h) {
                 var picks, wins;
-                if (rankNum === 8) {
-                    picks = h.pro_pick || 0;
-                    wins = h.pro_win || 0;
-                } else {
-                    picks = h[rankNum + '_pick'] || 0;
-                    wins = h[rankNum + '_win'] || 0;
-                }
+                if (rankNum === 8) { picks = h.pro_pick || 0; wins = h.pro_win || 0; }
+                else { picks = h[rankNum + '_pick'] || 0; wins = h[rankNum + '_win'] || 0; }
                 var winRate = picks > 0 ? (wins / picks * 100) : 0;
                 var imgPath = (h.img || '').replace(/^\//, '');
-                return {
-                    id: h.id,
-                    name: h.localized_name,
-                    icon: 'https://cdn.cloudflare.steamstatic.com/' + imgPath,
-                    fallbackIcon: 'https://api.opendota.com' + (h.icon || ''),
-                    picks: picks,
-                    winRate: winRate,
-                    position: getHeroPosition(h.id)
-                };
+                return { id: h.id, name: h.localized_name, icon: 'https://cdn.cloudflare.steamstatic.com/' + imgPath, fallbackIcon: 'https://api.opendota.com' + (h.icon || ''), picks: picks, winRate: winRate, position: getHeroPosition(h.id) };
             });
-            if (currentPosition !== 'all') {
-                var posId = parseInt(currentPosition);
-                heroes = heroes.filter(function(h) { return h.position === posId; });
-            }
+            if (currentPosition !== 'all') { var posId = parseInt(currentPosition); heroes = heroes.filter(function(h) { return h.position === posId; }); }
             var threshold = 50;
             var heroesWithData = heroes.filter(function(h) { return h.picks >= threshold; });
             if (heroesWithData.length < 10) { threshold = 20; heroesWithData = heroes.filter(function(h) { return h.picks >= threshold; }); }
@@ -657,14 +643,8 @@
             var heroesNoData = heroes.filter(function(h) { return h.picks < threshold; });
             heroesWithData.sort(function(a, b) { return b.winRate - a.winRate; });
             var total = heroesWithData.length;
-            if (total === 0) {
-                content.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Нет данных для выбранной позиции и ранга</div>';
-                return;
-            }
-            var sCount = Math.ceil(total * 0.15);
-            var aCount = Math.ceil(total * 0.20);
-            var bCount = Math.ceil(total * 0.25);
-            var cCount = Math.ceil(total * 0.25);
+            if (total === 0) { content.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Нет данных для выбранной позиции и ранга</div>'; return; }
+            var sCount = Math.ceil(total * 0.15), aCount = Math.ceil(total * 0.20), bCount = Math.ceil(total * 0.25), cCount = Math.ceil(total * 0.25);
             var sHeroes = heroesWithData.slice(0, sCount);
             var aHeroes = heroesWithData.slice(sCount, sCount + aCount);
             var bHeroes = heroesWithData.slice(sCount + aCount, sCount + aCount + bCount);
@@ -686,27 +666,488 @@
             }).join('') + '</div>';
         }
 
-        function generateDotaResults() {
-            return '<div class="result-header"><div class="result-header-info"><h2>Axe — Оффлейнер</h2><div class="result-header-meta">Длительность: 38:14 · Ранг: Legend · Линия: Hard Lane</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Blink Dagger куплен на 19-й минуте — на 5 минут позже медианы про-сцены (14:00). Команда потеряла 2 ключевых драки из-за отсутствия инициации.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">412</div><div class="metric-sub bad">Про-медиана: 520</div></div><div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">498</div><div class="metric-sub bad">Про-медиана: 580</div></div><div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">4/8/12</div><div class="metric-sub">20 участий</div></div><div class="metric-card"><div class="metric-label">Blink</div><div class="metric-value">19:30</div><div class="metric-sub bad">Про-медиана: 14:00</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Хорошее использование Counter Helix: урон выше медианы на 15%</div><div class="strength-item"><span class="marker">+</span> Грамотные инициации после Blink: 3 из 4 драк выиграны</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Недостаточный фарм в мидгейме: 2800 золота (норма: 4000+)</div><div class="weakness-item"><span class="marker">−</span> Мало стеков леса: всего 3 стека</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Стакайте лес с 7-й минуты. Цель: 6+ стеков к 15-й минуте.</div><div class="rec-exercise"><strong>Упражнение:</strong> В лобби получите Blink к 13-й минуте. Повторяйте 5 раз.</div></div><div class="recommendation-item"><span class="marker">2.</span><div>Практикуйте порог Culling Blade.</div><div class="rec-exercise"><strong>Упражнение:</strong> 10 минут в лобби — добивайте крипов ультой. Цель: 90%.</div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+        // === HERO NAME LOOKUP ===
+        function getHeroName(heroId) {
+            if (tierlistData) {
+                var h = tierlistData.find(function(x) { return parseInt(x.id) === parseInt(heroId); });
+                if (h) return h.localized_name;
+            }
+            return 'Hero #' + heroId;
         }
-        function generateCsResults() {
-            return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Выживаемость в первых контактах — 25%. Про-энтри выживают в 45-50%. Вы двигаетесь раньше смоков на 2-3 секунды.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div><div class="metric-card"><div class="metric-label">Выживаемость</div><div class="metric-value">25%</div><div class="metric-sub bad">Про: 47%</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Точный аим: HS% 48% — близко к про-медиане</div><div class="strength-item"><span class="marker">+</span> Первый заход в 68% раундов — команда получает раннюю инфу</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Выходите раньше смоков: в 7 из 12 раундов</div><div class="weakness-item"><span class="marker">−</span> Мало гранат: 1.4 за раунд — про-игроки используют 2.1</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги: смок → пауза 2 сек → вход.</div><div class="rec-exercise"><strong>Упражнение:</strong> Retake-режим 30 минут с паузой 2 секунды.</div></div><div class="recommendation-item"><span class="marker">2.</span><div>Используйте flash перед входом.</div><div class="rec-exercise"><strong>Упражнение:</strong> Изучите 5 flash-раскидок на Mirage. 20 мин/день.</div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
+
+        // === POSITION DETECTION FROM MATCH DATA ===
+        function getMatchPosition(player) {
+            var laneRole = player.lane_role || 0;
+            var hero = tierlistData ? tierlistData.find(function(h) { return parseInt(h.id) === parseInt(player.hero_id); }) : null;
+            var roles = (hero && hero.roles) || [];
+            var isSupport = roles.some(function(r) { return r.indexOf('Support') !== -1; });
+            var isCarry = roles.indexOf('Carry') !== -1;
+            var hasEscape = roles.indexOf('Escape') !== -1;
+            var hasInitiator = roles.indexOf('Initiator') !== -1;
+            if (laneRole === 2) return 2;
+            if (laneRole === 4) return 4;
+            if (laneRole === 1) {
+                if (isSupport && !isCarry) return 5;
+                return 1;
+            }
+            if (laneRole === 3) {
+                if (isSupport && !isCarry) {
+                    if (hasEscape || hasInitiator) return 4;
+                    return 5;
+                }
+                return 3;
+            }
+            if (isSupport && !isCarry) {
+                if (hasEscape || hasInitiator) return 4;
+                return 5;
+            }
+            return 1;
         }
-        function generateDotaResultsFromAPI(data) {
-            var duration = Math.floor(data.duration / 60) + ':' + String(data.duration % 60).padStart(2, '0');
+
+        // === ITEM NAME MAPPING ===
+        var ITEM_NAMES = {
+            'blink': 'Blink Dagger', 'black_king_bar': 'BKB', 'assault': 'Assault Cuirass',
+            'shivas_guard': "Shiva's Guard", 'radiance': 'Radiance', 'manta': 'Manta Style',
+            'butterfly': 'Butterfly', 'monkey_king_bar': 'MKB', 'abyssal_blade': 'Abyssal Blade',
+            'scythe_of_vyse': 'Scythe of Vyse', 'orchid': 'Orchid', 'bloodthorn': 'Bloodthorn',
+            'hurricane_pike': 'Hurricane Pike', 'sphere': "Linken's Sphere", 'greater_crit': 'Daedalus',
+            'satanic': 'Satanic', 'heart': 'Heart of Tarrasque', 'travel_boots': 'Boots of Travel',
+            'force_staff': 'Force Staff', 'eul': "Eul's Scepter", 'gungir': 'Gungir',
+            'silver_edge': 'Silver Edge', 'spirit_vessel': 'Spirit Vessel', 'solar_crest': 'Solar Crest',
+            'guardian_greaves': 'Guardian Greaves', 'arcane_boots': 'Arcane Boots',
+            'phase_boots': 'Phase Boots', 'power_treads': 'Power Treads', 'tranquil_boots': 'Tranquil Boots',
+            'aghanims_shard': "Aghanim's Shard", 'ultimate_scepter': "Aghanim's Scepter",
+            'ultimate_scepter_2': 'Aghs +17', 'refresher': 'Refresher Orb', 'pipe': 'Pipe of Insight',
+            'crimson_guard': 'Crimson Guard', 'lotus_orb': 'Lotus Orb', 'hood_of_defiance': 'Hood of Defiance',
+            'vanguard': 'Vanguard', 'soul_ring': 'Soul Ring', 'magic_wand': 'Magic Wand',
+            'bracer': 'Bracer', 'wraith_band': 'Wraith Band', 'null_talisman': 'Null Talisman',
+            'buckler': 'Buckler', 'headdress': 'Headdress', 'fluffy_hat': 'Fluffy Hat',
+            'crown': 'Crown', 'broadsword': 'Broadsword', 'blades_of_attack': 'Blades of Attack',
+            'claymore': 'Claymore', 'mithril_hammer': 'Mithril Hammer', 'ogre_axe': 'Ogre Axe',
+            'blade_of_alacrity': 'Blade of Alacrity', 'staff_of_wizardry': 'Staff of Wizardry',
+            'eagle_song': 'Eaglesong', 'reaver': 'Reaver', 'demon_edge': 'Demon Edge',
+            'mystic_staff': 'Mystic Staff', 'sacred_relic': 'Sacred Relic', 'relic': 'Sacred Relic',
+            'ring_of_health': 'Ring of Health', 'void_stone': 'Void Stone',
+            'energy_booster': 'Energy Booster', 'point_booster': 'Point Booster',
+            'vitality_booster': 'Vitality Booster', 'tiara': 'Tiara of Selemene',
+            'wind_lace': 'Wind Lace', 'chainmail': 'Chainmail', 'platemail': 'Platemail',
+            'helm_of_iron_will': 'Helm of Iron Will', 'lifesteal': 'Morbid Mask',
+            'morbid_mask': 'Morbid Mask', 'mask_of_madness': 'Mask of Madness',
+            'falcon_blade': 'Falcon Blade', 'falchion': 'Falchion', 'mage_slayer': 'Mage Slayer',
+            'witch_blade': 'Witch Blade', 'ghost': 'Ghost Scepter', 'ghost_scepter': 'Ghost Scepter',
+            'ethereal_blade': 'Ethereal Blade', 'sange': 'Sange', 'yasha': 'Yasha', 'kaya': 'Kaya',
+            'sange_and_yasha': 'Sange and Yasha', 'kaya_and_sange': 'Kaya and Sange',
+            'yasha_and_kaya': 'Yasha and Kaya', 'mekansm': 'Mekansm', 'vladmir': "Vladmir's Offering",
+            'vladmir_2': "Vladmir's Offering 2", 'ring_of_basilius': 'Ring of Basilius',
+            'aquila': 'Ring of Aquila', 'urn_of_shadows': 'Urn of Shadows',
+            'hand_of_midas': 'Hand of Midas', 'midas': 'Hand of Midas',
+            'bfury': 'Battle Fury', 'battle_fury': 'Battle Fury',
+            'desolator': 'Desolator', 'skull_basher': 'Skull Basher',
+            'crystalys': 'Crystalys', 'armlet': 'Armlet of Mordiggian',
+            'armlet_of_mordiggian': 'Armlet of Mordiggian', 'shadow_amulet': 'Shadow Amulet',
+            'glimmer_cape': 'Glimmer Cape', 'veil_of_discord': 'Veil of Discord',
+            'rod_of_atos': 'Rod of Atos', 'atos': 'Rod of Atos',
+            'dragon_lance': 'Dragon Lance', 'aether_lens': 'Aether Lens',
+            'octarine_core': 'Octarine Core', 'kaya_3': 'Kaya',
+            'blink_dagger': 'Blink Dagger', 'tpscroll': 'TP Scroll',
+            'quelling_blade': 'Quelling Blade', 'stout_shield': 'Stout Shield',
+            'gauntlets': 'Gauntlets of Strength', 'slippers': 'Slippers of Agility',
+            'mantle': 'Mantle of Intelligence', 'circlet': 'Circlet',
+            'tango': 'Tango', 'flask': 'Healing Salve', 'clarity': 'Clarity',
+            'enchanted_mango': 'Enchanted Mango', 'faerie_fire': 'Faerie Fire',
+            'tp_1': 'TP Scroll',
+        };
+
+        var KEY_ITEMS = ['blink', 'black_king_bar', 'assault', 'shivas_guard', 'radiance', 'manta',
+            'butterfly', 'monkey_king_bar', 'abyssal_blade', 'scythe_of_vyse', 'orchid', 'bloodthorn',
+            'hurricane_pike', 'sphere', 'greater_crit', 'satanic', 'heart', 'travel_boots',
+            'force_staff', 'eul', 'gungir', 'silver_edge', 'spirit_vessel', 'solar_crest',
+            'guardian_greaves', 'aghanims_shard', 'ultimate_scepter', 'ultimate_scepter_2',
+            'refresher', 'pipe', 'crimson_guard', 'lotus_orb', 'desolator', 'skull_basher',
+            'crystalys', 'armlet_of_mordiggian', 'glimmer_cape', 'veil_of_discord', 'rod_of_atos',
+            'dragon_lance', 'aether_lens', 'octarine_core', 'sange_and_yasha', 'kaya_and_sange',
+            'yasha_and_kaya', 'mekansm', 'vladmir', 'vladmir_2', 'hand_of_midas', 'bfury',
+            'mask_of_madness', 'ethereal_blade', 'falcon_blade', 'mage_slayer', 'witch_blade',
+            'ghost_scepter', 'arcane_boots', 'phase_boots', 'power_treads', 'tranquil_boots'];
+
+        // === PRO BENCHMARKS ===
+        var PRO_BENCHMARKS = {
+            1: { lh10: 50, lh20: 150, lh30: 250, gpm: 700, xpm: 680, name: 'керри', blinkPro: 18 },
+            2: { lh10: 45, lh20: 130, lh30: 200, gpm: 650, xpm: 720, name: 'мида', blinkPro: 12 },
+            3: { lh10: 30, lh20: 80, lh30: 150, gpm: 500, xpm: 480, name: 'оффлейнера', blinkPro: 13 },
+            4: { lh10: 15, lh20: 40, lh30: 80, gpm: 400, xpm: 380, name: 'саппорта', blinkPro: 20 },
+            5: { lh10: 10, lh20: 25, lh30: 50, gpm: 350, xpm: 320, name: 'хард-саппорта', blinkPro: 25 },
+        };
+
+        // === BUILD DETAILED ANALYSIS ===
+        function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
+            var durSec = data.duration || 0;
+            var durMin = Math.floor(durSec / 60);
+            var durStr = durMin + ':' + String(durSec % 60).padStart(2, '0');
             var matchId = data.match_id;
-            var playerOptions = '';
-            if (data.players) { data.players.forEach(function(p, i) { var side = p.player_slot < 128 ? 'Radiant' : 'Dire'; playerOptions += '<option value="' + i + '">Слот ' + p.player_slot + ' (' + side + ') — KDA: ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>'; }); }
-            var player = data.players && data.players[0];
-            if (!player) return '<div class="problem-block"><div class="problem-text">Данные игрока не найдены</div></div>';
-            var kills = player.kills, deaths = player.deaths, assists = player.assists;
-            var gpm = player.gold_per_min, xpm = player.xp_per_min;
-            var heroDamage = player.hero_damage || 0, towerDamage = player.tower_damage || 0;
-            var lastHits = player.last_hits || 0, denies = player.denies || 0;
             var isRadiant = player.player_slot < 128;
             var playerWon = isRadiant ? data.radiant_win : !data.radiant_win;
-            return '<div class="result-header"><div class="result-header-info"><h2>Матч #' + matchId + '</h2><div class="result-header-meta">Длительность: ' + duration + ' · Сторона: ' + (isRadiant ? 'Radiant' : 'Dire') + '</div></div><div class="result-badge ' + (playerWon ? 'win' : 'lose') + '">' + (playerWon ? 'Победа' : 'Поражение') + '</div></div><div class="player-select"><div class="player-select-label">Выберите игрока:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\'' + matchId + '\')">' + playerOptions + '</select></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">' + gpm + '</div><div class="metric-sub ' + (gpm >= 500 ? 'good' : 'bad') + '">Про-медиана: 500</div></div><div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">' + xpm + '</div><div class="metric-sub ' + (xpm >= 550 ? 'good' : 'bad') + '">Про-медиана: 550</div></div><div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + kills + '/' + deaths + '/' + assists + '</div></div><div class="metric-card"><div class="metric-label">Урон по героям</div><div class="metric-value">' + heroDamage.toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Урон по зданиям</div><div class="metric-value">' + towerDamage.toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">' + lastHits + '</div></div><div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">' + denies + '</div></div></div><div class="result-block"><div class="result-block-title">📊 Разбор</div><div class="problem-text">GPM ' + (gpm >= 500 ? 'в норме' : 'ниже про-медианы') + ' (500). XPM ' + (xpm >= 550 ? 'в норме' : 'ниже про-медианы') + ' (550). K/D: ' + (kills / Math.max(deaths, 1)).toFixed(2) + '. ' + (deaths > 8 ? 'Слишком много смертей — работайте над позиционированием.' : 'Хорошая выживаемость.') + '</div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+            var heroName = getHeroName(player.hero_id);
+            var posNum = getMatchPosition(player);
+            var posNames = ['—', 'Керри', 'Мид', 'Оффлейнер', 'Саппорт', 'Хард-саппорт'];
+            var posName = posNames[posNum] || 'Игрок';
+            var bm = PRO_BENCHMARKS[posNum] || PRO_BENCHMARKS[1];
+
+            var kills = player.kills || 0;
+            var deaths = player.deaths || 0;
+            var assists = player.assists || 0;
+            var gpm = player.gold_per_min || 0;
+            var xpm = player.xp_per_min || 0;
+            var lastHits = player.last_hits || 0;
+            var denies = player.denies || 0;
+            var heroDamage = player.hero_damage || 0;
+            var towerDamage = player.tower_damage || 0;
+            var apm = player.actions_per_min || 0;
+            var stuns = player.stuns || 0;
+            var campsStacked = player.camps_stacked || 0;
+            var observerUses = player.obs_placed || (player.obs_log ? player.obs_log.length : 0);
+            var sentryUses = player.sen_placed || (player.sen_log ? player.sen_log.length : 0);
+            var pings = player.pings || 0;
+            var runeUses = (player.runes_log ? player.runes_log.length : 0);
+
+            var goldT = player.gold_t || [];
+            var lhT = player.lh_t || [];
+            var lh10 = lhT[10] || 0;
+            var lh20 = lhT[20] || 0;
+            var lh30 = (lhT[30] || 0);
+            var radiantAdv = data.radiant_gold_adv || [];
+            var radiantScore = data.radiant_score || 0;
+            var direScore = data.dire_score || 0;
+            var firstBloodTime = data.first_blood_time || 0;
+            var fbMin = Math.floor(firstBloodTime / 60);
+            var fbSec = firstBloodTime % 60;
+            var teamKills = isRadiant ? radiantScore : direScore;
+            var killPart = teamKills > 0 ? Math.round((kills + assists) / teamKills * 100) : 0;
+
+            // Purchase log
+            var purchaseLog = player.purchase_log || [];
+            var keyPurchases = [];
+            var seenKeys = {};
+            purchaseLog.forEach(function(p) {
+                var key = p.key;
+                if (KEY_ITEMS.indexOf(key) !== -1 && !seenKeys[key]) {
+                    seenKeys[key] = true;
+                    var itemName = ITEM_NAMES[key] || key;
+                    var min = Math.floor(p.time / 60);
+                    var sec = p.time % 60;
+                    keyPurchases.push({ name: itemName, key: key, time: p.time, timeStr: min + ':' + String(sec).padStart(2, '0') });
+                }
+            });
+            keyPurchases.sort(function(a, b) { return a.time - b.time; });
+
+            var blink = keyPurchases.find(function(p) { return p.key === 'blink'; });
+            var bkb = keyPurchases.find(function(p) { return p.key === 'black_king_bar'; });
+
+            var html = '';
+
+            // Header
+            html += '<div class="result-header">';
+            html += '<div class="result-header-info">';
+            html += '<h2>' + heroName + ' — ' + posName + '</h2>';
+            html += '<div class="result-header-meta">Длительность: ' + durStr + ' · Сторона: ' + (isRadiant ? 'Radiant' : 'Dire') + ' · Счёт: ' + radiantScore + ':' + direScore + ' · Первая кровь: ' + fbMin + ':' + String(fbSec).padStart(2, '0') + '</div>';
+            html += '</div>';
+            html += '<div class="result-badge ' + (playerWon ? 'win' : 'lose') + '">' + (playerWon ? 'Победа' : 'Поражение') + '</div>';
+            html += '</div>';
+
+            // Player selector
+            html += '<div class="player-select"><div class="player-select-label">Выберите игрока для анализа:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\'' + matchId + '\')">' + playerOptions + '</select></div>';
+
+            // === BASIC METRICS ===
+            html += '<div class="result-block"><div class="result-block-title">📊 Базовые показатели</div>';
+            html += '<div class="metrics-grid">';
+            html += '<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">' + gpm + '</div><div class="metric-sub ' + (gpm >= bm.gpm ? 'good' : 'bad') + '">Про: ' + bm.gpm + '</div></div>';
+            html += '<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">' + xpm + '</div><div class="metric-sub ' + (xpm >= bm.xpm ? 'good' : 'bad') + '">Про: ' + bm.xpm + '</div></div>';
+            html += '<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + kills + '/' + deaths + '/' + assists + '</div><div class="metric-sub">Участие: ' + killPart + '%</div></div>';
+            html += '<div class="metric-card"><div class="metric-label">APM</div><div class="metric-value">' + apm + '</div><div class="metric-sub ' + (apm >= 200 ? 'good' : 'bad') + '">Про: 250+</div></div>';
+            html += '<div class="metric-card"><div class="metric-label">Урон по героям</div><div class="metric-value">' + (heroDamage / 1000).toFixed(1) + 'K</div></div>';
+            html += '<div class="metric-card"><div class="metric-label">Урон по зданиям</div><div class="metric-value">' + (towerDamage / 1000).toFixed(1) + 'K</div></div>';
+            html += '<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">' + lastHits + '</div></div>';
+            html += '<div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">' + denies + '</div></div>';
+            html += '</div></div>';
+
+            // === FARM TIMELINE ===
+            html += '<div class="result-block"><div class="result-block-title">📈 Фарм по таймлайну</div>';
+            html += '<table class="farm-table">';
+            html += '<tr><th>Время</th><th>10 мин</th><th>20 мин</th><th>30 мин</th></tr>';
+            html += '<tr><td>Ваши ластхиты</td><td class="gold-val">' + lh10 + '</td><td class="gold-val">' + lh20 + '</td><td class="gold-val">' + lh30 + '</td></tr>';
+            html += '<tr><td>Про-медиана (' + bm.name + ')</td><td class="pro-val">' + bm.lh10 + '</td><td class="pro-val">' + bm.lh20 + '</td><td class="pro-val">' + bm.lh30 + '</td></tr>';
+            var d10 = lh10 - bm.lh10, d20 = lh20 - bm.lh20, d30 = lh30 - bm.lh30;
+            html += '<tr><td>Разница</td>';
+            html += '<td class="' + (d10 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d10 >= 0 ? '+' : '') + d10 + '</td>';
+            html += '<td class="' + (d20 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d20 >= 0 ? '+' : '') + d20 + '</td>';
+            html += '<td class="' + (d30 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d30 >= 0 ? '+' : '') + d30 + '</td>';
+            html += '</tr></table>';
+
+            var farmText = '';
+            if (lh10 < bm.lh10 * 0.7) {
+                farmText += '<strong style="color:var(--red);">Слабый старт:</strong> к 10-й минуте у вас ' + lh10 + ' ластхитов — про-игроки на позиции ' + bm.name + ' добивают ' + bm.lh10 + '. Вы теряете примерно ' + Math.round((bm.lh10 - lh10) * 40) + ' золота на ранней стадии. Про-керри в это время уже фармят лес и линию одновременно, не пропуская ни одного крипа. ';
+            } else if (lh10 >= bm.lh10) {
+                farmText += '<strong style="color:var(--green);">Отличный старт:</strong> ' + lh10 + ' ластхитов к 10-й минуте — на уровне про-сцены. Вы эффективно используете раннюю игру для накопления золота. ';
+            } else {
+                farmText += '<strong style="color:var(--orange);">Средний старт:</strong> ' + lh10 + ' из ' + bm.lh10 + ' ластхитов к 10-й минуте. Чуть ниже про-медианы, но в пределах нормы. ';
+            }
+            var lhDelta20 = lh20 - lh10;
+            var lhDelta20Pro = bm.lh20 - bm.lh10;
+            if (lhDelta20 < lhDelta20Pro * 0.7) {
+                farmText += 'В мидгейме (10→20 мин) вы добили ' + lhDelta20 + ' крипов, про-игроки — ' + lhDelta20Pro + '. Вероятно, вы либо участвовали в драках вместо фарма, либо теряли линию. Про-игроки чередуют фарм и драки: берут драку → возвращаются на фарм за 30 секунд. ';
+            } else if (lhDelta20 >= lhDelta20Pro) {
+                farmText += 'В мидгейме фарм ускорился — ' + lhDelta20 + ' крипов за 10 минут, это про-уровень. Вы правильно распределили время между фармом и драками. ';
+            }
+            if (durMin > 30) {
+                var lhDelta30 = lh30 - lh20;
+                if (lhDelta30 < (bm.lh30 - bm.lh20) * 0.7) {
+                    farmText += 'В лейтгейме (20→30 мин) фарм замедлился: ' + lhDelta30 + ' крипов. В это время про-игроки фармят лесные лагеря между драками и не стоят без дела. ';
+                }
+            }
+            html += '<div class="analysis-text">' + farmText + '</div>';
+            html += '</div>';
+
+            // === KEY ITEM TIMINGS ===
+            if (keyPurchases.length > 0) {
+                html += '<div class="result-block"><div class="result-block-title">⏱️ Тайминги ключевых предметов</div>';
+                html += '<div class="item-timeline">';
+                keyPurchases.forEach(function(p) {
+                    html += '<div class="item-chip">' + p.name + ' — <span class="item-time">' + p.timeStr + '</span></div>';
+                });
+                html += '</div>';
+
+                var itemAnalysis = '';
+                if (blink) {
+                    var blinkMin = blink.time / 60;
+                    if (blinkMin > bm.blinkPro + 3) {
+                        itemAnalysis += '<strong style="color:var(--red);">Blink Dagger в ' + blink.timeStr + '</strong> — на ' + Math.round(blinkMin - bm.blinkPro) + ' минут позже про-нормы (' + bm.blinkPro + ' мин для ' + bm.name + '). Это критично: без инициации ваша команда не могла брать драки и теряла темп. Про-игроки покупают Blink, используя стаки леса и эффективный фарм. Каждая минута задержки — это потерянные драки и地图ный контроль. ';
+                    } else if (blinkMin <= bm.blinkPro + 1) {
+                        itemAnalysis += '<strong style="color:var(--green);">Blink Dagger в ' + blink.timeStr + '</strong> — отличный тайминг, на уровне про-сцены. Вы смогли нафармить ключевой предмет без отставания. ';
+                    } else {
+                        itemAnalysis += 'Blink Dagger в ' + blink.timeStr + ' — приемлемо, но чуть медленнее про-нормы (' + bm.blinkPro + ' мин). ';
+                    }
+                }
+                if (bkb) {
+                    var bkbMin = bkb.time / 60;
+                    var bkbPro = (posNum <= 2) ? 17 : 20;
+                    if (bkbMin > bkbPro + 4) {
+                        itemAnalysis += '<strong style="color:var(--red);">BKB в ' + bkb.timeStr + '</strong> — поздно. Про-игроки берут BKB к ' + bkbPro + '-й минуте. Без него вы были уязвимы в каждой драке и не могли реализовать потенциал героя. ';
+                    } else {
+                        itemAnalysis += 'BKB в ' + bkb.timeStr + ' — хороший тайминг. ';
+                    }
+                }
+                if (itemAnalysis) {
+                    html += '<div class="analysis-text">' + itemAnalysis + '</div>';
+                }
+                html += '</div>';
+            }
+
+            // === MATCH DYNAMICS ===
+            if (radiantAdv.length > 0) {
+                html += '<div class="result-block"><div class="result-block-title">🗺️ Динамика матча</div>';
+                var playerAdv = isRadiant ? radiantAdv : radiantAdv.map(function(v) { return -v; });
+                var maxAdv = 0, maxAdvMin = 0, maxDis = 0, maxDisMin = 0;
+                for (var i = 0; i < playerAdv.length; i++) {
+                    if (playerAdv[i] > maxAdv) { maxAdv = playerAdv[i]; maxAdvMin = i; }
+                    if (playerAdv[i] < maxDis) { maxDis = playerAdv[i]; maxDisMin = i; }
+                }
+                var dynamics = '';
+                if (maxAdv > 5000) {
+                    dynamics += 'Ваше максимальное преимущество — <strong>+' + (maxAdv / 1000).toFixed(1) + 'K золота</strong> на ' + maxAdvMin + '-й минуте. ';
+                }
+                if (maxDis < -5000) {
+                    dynamics += 'Максимальное отставание — <strong>−' + (Math.abs(maxDis) / 1000).toFixed(1) + 'K золота</strong> на ' + maxDisMin + '-й минуте. ';
+                }
+                var earlyAdv = playerAdv[10] || 0;
+                if (earlyAdv > 2000) {
+                    dynamics += 'Ранняя игра прошла уверенно: к 10-й минуте +' + (earlyAdv / 1000).toFixed(1) + 'K золота в вашу пользу. Про-команды в такой ситуации давят на Рошана и захватывают контроль карты. ';
+                } else if (earlyAdv < -2000) {
+                    dynamics += 'Ранняя игра была трудной: к 10-й минуте −' + (Math.abs(earlyAdv) / 1000).toFixed(1) + 'K золота. Про-игроки в такой ситуации переходят в дефенс и фарм, избегая драк. ';
+                }
+                var midAdv = playerAdv[20] || 0;
+                if (midAdv > 3000 && earlyAdv < 0) {
+                    dynamics += '<strong style="color:var(--green);">Сумели перевернуть игру</strong> к 20-й минуте: +' + (midAdv / 1000).toFixed(1) + 'K золота. Это признак хорошей командной игры. ';
+                } else if (midAdv < -3000 && earlyAdv > 0) {
+                    dynamics += '<strong style="color:var(--red);">Потеряли преимущество</strong> к 20-й минуте: −' + (Math.abs(midAdv) / 1000).toFixed(1) + 'K золота. Вероятно, были проиграны ключевые драки или потерян Рошан. ';
+                }
+                var lastIdx = Math.min(30, playerAdv.length - 1);
+                var lateAdv = playerAdv[lastIdx] || 0;
+                if (lateAdv > 0 && playerWon) {
+                    dynamics += 'Закрепили преимущество в лейтгейме и довели игру до победы — это признак дисциплинированной команды. ';
+                } else if (lateAdv < 0 && !playerWon) {
+                    dynamics += 'Не смогли отыграться в лейтгейме — отставание сохранилось до конца. ';
+                } else if (lateAdv > 0 && !playerWon) {
+                    dynamics += '<strong style="color:var(--red);">Имели преимущество, но проиграли</strong> — это признак слабого лейтгейма, ошибок в ключевых драках или плохого использования артефактов. Про-команды в такой ситуации закрывают игру через Рошана и Barracks. ';
+                } else if (lateAdv < 0 && playerWon) {
+                    dynamics += '<strong style="color:var(--green);">Выиграли из отстающей позиции</strong> — отличный камбэк. Про-команды часто выигрывают такие игры через один удачный файт. ';
+                }
+                if (!dynamics) dynamics = 'Матч прошёл в равной борьбе, без значительного перевеса ни одной из сторон.';
+                html += '<div class="analysis-text">' + dynamics + '</div>';
+                html += '</div>';
+            }
+
+            // === SUPPORT METRICS ===
+            if (posNum === 4 || posNum === 5) {
+                html += '<div class="result-block"><div class="result-block-title">🌿 Саппорт-метрики</div>';
+                html += '<div class="metrics-grid">';
+                html += '<div class="metric-card"><div class="metric-label">Стаки</div><div class="metric-value">' + campsStacked + '</div><div class="metric-sub ' + (campsStacked >= 5 ? 'good' : 'bad') + '">Про: 6+</div></div>';
+                html += '<div class="metric-card"><div class="metric-label">Обсерверы</div><div class="metric-value">' + observerUses + '</div><div class="metric-sub ' + (observerUses >= 10 ? 'good' : 'bad') + '">Про: 12+</div></div>';
+                html += '<div class="metric-card"><div class="metric-label">Сентри</div><div class="metric-value">' + sentryUses + '</div><div class="metric-sub">Про: 8+</div></div>';
+                html += '<div class="metric-card"><div class="metric-label">Стан (сек)</div><div class="metric-value">' + Math.round(stuns) + '</div><div class="metric-sub ' + (stuns >= 20 ? 'good' : 'bad') + '">Про: 25+</div></div>';
+                html += '<div class="metric-card"><div class="metric-label">Руны</div><div class="metric-value">' + runeUses + '</div><div class="metric-sub">Про: 4+</div></div>';
+                html += '<div class="metric-card"><div class="metric-label">Пинги</div><div class="metric-value">' + pings + '</div><div class="metric-sub">Про: 50+</div></div>';
+                html += '</div>';
+                var supText = '';
+                if (campsStacked < 3) {
+                    supText += '<strong style="color:var(--red);">Мало стеков:</strong> всего ' + campsStacked + '. Про-саппорты стакают 5-8 лагерей за игру. Стаки — это бесплатное золото для керри. Про-игроки стакают в окне 0:53, не теряя времени на линии. ';
+                } else {
+                    supText += '<strong style="color:var(--green);">Хорошая работа со стаками:</strong> ' + campsStacked + ' — на уровне про-сцены. ';
+                }
+                if (observerUses < 6) {
+                    supText += '<strong style="color:var(--red);">Мало вардинга:</strong> ' + observerUses + ' обсерверов. Про-саппорты ставят 10-15 вардов за игру. Вард-карта — это контроль карты и безопасности команды. Ставьте варды на вражеский лес перед Рошаном и на свои входы при защите. ';
+                }
+                if (stuns < 15) {
+                    supText += '<strong style="color:var(--orange);">Мало контроля:</strong> ' + Math.round(stuns) + ' сек стана. Про-саппорты дают 25-35 секунд стана. Работайте над позиционированием в драках — используйте способности по керри врага, а не по саппортам. ';
+                }
+                if (runeUses < 2) {
+                    supText += 'Вы собрали мало рун (' + runeUses + '). Про-саппорты контролируют руны воды и bounty для команды. ';
+                }
+                html += '<div class="analysis-text">' + supText + '</div>';
+                html += '</div>';
+            }
+
+            // === PRO COMPARISON ===
+            html += '<div class="result-block"><div class="result-block-title">🏆 Сравнение с киберспортсменами</div>';
+            var comp = [];
+            var gpmRatio = Math.round(gpm / bm.gpm * 100);
+            if (gpmRatio >= 95) {
+                comp.push('Фарм на уровне про — <strong style="color:var(--green);">' + gpm + ' GPM</strong> (' + gpmRatio + '% от про-медианы). Это значит, что вы эффективно используете каждую секунду для заработка золота, как топ-1% игроков на позиции ' + bm.name + '.');
+            } else if (gpmRatio >= 75) {
+                comp.push('Фарм ниже про-уровня — <strong style="color:var(--orange);">' + gpm + ' GPM</strong> (' + gpmRatio + '% от про-медианы). Про-игроки на позиции ' + bm.name + ' имеют ' + bm.gpm + ' GPM. Разница в ' + (bm.gpm - gpm) + ' GPM — это примерно ' + Math.round((bm.gpm - gpm) * durMin / 1000) + 'K потерянного золота за игру, что эквивалентно одному крупному артефакту.');
+            } else {
+                comp.push('Фарм значительно ниже про-уровня — <strong style="color:var(--red);">' + gpm + ' GPM</strong> (' + gpmRatio + '% от про-медианы). Про-игроки фармят агрессивнее: они чередуют линию, лес и стак в одном цикле. Попробуйте фарм-паттерн: крип с линии → 2 крипа из леса → снова линия.');
+            }
+            if (killPart >= 70) {
+                comp.push('Отличное участие в драках — <strong style="color:var(--green);">' + killPart + '%</strong>. Вы присутствуете в большинстве драк, как и про-игроки на вашей позиции. Это значит, что вы правильно читаете карту и телепортируетесь на драки вовремя.');
+            } else if (killPart >= 45) {
+                comp.push('Участие в драках — <strong style="color:var(--orange);">' + killPart + '%</strong>. Про-игроки на позиции ' + bm.name + ' участвуют в 65-80% убийств команды. Вы либо слишком долго фармите, либо не телепортируетесь на драки. Про-игроки всегда держат TP свиток и следят за мини-картой.');
+            } else {
+                comp.push('Низкое участие в драках — <strong style="color:var(--red);">' + killPart + '%</strong>. Вы пропускаете ключевые драки. Про-игроки на вашей позиции всегда готовы к телепорту — они фармят рядом с вышкой, чтобы успеть на драку за 3 секунды.');
+            }
+            if (deaths <= 3) {
+                comp.push('Выживаемость отличная — <strong style="color:var(--green);">' + deaths + ' смертей</strong> за ' + durMin + ' мин. Про-игроки на вашей позиции умирают 3-5 раз за матч. Каждая смерть — это потеря золота, опыта и темпа, и вы минимизируете эти потери.');
+            } else if (deaths >= 8) {
+                comp.push('Слишком много смертей — <strong style="color:var(--red);">' + deaths + '</strong>. Про-игроки на позиции ' + bm.name + ' умирают 3-5 раз. Каждая смерть — потеря ~' + Math.round(gpm * 0.5 / 1000 * 60) + 'K золота и опыта. Про-игроки отступают на 40% HP, а не на 10%. Работайте над таймингами отступления.');
+            } else {
+                comp.push('Выживаемость приемлемая — <strong>' + deaths + ' смертей</strong>, близко к про-норме (3-5).');
+            }
+            if (apm >= 250) {
+                comp.push('APM <strong style="color:var(--green);">' + apm + '</strong> — на уровне про-сцены. Вы активно используете камеру, проверки руны и микроконтроль.');
+            } else if (apm < 150) {
+                comp.push('APM <strong style="color:var(--red);">' + apm + '</strong> — низкий. Про-игроки делают 250+ действий в минуту: проверки камеры, мини-карты, контроля крипов. Низкий APM обычно означает, что вы недостаточно следите за картой.');
+            }
+            if (heroDamage > 20000 && posNum <= 3) {
+                comp.push('Высокий урон по героям — <strong>' + (heroDamage / 1000).toFixed(1) + 'K</strong>. Вы активно участвуете в драках и реализуете потенциал героя.');
+            } else if (heroDamage < 5000 && posNum <= 3) {
+                comp.push('Низкий урон по героям — <strong>' + (heroDamage / 1000).toFixed(1) + 'K</strong>. Про-игроки на вашей позиции наносят 15-30K. Вы либо избегаете драк, либо не реализуете способности.');
+            }
+            comp.forEach(function(c) {
+                html += '<div class="comp-item">' + c + '</div>';
+            });
+            html += '</div>';
+
+            // === STRENGTHS ===
+            html += '<div class="result-block"><div class="result-block-title">✅ Сильные стороны</div>';
+            var strengths = [];
+            if (lh10 >= bm.lh10) strengths.push('Отличный фарм на старте — ' + lh10 + ' ластхитов к 10-й минуте, на уровне про-сцены.');
+            if (gpm >= bm.gpm) strengths.push('GPM ' + gpm + ' — про-уровень фарма.');
+            if (killPart >= 65) strengths.push('Высокое участие в драках (' + killPart + '%) — всегда на месте в ключевые моменты.');
+            if (deaths <= 3) strengths.push('Мало смертей (' + deaths + ') — грамотное позиционирование.');
+            if (blink && (blink.time / 60) <= bm.blinkPro + 1) strengths.push('Blink Dagger в ' + blink.timeStr + ' — отличный тайминг.');
+            if (heroDamage > 15000) strengths.push('Высокий урон по героям (' + (heroDamage / 1000).toFixed(1) + 'K) — активное участие в драках.');
+            if (campsStacked >= 5 && (posNum === 4 || posNum === 5)) strengths.push('Хорошая работа со стаками (' + campsStacked + ' стака).');
+            if (towerDamage > 2000) strengths.push('Урон по зданиям (' + (towerDamage / 1000).toFixed(1) + 'K) — помогали пушить.');
+            if (denies >= 15) strengths.push('Хорошее добивание (' + denies + ' deny) — давили оппонента на линии.');
+            if (strengths.length === 0) strengths.push('В этом матче не выявлено выраженных сильных сторон. Работайте над фундаментальными навыками — фарм и карта.');
+            strengths.forEach(function(s) { html += '<div class="strength-item"><span class="marker">+</span> ' + s + '</div>'; });
+            html += '</div>';
+
+            // === WEAKNESSES ===
+            html += '<div class="result-block"><div class="result-block-title">❌ Слабые стороны</div>';
+            var weaknesses = [];
+            if (lh10 < bm.lh10 * 0.7) weaknesses.push('Слабый старт — ' + lh10 + ' ластхитов к 10-й минуте (про: ' + bm.lh10 + '). Потеря раннего золота.');
+            if (gpm < bm.gpm * 0.8) weaknesses.push('Низкий GPM (' + gpm + ', про: ' + bm.gpm + ') — недостаточный фарм.');
+            if (killPart < 45) weaknesses.push('Низкое участие в драках (' + killPart + '%) — пропускаете ключевые моменты.');
+            if (deaths >= 8) weaknesses.push('Слишком много смертей (' + deaths + ') — работайте над позиционированием.');
+            if (apm < 150) weaknesses.push('Низкий APM (' + apm + ') — мало действий в минуту.');
+            if (blink && (blink.time / 60) > bm.blinkPro + 3) weaknesses.push('Blink Dagger в ' + blink.timeStr + ' — на ' + Math.round(blink.time / 60 - bm.blinkPro) + ' мин позже про-нормы.');
+            if (bkb && (bkb.time / 60) > ((posNum <= 2) ? 21 : 24)) weaknesses.push('BKB в ' + bkb.timeStr + ' — поздно, вы были уязвимы в драках.');
+            if (posNum >= 4 && campsStacked < 3) weaknesses.push('Мало стеков (' + campsStacked + ') — про-саппорты стакают 5-8 раз.');
+            if (posNum >= 4 && observerUses < 6) weaknesses.push('Мало вардинга (' + observerUses + ' обсерверов) — недостаточный контроль карты.');
+            if (denies < 5 && posNum <= 3) weaknesses.push('Мало добиваний (' + denies + ') — про-игроки добивают 10-20 крипов.');
+            if (posNum <= 3 && heroDamage < 8000) weaknesses.push('Низкий урон по героям (' + (heroDamage / 1000).toFixed(1) + 'K) — мало участия в драках.');
+            if (weaknesses.length === 0) weaknesses.push('Ярко выраженных слабых сторон не выявлено — отличный матч!');
+            weaknesses.forEach(function(w) { html += '<div class="weakness-item"><span class="marker">−</span> ' + w + '</div>'; });
+            html += '</div>';
+
+            // === RECOMMENDATIONS ===
+            html += '<div class="result-block"><div class="result-block-title">💡 Рекомендации</div>';
+            var recs = [];
+            if (lh10 < bm.lh10 * 0.7) {
+                recs.push({ text: 'Тренируйте ластхиты под башней. Про-игроки добивают 90% крипов под башней.', exercise: 'В лобби 15 минут — добивайте крипов под башней. Цель: 95% успеха. Повторяйте 5 раз.' });
+            }
+            if (gpm < bm.gpm * 0.8) {
+                recs.push({ text: 'Улучшите фарм-паттерн. Про-игроки фармят лес и линию одновременно — чередуют крип с линии и 2 крипа из леса.', exercise: 'В лобби 20 минут: крип с линии → 2 крипа из леса → обратно. Цель: 80 LH к 10-й минуте.' });
+            }
+            if (killPart < 50) {
+                recs.push({ text: 'Всегда держите TP свиток. Про-игроки телепортируются на каждую драку.', exercise: 'За каждую игру ставьте цель: 70% участия в убийствах. Проверяйте мини-карту каждые 5 секунд.' });
+            }
+            if (deaths >= 8) {
+                recs.push({ text: 'Работайте над отступлением. Про-игроки уходят из драки на 40% HP, а не на 10%.', exercise: 'Смотрите реплеи своих смертей и анализируйте: можно ли было выжить? В 80% случаев — да.' });
+            }
+            if (apm < 150) {
+                recs.push({ text: 'Повышайте APM через частую проверку карты и контроль крипов.', exercise: 'Привычка: каждые 3 секунды проверяйте мини-карту. Это повышает APM и ситуационную осведомлённость.' });
+            }
+            if (blink && (blink.time / 60) > bm.blinkPro + 3) {
+                recs.push({ text: 'Ускорьте тайминг Blink Dagger. Стакайте лес и используйте каждую секунду для фарма.', exercise: 'В лобби получите Blink к ' + bm.blinkPro + '-й минуте. Повторяйте 5 раз, пока не получится стабильно.' });
+            }
+            if (posNum >= 4 && campsStacked < 3) {
+                recs.push({ text: 'Стакайте лес каждые 53 секунды. Это бесплатное золото для керри.', exercise: 'В лобби — стакайте 3 разных лагеря поочерёдно. Цель: 10 стаков за 10 минут без потери линии.' });
+            }
+            if (posNum >= 4 && observerUses < 6) {
+                recs.push({ text: 'Покупайте и ставьте варды каждые 6 минут. Контроль карты — ваша главная задача.', exercise: 'Изучите 10 ключевых точек для вардов на каждой стороне. Тренируйте расстановку в лобби.' });
+            }
+            if (denies < 5 && posNum <= 3) {
+                recs.push({ text: 'Добивайте своих крипов. Это лишний опыт для врага и золото для вас.', exercise: 'В лобби — 10 минут, цель: 15+ добиваний. Фокус на таймингах анимации атаки.' });
+            }
+            if (posNum <= 3 && heroDamage < 8000) {
+                recs.push({ text: 'Участвуйте в драках активнее. Про-игроки на вашей позиции наносят 15-30K урона.', exercise: 'Смотрите реплеи про-игроков на вашем герое и замечайте, когда они вступают в драку.' });
+            }
+            if (recs.length === 0) {
+                recs.push({ text: 'Продолжайте поддерживать текущий уровень игры — показатели на уровне про-сцены.', exercise: 'Смотрите реплеи профессиональных матчей на вашей позиции и замечайте микро-решения.' });
+            }
+            recs.forEach(function(r, i) {
+                html += '<div class="recommendation-item"><span class="marker">' + (i + 1) + '.</span><div>' + r.text + '<div class="rec-exercise"><strong>Упражнение:</strong> ' + r.exercise + '</div></div></div>';
+            });
+            html += '</div>';
+
+            html += '<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+            return html;
         }
+
+        function generateDotaResultsFromAPI(data) {
+            var players = data.players || [];
+            var playerOptions = '';
+            players.forEach(function(p, i) {
+                var side = p.player_slot < 128 ? 'Radiant' : 'Dire';
+                var heroName = getHeroName(p.hero_id);
+                playerOptions += '<option value="' + i + '"' + (i === 0 ? ' selected' : '') + '>' + heroName + ' (' + side + ') — KDA: ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
+            });
+            var player = players[0];
+            if (!player) return '<div class="problem-block"><div class="problem-text">Данные игрока не найдены</div></div>';
+            return buildDotaAnalysis(data, player, 0, playerOptions);
+        }
+
         window.switchDotaPlayer = async function(matchId) {
             var resultsDiv = document.getElementById('dotaResults');
             var dropdown = resultsDiv.querySelector('.player-select-dropdown');
@@ -714,19 +1155,22 @@
             try {
                 var response = await fetch('https://api.opendota.com/api/matches/' + matchId);
                 var data = await response.json();
-                var player = data.players[playerIndex]; if (!player) return;
-                var isRadiant = player.player_slot < 128;
-                var playerWon = isRadiant ? data.radiant_win : !data.radiant_win;
-                var badge = resultsDiv.querySelector('.result-badge');
-                badge.className = 'result-badge ' + (playerWon ? 'win' : 'lose');
-                badge.textContent = playerWon ? 'Победа' : 'Поражение';
-                var metricsGrid = resultsDiv.querySelector('.metrics-grid');
-                var gpm = player.gold_per_min, xpm = player.xp_per_min;
-                metricsGrid.innerHTML = '<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">' + gpm + '</div><div class="metric-sub ' + (gpm >= 500 ? 'good' : 'bad') + '">Про-медиана: 500</div></div><div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">' + xpm + '</div><div class="metric-sub ' + (xpm >= 550 ? 'good' : 'bad') + '">Про-медиана: 550</div></div><div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + player.kills + '/' + player.deaths + '/' + player.assists + '</div></div><div class="metric-card"><div class="metric-label">Урон по героям</div><div class="metric-value">' + (player.hero_damage || 0).toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Урон по зданиям</div><div class="metric-value">' + (player.tower_damage || 0).toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">' + (player.last_hits || 0) + '</div></div><div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">' + (player.denies || 0) + '</div></div>';
-                var block = resultsDiv.querySelector('.result-block .problem-text');
-                block.innerHTML = 'GPM ' + (gpm >= 500 ? 'в норме' : 'ниже про-медианы') + ' (500). XPM ' + (xpm >= 550 ? 'в норме' : 'ниже про-медианы') + ' (550). K/D: ' + (player.kills / Math.max(player.deaths, 1)).toFixed(2) + '. ' + (player.deaths > 8 ? 'Слишком много смертей.' : 'Хорошая выживаемость.');
+                var player = data.players[playerIndex];
+                if (!player) return;
+                var playerOptions = '';
+                data.players.forEach(function(p, i) {
+                    var side = p.player_slot < 128 ? 'Radiant' : 'Dire';
+                    var heroName = getHeroName(p.hero_id);
+                    playerOptions += '<option value="' + i + '"' + (i === playerIndex ? ' selected' : '') + '>' + heroName + ' (' + side + ') — KDA: ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
+                });
+                resultsDiv.innerHTML = buildDotaAnalysis(data, player, playerIndex, playerOptions);
             } catch (err) { console.error('Ошибка:', err); }
         };
+
+        function generateCsResults() {
+            return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Выживаемость в первых контактах — 25%. Про-энтри выживают в 45-50%. Вы двигаетесь раньше смоков на 2-3 секунды.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div><div class="metric-card"><div class="metric-label">Выживаемость</div><div class="metric-value">25%</div><div class="metric-sub bad">Про: 47%</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Точный аим: HS% 48% — близко к про-медиане</div><div class="strength-item"><span class="marker">+</span> Первый заход в 68% раундов — команда получает раннюю инфу</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Выходите раньше смоков: в 7 из 12 раундов</div><div class="weakness-item"><span class="marker">−</span> Мало гранат: 1.4 за раунд — про-игроки используют 2.1</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги: смок → пауза 2 сек → вход.</div><div class="rec-exercise"><strong>Упражнение:</strong> Retake-режим 30 минут с паузой 2 секунды.</div></div><div class="recommendation-item"><span class="marker">2.</span><div>Используйте flash перед входом.</div><div class="rec-exercise"><strong>Упражнение:</strong> Изучите 5 flash-раскидок на Mirage. 20 мин/день.</div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
+        }
+
         window.resetAnalysis = function(game) {
             var prefix = game === 'dota' ? 'dota' : 'cs';
             document.getElementById(prefix + 'Results').classList.remove('visible');
@@ -736,6 +1180,7 @@
             document.getElementById(prefix + 'Link').value = '';
             if (game === 'cs') { var fi = document.getElementById('csFile'); if (fi) fi.value = ''; }
         };
+
         async function runAnalysis(game) {
             var prefix = game === 'dota' ? 'dota' : 'cs';
             var link = document.getElementById(prefix + 'Link').value.trim();
@@ -750,16 +1195,23 @@
             wrapper.classList.add('visible'); fill.style.width = '0%'; text.textContent = 'Обработка запроса...';
             try {
                 if (game === 'dota') {
-                    fill.style.width = '20%'; text.textContent = 'Получение данных матча...';
+                    fill.style.width = '15%'; text.textContent = 'Загрузка данных о героях...';
+                    if (!tierlistData) {
+                        try {
+                            var statsRes = await fetch('https://api.opendota.com/api/heroStats');
+                            if (statsRes.ok) tierlistData = await statsRes.json();
+                        } catch (e) {}
+                    }
+                    fill.style.width = '30%'; text.textContent = 'Получение данных матча...';
                     var response = await fetch('https://api.opendota.com/api/matches/' + matchId);
                     if (!response.ok) throw new Error('Матч не найден');
-                    fill.style.width = '50%'; text.textContent = 'Анализ игровых метрик...';
+                    fill.style.width = '55%'; text.textContent = 'Анализ таймлайна и метрик...';
                     var data = await response.json();
-                    if (!data.players || data.players.length === 0) throw new Error('Матч ещё не обработан. Попробуйте другой.');
-                    fill.style.width = '80%'; text.textContent = 'Формирование разбора...';
+                    if (!data.players || data.players.length === 0) throw new Error('Матч ещё не обработан. Попробуйте позже.');
+                    fill.style.width = '80%'; text.textContent = 'Сравнение с про-сценой...';
                     await new Promise(function(r) { setTimeout(r, 600); });
                     fill.style.width = '100%'; text.textContent = 'Готово!';
-                    await new Promise(function(r) { setTimeout(r, 500); });
+                    await new Promise(function(r) { setTimeout(r, 400); });
                     wrapper.classList.remove('visible');
                     resultsDiv.innerHTML = generateDotaResultsFromAPI(data);
                     resultsDiv.classList.add('visible');
