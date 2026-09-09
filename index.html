@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -14,7 +14,6 @@
         }
         body { background-color: var(--dark-bg); color: #fff; line-height: 1.6; overflow-x: hidden; }
         html { scroll-behavior: smooth; }
-
         .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
         .auth-logo { font-size: 2.5rem; font-weight: bold; color: var(--dark-gold); margin-bottom: 20px; letter-spacing: 1px; }
         .auth-box { width: 100%; max-width: 400px; background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 32px; }
@@ -32,7 +31,6 @@
         .auth-switch a { color: var(--dark-gold); cursor: pointer; text-decoration: none; font-weight: 600; }
         .auth-switch a:hover { text-decoration: underline; }
         .auth-hint { text-align: center; margin-top: 14px; color: #666; font-size: 0.85rem; }
-
         .app-wrapper { display: none; min-height: 100vh; }
         .app-wrapper.active { display: block; }
         .burger { position: fixed; top: 20px; left: 20px; z-index: 200; cursor: pointer; padding: 10px; background-color: var(--card-bg); border-radius: 8px; border: 1px solid #333; }
@@ -40,7 +38,6 @@
         .burger.open span:nth-child(1) { transform: rotate(45deg) translate(6px,6px); }
         .burger.open span:nth-child(2) { opacity: 0; }
         .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(6px,-6px); }
-
         .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background-color: #1a1a2a; border-right: 1px solid #333; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.25,1,0.5,1); z-index: 150; padding-top: 80px; overflow-y: auto; }
         .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.5); }
         .sidebar-user { padding: 16px 24px; border-bottom: 1px solid #333; margin-bottom: 8px; }
@@ -52,15 +49,12 @@
         .sidebar-item.active { color: var(--dark-gold); border-left-color: var(--dark-gold); background-color: rgba(197,160,40,0.08); font-weight: 600; }
         .sidebar-item .icon { font-size: 1.2rem; width: 24px; text-align: center; }
         .sidebar-divider { height: 1px; background-color: #333; margin: 8px 20px; }
-
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; z-index: 100; }
         .overlay.visible { opacity: 1; visibility: visible; }
-
         .navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 18px 80px; border-bottom: 1px solid #333; }
         .navbar-logo { font-size: 1.6rem; font-weight: bold; color: var(--dark-gold); letter-spacing: 1px; }
         .logout-btn { background-color: var(--beige); color: #333; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 500; transition: background 0.3s; }
         .logout-btn:hover { background-color: var(--gold-hover); }
-
         .content-area { padding: 40px 40px 40px 80px; max-width: 1200px; }
         .section { display: none; animation: fadeIn 0.5s ease; }
         .section.active { display: block; }
@@ -69,14 +63,12 @@
         .section-desc { color: #bbb; font-size: 1.05rem; margin-bottom: 30px; max-width: 700px; line-height: 1.8; }
         .back-home-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px; padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem; transition: all 0.3s; margin-bottom: 24px; }
         .back-home-btn:hover { border-color: var(--dark-gold); color: var(--dark-gold); }
-
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
         .feature-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; transition: transform 0.3s, box-shadow 0.3s; }
         .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         .feature-icon { font-size: 2rem; margin-bottom: 12px; }
         .feature-title { color: var(--dark-gold); font-weight: 600; font-size: 1.1rem; margin-bottom: 8px; }
         .feature-text { color: #999; font-size: 0.95rem; }
-
         .subscription-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
         .subscription-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; position: relative; transform: translateY(30px); opacity: 0; transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.3s ease; }
         .subscription-card.visible { transform: translateY(0); opacity: 1; }
@@ -92,10 +84,8 @@
         .card-btn.current { background-color: var(--dark-gold); color: #111; cursor: default; }
         .current-badge { display: none; text-align: center; color: var(--dark-gold); font-size: 0.85rem; font-weight: 600; margin-top: 8px; }
         .current-badge.visible { display: block; }
-
         .game-block { max-width: 700px; margin: 0 auto; }
         .game-icon { font-size: 3rem; margin-bottom: 16px; text-align: center; }
-
         .dota-subtabs { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
         .dota-subtab { display: flex; align-items: center; gap: 10px; background-color: var(--card-bg); border: 2px solid #333; border-radius: 10px; padding: 14px 28px; cursor: pointer; transition: all 0.3s ease; }
         .dota-subtab:hover { border-color: #555; transform: translateY(-2px); }
@@ -105,7 +95,6 @@
         .dota-subtab.active .dota-subtab-text { color: var(--dark-gold); }
         .dota-subcontent { display: none; }
         .dota-subcontent.active { display: block; animation: fadeIn 0.4s ease; }
-
         .link-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
         .link-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
         .link-input:focus { border-color: var(--dark-gold); box-shadow: 0 0 0 2px rgba(197,160,40,0.2); }
@@ -119,7 +108,6 @@
         .progress-bar { width: 100%; height: 8px; background-color: #333; border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; width: 0%; background-color: var(--dark-gold); border-radius: 4px; transition: width 0.5s ease; }
         .progress-text { margin-top: 10px; color: #aaa; font-size: 0.95rem; }
-
         .results-wrapper { display: none; margin-top: 30px; }
         .results-wrapper.visible { display: block; animation: fadeIn 0.6s ease; }
         .result-header { background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
@@ -142,8 +130,8 @@
         .metric-sub.bad { color: var(--red); }
         .result-block { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 24px; margin-bottom: 20px; }
         .result-block-title { color: var(--dark-gold); font-weight: 600; font-size: 1.15rem; margin-bottom: 14px; }
-        .strength-item, .weakness-item, .recommendation-item, .episode-item { padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
-        .strength-item:last-child, .weakness-item:last-child, .recommendation-item:last-child, .episode-item:last-child { border-bottom: none; }
+        .strength-item, .weakness-item, .recommendation-item { padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
+        .strength-item:last-child, .weakness-item:last-child, .recommendation-item:last-child { border-bottom: none; }
         .strength-item { display: flex; align-items: start; gap: 10px; }
         .strength-item .marker { color: var(--green); font-weight: bold; }
         .weakness-item .marker { color: var(--red); font-weight: bold; }
@@ -157,8 +145,6 @@
         .player-select-label { color: #888; font-size: 0.9rem; margin-bottom: 8px; }
         .player-select-dropdown { width: 100%; max-width: 400px; padding: 12px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; cursor: pointer; }
         .player-select-dropdown:focus { border-color: var(--dark-gold); }
-
-        /* ТИР-ЛИСТ */
         .rank-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
         .rank-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid #333; transition: all 0.3s ease; min-width: 80px; }
         .rank-badge:hover { transform: translateY(-3px); border-color: #555; }
@@ -173,7 +159,6 @@
         .position-badge-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .position-badge-name { font-size: 0.72rem; color: #aaa; text-align: center; }
         .position-badge.active .position-badge-name { color: var(--dark-gold); }
-
         .tier-table { display: flex; flex-direction: column; gap: 12px; }
         .tier-row { display: flex; gap: 12px; align-items: stretch; background-color: var(--card-bg); border-radius: 10px; padding: 16px; border: 1px solid #333; min-height: 80px; }
         .tier-label { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 70px; border-radius: 8px; font-weight: 800; font-size: 1.6rem; padding: 8px; flex-shrink: 0; }
@@ -204,7 +189,6 @@
         .tier-info-letter.b { color: #f1c40f; }
         .tier-info-letter.c { color: #95a5a6; }
         .tier-info-letter.d { color: #636e72; }
-
         @media (max-width: 768px) {
             .content-area { padding: 30px 20px; }
             .navbar { padding: 18px 20px 18px 70px; }
@@ -218,8 +202,6 @@
     </style>
 </head>
 <body>
-
-    <!-- АВТОРИЗАЦИЯ -->
     <div class="auth-container" id="authScreen">
         <div class="auth-logo">GamerAnalyzer</div>
         <div class="auth-box">
@@ -244,8 +226,6 @@
             <div class="auth-hint">Данные хранятся в защищённой облачной базе</div>
         </div>
     </div>
-
-    <!-- ПРИЛОЖЕНИЕ -->
     <div class="app-wrapper" id="appWrapper">
         <div class="burger" id="burger"><span></span><span></span><span></span></div>
         <div class="overlay" id="overlay"></div>
@@ -261,12 +241,10 @@
             <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
             <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
         </div>
-
         <div class="navbar">
             <div class="navbar-logo">GamerAnalyzer</div>
             <button class="logout-btn" id="logoutBtn">Выйти</button>
         </div>
-
         <div class="content-area">
             <div class="section active" id="section-home">
                 <div class="section-title">Функционал сервиса</div>
@@ -280,7 +258,6 @@
                     <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальный тир-лист по рангам и позициям — от Рекрута до Титана. На основе статистики.</div></div>
                 </div>
             </div>
-
             <div class="section" id="section-subscriptions">
                 <button class="back-home-btn" data-back="home">← На главную страницу</button>
                 <div class="section-title">Тарифы и подписки</div>
@@ -307,7 +284,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="section" id="section-dota2">
                 <button class="back-home-btn" data-back="home">← На главную страницу</button>
                 <div class="dota-subtabs">
@@ -320,7 +296,6 @@
                         <span class="dota-subtab-text">Тир-лист героев</span>
                     </div>
                 </div>
-
                 <div class="dota-subcontent active" id="dotaSub-analysis">
                     <div class="game-block">
                         <div class="game-icon">⚔️</div>
@@ -337,7 +312,6 @@
                         <div class="results-wrapper" id="dotaResults"></div>
                     </div>
                 </div>
-
                 <div class="dota-subcontent" id="dotaSub-tierlist">
                     <div class="section-title">Тир-лист героев Dota 2</div>
                     <div class="section-desc">Актуальный тир-лист героев по рангам и позициям. Данные обновляются автоматически — рейтинг строится по проценту побед.</div>
@@ -357,7 +331,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="section" id="section-cs2">
                 <button class="back-home-btn" data-back="home">← На главную страницу</button>
                 <div class="game-block">
@@ -379,14 +352,11 @@
             </div>
         </div>
     </div>
-
     <script>
-        // === SUPABASE ===
         const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';
         const supabaseClient = (SUPABASE_URL !== 'https://nkzxnjixxcuxyziprbdg.supabase.co' && SUPABASE_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8')
             ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
         async function hashPassword(password) {
             const data = new TextEncoder().encode('ga_salt_' + password);
             const hash = await crypto.subtle.digest('SHA-256', data);
@@ -395,8 +365,6 @@
         function setCurrentUser(user) { localStorage.setItem('ga_current_user', JSON.stringify(user)); }
         function getCurrentUser() { const raw = localStorage.getItem('ga_current_user'); return raw ? JSON.parse(raw) : null; }
         function clearCurrentUser() { localStorage.removeItem('ga_current_user'); }
-
-        // === DOM ===
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -408,12 +376,8 @@
         const sidebarItems = document.querySelectorAll('.sidebar-item');
         const sections = document.querySelectorAll('.section');
         const subscriptionCards = document.querySelectorAll('.subscription-card');
-
-        // === ПЕРЕКЛЮЧЕНИЕ ФОРМ ===
         document.getElementById('goToRegister').addEventListener('click', () => { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; hideError('loginError'); });
         document.getElementById('goToLogin').addEventListener('click', () => { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; hideError('regError'); hideSuccess('regSuccess'); });
-
-        // === РЕГИСТРАЦИЯ ===
         registerBtn.addEventListener('click', async () => {
             const login = document.getElementById('regLoginInput').value.trim().toLowerCase();
             const password = document.getElementById('regPasswordInput').value;
@@ -434,8 +398,6 @@
                 setTimeout(() => { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; hideSuccess('regSuccess'); document.getElementById('loginInput').value = login; }, 1500);
             } catch (err) { showError('regError', 'Ошибка: ' + (err.message || err)); }
         });
-
-        // === ВХОД (с детальными ошибками) ===
         loginBtn.addEventListener('click', async () => {
             const login = document.getElementById('loginInput').value.trim().toLowerCase();
             const password = document.getElementById('passwordInput').value;
@@ -452,7 +414,6 @@
                 enterApp();
             } catch (err) { console.error('Ошибка:', err); showError('loginError', 'Ошибка входа: ' + (err.message || err)); }
         });
-
         function enterApp() { authScreen.style.display = 'none'; setTimeout(() => { appWrapper.classList.add('active'); updateUserInfo(); updateSubscriptionUI(); }, 10); }
         function updateUserInfo() {
             const user = getCurrentUser(); if (!user) return;
@@ -468,7 +429,6 @@
                 if (activeCard) { activeCard.classList.add('active-plan'); const btn = activeCard.querySelector('.card-btn'); const badge = activeCard.querySelector('.current-badge'); btn.classList.add('current'); btn.textContent = 'Активна'; badge.classList.add('visible'); }
             }
         }
-
         document.getElementById('btn-dota').addEventListener('click', () => selectPlan('pro_dota2'));
         document.getElementById('btn-cs').addEventListener('click', () => selectPlan('pro_cs2'));
         document.getElementById('btn-premium').addEventListener('click', () => selectPlan('premium'));
@@ -478,13 +438,11 @@
             try { if (supabaseClient) await supabaseClient.from('users').update({ plan }).eq('login', user.login); } catch (err) { console.error('Ошибка обновления:', err); }
             updateUserInfo(); updateSubscriptionUI(); revealCards();
         }
-
         logoutBtn.addEventListener('click', () => { clearCurrentUser(); appWrapper.classList.remove('active'); closeSidebar(); document.getElementById('loginInput').value = ''; document.getElementById('passwordInput').value = ''; setTimeout(() => { authScreen.style.display = 'flex'; }, 300); });
         burger.addEventListener('click', () => toggleSidebar());
         overlay.addEventListener('click', () => closeSidebar());
         function toggleSidebar() { sidebar.classList.toggle('open'); overlay.classList.toggle('visible'); burger.classList.toggle('open'); }
         function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); burger.classList.remove('open'); }
-
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
                 sidebarItems.forEach(i => i.classList.remove('active')); item.classList.add('active');
@@ -497,7 +455,6 @@
             });
         });
         function revealCards() { subscriptionCards.forEach((card, index) => { card.classList.remove('visible'); setTimeout(() => { card.classList.add('visible'); }, index * 150); }); }
-
         document.querySelectorAll('.back-home-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 sidebarItems.forEach(i => i.classList.remove('active')); sections.forEach(s => s.classList.remove('active'));
@@ -505,7 +462,6 @@
                 const homeItem = document.querySelector('.sidebar-item[data-section="home"]'); if (homeItem) homeItem.classList.add('active');
             });
         });
-
         document.querySelectorAll('.dota-subtab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.dota-subtab').forEach(t => t.classList.remove('active'));
@@ -516,13 +472,11 @@
                 if (target === 'tierlist' && !tierlistData) loadTierlist();
             });
         });
-
         function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
         function hideError(id) { const el = document.getElementById(id); el.classList.remove('visible'); }
         function showSuccess(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
         function hideSuccess(id) { const el = document.getElementById(id); el.classList.remove('visible'); }
 
-        // === РАНГИ (CSS-медали) ===
         const RANKS = [
             { num: 1, name: 'Рекрут',     color: '#6b6b6b' },
             { num: 2, name: 'Страж',      color: '#4a9d4a' },
@@ -533,8 +487,6 @@
             { num: 7, name: 'Божество',   color: '#06b6d4' },
             { num: 8, name: 'Титан',      color: '#ef4444' },
         ];
-
-        // === ПОЗИЦИИ ===
         const POSITIONS = [
             { id: 'all', name: 'Все',          icon: '⚔️' },
             { id: 1,     name: 'Carry',         icon: '🛡️' },
@@ -543,124 +495,155 @@
             { id: 4,     name: 'Support',       icon: '✨' },
             { id: 5,     name: 'Hard Support',  icon: '🌿' },
         ];
-
         let tierlistData = null;
+        let laneRolesMap = {};
         let currentRank = 7;
         let currentPosition = 'all';
 
-        // === ЗАГРУЗКА ТИР-ЛИСТА ===
         async function loadTierlist() {
             const content = document.getElementById('tierlistContent');
             content.innerHTML = '<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div>';
             try {
-                const response = await fetch('https://api.opendota.com/api/heroStats');
-                if (!response.ok) throw new Error('Данные недоступны');
-                tierlistData = await response.json();
+                const [statsRes, laneRes] = await Promise.all([
+                    fetch('https://api.opendota.com/api/heroStats'),
+                    fetch('https://api.opendota.com/api/scenarios/laneRoles')
+                ]);
+                if (!statsRes.ok) throw new Error('Данные недоступны');
+                tierlistData = await statsRes.json();
+                if (laneRes.ok) {
+                    const laneData = await laneRes.json();
+                    laneRolesMap = {};
+                    const heroLaneGames = {};
+                    laneData.forEach(function(entry) {
+                        var hid = parseInt(entry.hero_id);
+                        var lane = entry.lane_role;
+                        var games = parseInt(entry.games) || 0;
+                        if (!heroLaneGames[hid]) heroLaneGames[hid] = {};
+                        heroLaneGames[hid][lane] = (heroLaneGames[hid][lane] || 0) + games;
+                    });
+                    Object.keys(heroLaneGames).forEach(function(hid) {
+                        var lanes = heroLaneGames[hid];
+                        var bestLane = 0, bestGames = 0;
+                        Object.keys(lanes).forEach(function(lane) {
+                            if (lanes[lane] > bestGames) { bestGames = lanes[lane]; bestLane = parseInt(lane); }
+                        });
+                        laneRolesMap[hid] = bestLane;
+                    });
+                }
                 renderPositionSelector();
                 renderRankSelector();
                 renderTierlist(currentRank);
-                const now = new Date();
+                var now = new Date();
                 document.getElementById('tierlistUpdated').textContent = 'Данные обновлены: ' + now.toLocaleDateString('ru-RU') + ' в ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             } catch (err) {
                 content.innerHTML = '<div class="tierlist-error">Ошибка загрузки: ' + err.message + '<br><br>Попробуйте обновить страницу.</div>';
             }
         }
 
-        // === СЕЛЕКТОР ПОЗИЦИЙ ===
         function renderPositionSelector() {
-            const selector = document.getElementById('positionSelector');
-            selector.innerHTML = POSITIONS.map(p => {
-                const iconHtml = (typeof p.icon === 'string' && p.icon.startsWith('http'))
-                    ? '<img src="' + p.icon + '" style="width:28px;height:28px;" onerror="this.parentElement.innerHTML=\'⚔️\'">'
-                    : '<span style="font-size:1.4rem;">' + p.icon + '</span>';
+            var selector = document.getElementById('positionSelector');
+            selector.innerHTML = POSITIONS.map(function(p) {
+                var iconHtml = '<span style="font-size:1.4rem;">' + p.icon + '</span>';
                 return '<div class="position-badge ' + (p.id === currentPosition ? 'active' : '') + '" data-pos="' + p.id + '"><div class="position-badge-icon">' + iconHtml + '</div><div class="position-badge-name">' + p.name + '</div></div>';
             }).join('');
-            selector.querySelectorAll('.position-badge').forEach(badge => {
-                badge.addEventListener('click', () => {
+            selector.querySelectorAll('.position-badge').forEach(function(badge) {
+                badge.addEventListener('click', function() {
                     currentPosition = badge.dataset.pos;
-                    selector.querySelectorAll('.position-badge').forEach(b => b.classList.remove('active'));
+                    selector.querySelectorAll('.position-badge').forEach(function(b) { b.classList.remove('active'); });
                     badge.classList.add('active');
                     renderTierlist(currentRank);
                 });
             });
         }
 
-        // === СЕЛЕКТОР РАНГОВ (CSS-медали) ===
         function renderRankSelector() {
-            const selector = document.getElementById('rankSelector');
-            selector.innerHTML = RANKS.map(r => {
+            var selector = document.getElementById('rankSelector');
+            selector.innerHTML = RANKS.map(function(r) {
                 return '<div class="rank-badge ' + (r.num === currentRank ? 'active' : '') + '" data-rank="' + r.num + '">'
                     + '<div class="rank-badge-icon" style="width:36px;height:36px;border-radius:50%;background:' + r.color + ';display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;box-shadow:0 0 8px ' + r.color + '99;">' + r.num + '</div>'
                     + '<div class="rank-badge-name">' + r.name + '</div></div>';
             }).join('');
-            selector.querySelectorAll('.rank-badge').forEach(badge => {
-                badge.addEventListener('click', () => {
+            selector.querySelectorAll('.rank-badge').forEach(function(badge) {
+                badge.addEventListener('click', function() {
                     currentRank = parseInt(badge.dataset.rank);
-                    selector.querySelectorAll('.rank-badge').forEach(b => b.classList.remove('active'));
+                    selector.querySelectorAll('.rank-badge').forEach(function(b) { b.classList.remove('active'); });
                     badge.classList.add('active');
                     renderTierlist(currentRank);
                 });
             });
         }
 
-        // === ОПРЕДЕЛЕНИЕ ПОЗИЦИИ ГЕРОЯ ЧЕРЕЗ ROLES ===
         function getHeroPosition(heroId) {
-            const hero = tierlistData.find(h => parseInt(h.hero_id) === parseInt(heroId));
+            var id = parseInt(heroId);
+            var hero = tierlistData.find(function(h) { return parseInt(h.id) === id; });
             if (!hero) return null;
-            const roles = hero.roles || [];
-            const hasCarry = roles.includes('Carry');
-            const hasSupport = roles.includes('Support');
-            const hasDurable = roles.includes('Durable');
-            const hasInitiator = roles.includes('Initiator');
-            const hasNuker = roles.includes('Nuker');
-            const hasDisabler = roles.includes('Disabler');
-            const hasEscape = roles.includes('Escape');
-
+            var roles = hero.roles || [];
+            var hasSupport = roles.indexOf('Support') !== -1;
+            var hasCarry = roles.indexOf('Carry') !== -1;
+            var hasDurable = roles.indexOf('Durable') !== -1;
+            var hasInitiator = roles.indexOf('Initiator') !== -1;
+            var hasNuker = roles.indexOf('Nuker') !== -1;
+            var hasDisabler = roles.indexOf('Disabler') !== -1;
+            var hasEscape = roles.indexOf('Escape') !== -1;
+            var lane = laneRolesMap[id];
+            if (lane) {
+                if (lane === 1) return 1;
+                if (lane === 2) return 2;
+                if (lane === 3) {
+                    if (hasSupport) {
+                        if (hasNuker || hasDisabler || hasInitiator) return 4;
+                        return 5;
+                    }
+                    return 3;
+                }
+                if (lane === 4) return 4;
+            }
             if (hasSupport) {
                 if (hasNuker || hasDisabler || hasInitiator) return 4;
                 return 5;
             }
-            if (hasCarry) return 1;
+            if (hasCarry && !hasDurable && !hasInitiator) return 1;
             if (hasDurable || hasInitiator) return 3;
-            if (hasEscape && hasNuker) return 2;
-            if (hasNuker && !hasCarry && !hasSupport) return 2;
+            if (hasNuker) return 2;
+            if (hasCarry) return 1;
             return 1;
         }
 
-        // === РЕНДЕР ТИР-ЛИСТА ===
         function renderTierlist(rankNum) {
             if (!tierlistData) return;
-            const content = document.getElementById('tierlistContent');
-
-            let heroes = tierlistData.map(h => {
-                const picks = h[rankNum + '_pick'] || 0;
-                const wins = h[rankNum + '_win'] || 0;
-                const winRate = picks > 0 ? (wins / picks * 100) : 0;
+            var content = document.getElementById('tierlistContent');
+            var heroes = tierlistData.map(function(h) {
+                var picks, wins;
+                if (rankNum === 8) {
+                    picks = h.pro_pick || 0;
+                    wins = h.pro_win || 0;
+                } else {
+                    picks = h[rankNum + '_pick'] || 0;
+                    wins = h[rankNum + '_win'] || 0;
+                }
+                var winRate = picks > 0 ? (wins / picks * 100) : 0;
                 var imgPath = (h.img || '').replace(/^\//, '');
                 return {
-                    id: h.hero_id,
+                    id: h.id,
                     name: h.localized_name,
-                    roles: h.roles || [],
                     icon: 'https://cdn.cloudflare.steamstatic.com/' + imgPath,
                     fallbackIcon: 'https://api.opendota.com' + (h.icon || ''),
                     picks: picks,
                     winRate: winRate,
-                    position: getHeroPosition(h.hero_id)
+                    position: getHeroPosition(h.id)
                 };
             });
-
             if (currentPosition !== 'all') {
                 var posId = parseInt(currentPosition);
-                heroes = heroes.filter(h => h.position === posId);
+                heroes = heroes.filter(function(h) { return h.position === posId; });
             }
-
             var threshold = 50;
-            var heroesWithData = heroes.filter(h => h.picks >= threshold);
-            if (heroesWithData.length < 10) { threshold = 20; heroesWithData = heroes.filter(h => h.picks >= threshold); }
-            if (heroesWithData.length < 10) { threshold = 5; heroesWithData = heroes.filter(h => h.picks >= threshold); }
-            if (heroesWithData.length < 5) { threshold = 0; heroesWithData = heroes.filter(h => h.picks >= 0); }
-
-            var heroesNoData = heroes.filter(h => h.picks < threshold);
+            var heroesWithData = heroes.filter(function(h) { return h.picks >= threshold; });
+            if (heroesWithData.length < 10) { threshold = 20; heroesWithData = heroes.filter(function(h) { return h.picks >= threshold; }); }
+            if (heroesWithData.length < 10) { threshold = 5; heroesWithData = heroes.filter(function(h) { return h.picks >= threshold; }); }
+            if (heroesWithData.length < 10) { threshold = 1; heroesWithData = heroes.filter(function(h) { return h.picks >= threshold; }); }
+            if (heroesWithData.length < 5) { threshold = 0; heroesWithData = heroes; }
+            var heroesNoData = heroes.filter(function(h) { return h.picks < threshold; });
             heroesWithData.sort(function(a, b) { return b.winRate - a.winRate; });
             var total = heroesWithData.length;
             if (total === 0) {
@@ -685,141 +668,130 @@
             ];
             content.innerHTML = '<div class="tier-table">' + tiers.map(function(tier) {
                 return '<div class="tier-row"><div class="tier-label ' + tier.class + '">' + tier.label + '<div class="tier-label-desc">' + tier.desc + '</div></div><div class="tier-heroes">' + tier.heroes.map(function(h) {
-                    return '<div class="hero-card" title="' + h.name + '"><img src="' + h.icon + '" alt="' + h.name + '" loading="lazy" onerror="this.src=\'' + h.fallbackIcon + '\'"><div class="hero-card-winrate">' + (h.winRate > 0 ? h.winRate.toFixed(1) + '%' : '—') + '</div><div class="hero-card-tooltip">' + h.name + ' · ' + (h.winRate > 0 ? h.winRate.toFixed(1) + '% WR' : 'нет данных') + ' · ' + h.picks + ' игр</div></div>';
+                    var wrText = h.winRate > 0 ? h.winRate.toFixed(1) + '%' : (rankNum === 8 ? 'про' : '—');
+                    var wrTooltip = h.winRate > 0 ? h.winRate.toFixed(1) + '% WR' : 'нет данных';
+                    return '<div class="hero-card" title="' + h.name + '"><img src="' + h.icon + '" alt="' + h.name + '" loading="lazy" onerror="this.src=\'' + h.fallbackIcon + '\'"><div class="hero-card-winrate">' + wrText + '</div><div class="hero-card-tooltip">' + h.name + ' · ' + wrTooltip + ' · ' + h.picks + ' игр</div></div>';
                 }).join('') + '</div></div>';
             }).join('') + '</div>';
         }
 
-        // === ГЕНЕРАЦИЯ РЕЗУЛЬТАТОВ ===
         function generateDotaResults() {
             return '<div class="result-header"><div class="result-header-info"><h2>Axe — Оффлейнер</h2><div class="result-header-meta">Длительность: 38:14 · Ранг: Legend · Линия: Hard Lane</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Blink Dagger куплен на 19-й минуте — на 5 минут позже медианы про-сцены (14:00). Команда потеряла 2 ключевых драки из-за отсутствия инициации.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">412</div><div class="metric-sub bad">Про-медиана: 520</div></div><div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">498</div><div class="metric-sub bad">Про-медиана: 580</div></div><div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">4/8/12</div><div class="metric-sub">20 участий</div></div><div class="metric-card"><div class="metric-label">Blink</div><div class="metric-value">19:30</div><div class="metric-sub bad">Про-медиана: 14:00</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Хорошее использование Counter Helix: урон выше медианы на 15%</div><div class="strength-item"><span class="marker">+</span> Грамотные инициации после Blink: 3 из 4 драк выиграны</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Недостаточный фарм в мидгейме: 2800 золота (норма: 4000+)</div><div class="weakness-item"><span class="marker">−</span> Мало стеков леса: всего 3 стека</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Стакайте лес с 7-й минуты. Цель: 6+ стеков к 15-й минуте.</div><div class="rec-exercise"><strong>Упражнение:</strong> В лобби получите Blink к 13-й минуте. Повторяйте 5 раз.</div></div><div class="recommendation-item"><span class="marker">2.</span><div>Практикуйте порог Culling Blade.</div><div class="rec-exercise"><strong>Упражнение:</strong> 10 минут в лобби — добивайте крипов ультой. Цель: 90%.</div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
         }
-
         function generateCsResults() {
             return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Выживаемость в первых контактах — 25%. Про-энтри выживают в 45-50%. Вы двигаетесь раньше смоков на 2-3 секунды.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div><div class="metric-card"><div class="metric-label">Выживаемость</div><div class="metric-value">25%</div><div class="metric-sub bad">Про: 47%</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Точный аим: HS% 48% — близко к про-медиане</div><div class="strength-item"><span class="marker">+</span> Первый заход в 68% раундов — команда получает раннюю инфу</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Выходите раньше смоков: в 7 из 12 раундов</div><div class="weakness-item"><span class="marker">−</span> Мало гранат: 1.4 за раунд — про-игроки используют 2.1</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги: смок → пауза 2 сек → вход.</div><div class="rec-exercise"><strong>Упражнение:</strong> Retake-режим 30 минут с паузой 2 секунды.</div></div><div class="recommendation-item"><span class="marker">2.</span><div>Используйте flash перед входом.</div><div class="rec-exercise"><strong>Упражнение:</strong> Изучите 5 flash-раскидок на Mirage. 20 мин/день.</div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
         }
-
         function generateDotaResultsFromAPI(data) {
-            const duration = Math.floor(data.duration / 60) + ':' + String(data.duration % 60).padStart(2, '0');
-            const matchId = data.match_id;
-            let playerOptions = '';
-            if (data.players) { data.players.forEach((p, i) => { const side = p.player_slot < 128 ? 'Radiant' : 'Dire'; playerOptions += '<option value="' + i + '">Слот ' + p.player_slot + ' (' + side + ') — KDA: ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>'; }); }
-            const player = data.players && data.players[0];
+            var duration = Math.floor(data.duration / 60) + ':' + String(data.duration % 60).padStart(2, '0');
+            var matchId = data.match_id;
+            var playerOptions = '';
+            if (data.players) { data.players.forEach(function(p, i) { var side = p.player_slot < 128 ? 'Radiant' : 'Dire'; playerOptions += '<option value="' + i + '">Слот ' + p.player_slot + ' (' + side + ') — KDA: ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>'; }); }
+            var player = data.players && data.players[0];
             if (!player) return '<div class="problem-block"><div class="problem-text">Данные игрока не найдены</div></div>';
-            const kills = player.kills, deaths = player.deaths, assists = player.assists;
-            const gpm = player.gold_per_min, xpm = player.xp_per_min;
-            const heroDamage = player.hero_damage || 0, towerDamage = player.tower_damage || 0;
-            const lastHits = player.last_hits || 0, denies = player.denies || 0;
-            const isRadiant = player.player_slot < 128;
-            const playerWon = isRadiant ? data.radiant_win : !data.radiant_win;
-            const winText = playerWon ? 'Победа' : 'Поражение';
-            const winClass = playerWon ? 'win' : 'lose';
-            return '<div class="result-header"><div class="result-header-info"><h2>Матч #' + matchId + '</h2><div class="result-header-meta">Длительность: ' + duration + ' · Сторона: ' + (isRadiant ? 'Radiant' : 'Dire') + '</div></div><div class="result-badge ' + winClass + '">' + winText + '</div></div><div class="player-select"><div class="player-select-label">Выберите игрока:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\'' + matchId + '\')">' + playerOptions + '</select></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">' + gpm + '</div><div class="metric-sub ' + (gpm >= 500 ? 'good' : 'bad') + '">Про-медиана: 500</div></div><div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">' + xpm + '</div><div class="metric-sub ' + (xpm >= 550 ? 'good' : 'bad') + '">Про-медиана: 550</div></div><div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + kills + '/' + deaths + '/' + assists + '</div></div><div class="metric-card"><div class="metric-label">Урон по героям</div><div class="metric-value">' + heroDamage.toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Урон по зданиям</div><div class="metric-value">' + towerDamage.toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">' + lastHits + '</div></div><div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">' + denies + '</div></div></div><div class="result-block"><div class="result-block-title">📊 Разбор</div><div class="problem-text">GPM ' + (gpm >= 500 ? 'в норме' : 'ниже про-медианы') + ' (500). XPM ' + (xpm >= 550 ? 'в норме' : 'ниже про-медианы') + ' (550). K/D: ' + (kills / Math.max(deaths, 1)).toFixed(2) + '. ' + (deaths > 8 ? 'Слишком много смертей — работайте над позиционированием.' : 'Хорошая выживаемость.') + '</div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+            var kills = player.kills, deaths = player.deaths, assists = player.assists;
+            var gpm = player.gold_per_min, xpm = player.xp_per_min;
+            var heroDamage = player.hero_damage || 0, towerDamage = player.tower_damage || 0;
+            var lastHits = player.last_hits || 0, denies = player.denies || 0;
+            var isRadiant = player.player_slot < 128;
+            var playerWon = isRadiant ? data.radiant_win : !data.radiant_win;
+            return '<div class="result-header"><div class="result-header-info"><h2>Матч #' + matchId + '</h2><div class="result-header-meta">Длительность: ' + duration + ' · Сторона: ' + (isRadiant ? 'Radiant' : 'Dire') + '</div></div><div class="result-badge ' + (playerWon ? 'win' : 'lose') + '">' + (playerWon ? 'Победа' : 'Поражение') + '</div></div><div class="player-select"><div class="player-select-label">Выберите игрока:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\'' + matchId + '\')">' + playerOptions + '</select></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">' + gpm + '</div><div class="metric-sub ' + (gpm >= 500 ? 'good' : 'bad') + '">Про-медиана: 500</div></div><div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">' + xpm + '</div><div class="metric-sub ' + (xpm >= 550 ? 'good' : 'bad') + '">Про-медиана: 550</div></div><div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + kills + '/' + deaths + '/' + assists + '</div></div><div class="metric-card"><div class="metric-label">Урон по героям</div><div class="metric-value">' + heroDamage.toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Урон по зданиям</div><div class="metric-value">' + towerDamage.toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">' + lastHits + '</div></div><div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">' + denies + '</div></div></div><div class="result-block"><div class="result-block-title">📊 Разбор</div><div class="problem-text">GPM ' + (gpm >= 500 ? 'в норме' : 'ниже про-медианы') + ' (500). XPM ' + (xpm >= 550 ? 'в норме' : 'ниже про-медианы') + ' (550). K/D: ' + (kills / Math.max(deaths, 1)).toFixed(2) + '. ' + (deaths > 8 ? 'Слишком много смертей — работайте над позиционированием.' : 'Хорошая выживаемость.') + '</div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
         }
-
         window.switchDotaPlayer = async function(matchId) {
-            const resultsDiv = document.getElementById('dotaResults');
-            const dropdown = resultsDiv.querySelector('.player-select-dropdown');
-            const playerIndex = parseInt(dropdown.value);
+            var resultsDiv = document.getElementById('dotaResults');
+            var dropdown = resultsDiv.querySelector('.player-select-dropdown');
+            var playerIndex = parseInt(dropdown.value);
             try {
-                const response = await fetch('https://api.opendota.com/api/matches/' + matchId);
-                const data = await response.json();
-                const player = data.players[playerIndex]; if (!player) return;
-                const isRadiant = player.player_slot < 128;
-                const playerWon = isRadiant ? data.radiant_win : !data.radiant_win;
-                const badge = resultsDiv.querySelector('.result-badge');
+                var response = await fetch('https://api.opendota.com/api/matches/' + matchId);
+                var data = await response.json();
+                var player = data.players[playerIndex]; if (!player) return;
+                var isRadiant = player.player_slot < 128;
+                var playerWon = isRadiant ? data.radiant_win : !data.radiant_win;
+                var badge = resultsDiv.querySelector('.result-badge');
                 badge.className = 'result-badge ' + (playerWon ? 'win' : 'lose');
                 badge.textContent = playerWon ? 'Победа' : 'Поражение';
-                const metricsGrid = resultsDiv.querySelector('.metrics-grid');
-                const gpm = player.gold_per_min, xpm = player.xp_per_min;
+                var metricsGrid = resultsDiv.querySelector('.metrics-grid');
+                var gpm = player.gold_per_min, xpm = player.xp_per_min;
                 metricsGrid.innerHTML = '<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">' + gpm + '</div><div class="metric-sub ' + (gpm >= 500 ? 'good' : 'bad') + '">Про-медиана: 500</div></div><div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">' + xpm + '</div><div class="metric-sub ' + (xpm >= 550 ? 'good' : 'bad') + '">Про-медиана: 550</div></div><div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + player.kills + '/' + player.deaths + '/' + player.assists + '</div></div><div class="metric-card"><div class="metric-label">Урон по героям</div><div class="metric-value">' + (player.hero_damage || 0).toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Урон по зданиям</div><div class="metric-value">' + (player.tower_damage || 0).toLocaleString() + '</div></div><div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">' + (player.last_hits || 0) + '</div></div><div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">' + (player.denies || 0) + '</div></div>';
-                const block = resultsDiv.querySelector('.result-block .problem-text');
+                var block = resultsDiv.querySelector('.result-block .problem-text');
                 block.innerHTML = 'GPM ' + (gpm >= 500 ? 'в норме' : 'ниже про-медианы') + ' (500). XPM ' + (xpm >= 550 ? 'в норме' : 'ниже про-медианы') + ' (550). K/D: ' + (player.kills / Math.max(player.deaths, 1)).toFixed(2) + '. ' + (player.deaths > 8 ? 'Слишком много смертей.' : 'Хорошая выживаемость.');
             } catch (err) { console.error('Ошибка:', err); }
         };
-
         window.resetAnalysis = function(game) {
-            const prefix = game === 'dota' ? 'dota' : 'cs';
+            var prefix = game === 'dota' ? 'dota' : 'cs';
             document.getElementById(prefix + 'Results').classList.remove('visible');
             document.getElementById(prefix + 'Results').innerHTML = '';
             document.getElementById(prefix + 'Progress').classList.remove('visible');
             document.getElementById(prefix + 'ProgressFill').style.width = '0%';
             document.getElementById(prefix + 'Link').value = '';
-            if (game === 'cs') { const fi = document.getElementById('csFile'); if (fi) fi.value = ''; }
+            if (game === 'cs') { var fi = document.getElementById('csFile'); if (fi) fi.value = ''; }
         };
-
         async function runAnalysis(game) {
-            const prefix = game === 'dota' ? 'dota' : 'cs';
-            const link = document.getElementById(prefix + 'Link').value.trim();
+            var prefix = game === 'dota' ? 'dota' : 'cs';
+            var link = document.getElementById(prefix + 'Link').value.trim();
             if (!link) { alert('Вставьте ссылку или match_id'); return; }
-            let matchId = link;
-            if (link.includes('/')) { const parts = link.split('/'); matchId = parts[parts.length - 1]; }
-            const wrapper = document.getElementById(prefix + 'Progress');
-            const fill = document.getElementById(prefix + 'ProgressFill');
-            const text = document.getElementById(prefix + 'ProgressText');
-            const resultsDiv = document.getElementById(prefix + 'Results');
+            var matchId = link;
+            if (link.includes('/')) { var parts = link.split('/'); matchId = parts[parts.length - 1]; }
+            var wrapper = document.getElementById(prefix + 'Progress');
+            var fill = document.getElementById(prefix + 'ProgressFill');
+            var text = document.getElementById(prefix + 'ProgressText');
+            var resultsDiv = document.getElementById(prefix + 'Results');
             resultsDiv.classList.remove('visible'); resultsDiv.innerHTML = '';
             wrapper.classList.add('visible'); fill.style.width = '0%'; text.textContent = 'Обработка запроса...';
             try {
                 if (game === 'dota') {
                     fill.style.width = '20%'; text.textContent = 'Получение данных матча...';
-                    const response = await fetch('https://api.opendota.com/api/matches/' + matchId);
+                    var response = await fetch('https://api.opendota.com/api/matches/' + matchId);
                     if (!response.ok) throw new Error('Матч не найден');
                     fill.style.width = '50%'; text.textContent = 'Анализ игровых метрик...';
-                    const data = await response.json();
+                    var data = await response.json();
                     if (!data.players || data.players.length === 0) throw new Error('Матч ещё не обработан. Попробуйте другой.');
                     fill.style.width = '80%'; text.textContent = 'Формирование разбора...';
-                    await new Promise(r => setTimeout(r, 600));
+                    await new Promise(function(r) { setTimeout(r, 600); });
                     fill.style.width = '100%'; text.textContent = 'Готово!';
-                    await new Promise(r => setTimeout(r, 500));
+                    await new Promise(function(r) { setTimeout(r, 500); });
                     wrapper.classList.remove('visible');
                     resultsDiv.innerHTML = generateDotaResultsFromAPI(data);
                     resultsDiv.classList.add('visible');
                     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
                 if (game === 'cs') {
-                    const fileInput = document.getElementById('csFile');
-                    const hasFile = fileInput && fileInput.files[0];
+                    var fileInput = document.getElementById('csFile');
+                    var hasFile = fileInput && fileInput.files[0];
                     if (hasFile) {
                         fill.style.width = '30%'; text.textContent = 'Обработка файла...';
                         try {
-                            const fd = new FormData(); fd.append('file', fileInput.files[0]);
-                            const response = await fetch('http://localhost:8000/analyze/cs2', { method: 'POST', body: fd });
+                            var fd = new FormData(); fd.append('file', fileInput.files[0]);
+                            var response = await fetch('http://localhost:8000/analyze/cs2', { method: 'POST', body: fd });
                             if (!response.ok) throw new Error('Сервер недоступен');
                             fill.style.width = '70%'; text.textContent = 'Анализ игровых метрик...';
                             await response.json();
                             fill.style.width = '100%'; text.textContent = 'Готово!';
-                            await new Promise(r => setTimeout(r, 500)); wrapper.classList.remove('visible');
-                            resultsDiv.innerHTML = generateCsResults();
-                            resultsDiv.classList.add('visible');
+                            await new Promise(function(r) { setTimeout(r, 500); }); wrapper.classList.remove('visible');
+                            resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
                             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         } catch (apiErr) {
                             text.textContent = 'Сервер недоступен — показываем демонстрационные данные';
-                            await new Promise(r => setTimeout(r, 2000)); wrapper.classList.remove('visible');
-                            resultsDiv.innerHTML = generateCsResults();
-                            resultsDiv.classList.add('visible');
+                            await new Promise(function(r) { setTimeout(r, 2000); }); wrapper.classList.remove('visible');
+                            resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
                             resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
                     } else {
                         fill.style.width = '50%'; text.textContent = 'Формирование разбора...';
-                        await new Promise(r => setTimeout(r, 1500));
+                        await new Promise(function(r) { setTimeout(r, 1500); });
                         fill.style.width = '100%'; text.textContent = 'Готово!';
-                        await new Promise(r => setTimeout(r, 500)); wrapper.classList.remove('visible');
-                        resultsDiv.innerHTML = generateCsResults();
-                        resultsDiv.classList.add('visible');
+                        await new Promise(function(r) { setTimeout(r, 500); }); wrapper.classList.remove('visible');
+                        resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
                         resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 }
             } catch (err) {
                 text.textContent = 'Ошибка: ' + err.message; fill.style.width = '0%';
-                setTimeout(() => { wrapper.classList.remove('visible'); fill.style.width = '0%'; text.textContent = 'В очереди...'; }, 3000);
+                setTimeout(function() { wrapper.classList.remove('visible'); fill.style.width = '0%'; text.textContent = 'В очереди...'; }, 3000);
             }
         }
-
-        document.getElementById('dotaAnalyzeBtn').addEventListener('click', () => runAnalysis('dota'));
-        document.getElementById('csAnalyzeBtn').addEventListener('click', () => runAnalysis('cs'));
-
-        window.addEventListener('load', () => { const user = getCurrentUser(); if (user) enterApp(); });
+        document.getElementById('dotaAnalyzeBtn').addEventListener('click', function() { runAnalysis('dota'); });
+        document.getElementById('csAnalyzeBtn').addEventListener('click', function() { runAnalysis('cs'); });
+        window.addEventListener('load', function() { var user = getCurrentUser(); if (user) enterApp(); });
     </script>
 </body>
 </html>
