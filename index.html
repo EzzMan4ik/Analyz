@@ -1141,7 +1141,9 @@
             players.forEach(function(p, i) {
                 var side = p.player_slot < 128 ? 'Radiant' : 'Dire';
                 var heroName = getHeroName(p.hero_id);
-                playerOptions += '<option value="' + i + '"' + (i === 0 ? ' selected' : '') + '>' + heroName + ' (' + side + ') — KDA: ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
+                var nick = p.personaname || ('Аноним #' + p.account_id);
+playerOptions += '<option value="' + i + '"' + (i === 0 ? ' selected' : '') + '>' + heroName + ' — ' + nick + ' (' + side + ') — ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
+
             });
             var player = players[0];
             if (!player) return '<div class="problem-block"><div class="problem-text">Данные игрока не найдены</div></div>';
@@ -1161,7 +1163,9 @@
                 data.players.forEach(function(p, i) {
                     var side = p.player_slot < 128 ? 'Radiant' : 'Dire';
                     var heroName = getHeroName(p.hero_id);
-                    playerOptions += '<option value="' + i + '"' + (i === playerIndex ? ' selected' : '') + '>' + heroName + ' (' + side + ') — KDA: ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
+                    var nick = p.personaname || ('Аноним #' + p.account_id);
+playerOptions += '<option value="' + i + '"' + (i === playerIndex ? ' selected' : '') + '>' + heroName + ' — ' + nick + ' (' + side + ') — ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
+
                 });
                 resultsDiv.innerHTML = buildDotaAnalysis(data, player, playerIndex, playerOptions);
             } catch (err) { console.error('Ошибка:', err); }
