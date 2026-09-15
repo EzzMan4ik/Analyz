@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -15,7 +14,6 @@
             --logo-primary: #c5a028;
             --logo-secondary: #fff;
         }
-        /* Светлая тема */
         html.light-theme {
             --dark-bg: #f5f5f8;
             --card-bg: #fff;
@@ -26,7 +24,6 @@
         html.light-theme body { color: #333; }
         html { scroll-behavior: smooth; }
 
-        /* === ЛОГОТИП SVG === */
         .ga-logo { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
         .ga-logo-svg { width: 36px; height: 36px; flex-shrink: 0; }
         .ga-logo-svg .ga-shield { fill: var(--card-bg); stroke: var(--logo-primary); stroke-width: 2; transition: fill 0.3s ease, stroke 0.3s ease; }
@@ -276,6 +273,43 @@
         .tier-info-letter.b { color: #f1c40f; }
         .tier-info-letter.c { color: #95a5a6; }
         .tier-info-letter.d { color: #636e72; }
+
+        /* === STEAM СТАТИСТИКА === */
+        .steam-block { max-width: 700px; margin: 0 auto; }
+        .steam-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+        .steam-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
+        html.light-theme .steam-input { background-color: #f9f9f9; color: #333; border-color: #ccc; }
+        .steam-input:focus { border-color: var(--dark-gold); box-shadow: 0 0 0 2px rgba(197,160,40,0.2); }
+        .steam-input::placeholder { color: #666; }
+        .steam-btn { background-color: var(--beige); color: #333; border: none; border-radius: 8px; padding: 16px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
+        .steam-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 15px rgba(197,160,40,0.4); }
+        .period-selector { display: flex; gap: 8px; flex-wrap: wrap; }
+        .period-btn { padding: 10px 20px; border-radius: 8px; border: 2px solid #333; background-color: var(--card-bg); color: #aaa; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; }
+        html.light-theme .period-btn { border-color: #ccc; color: #555; }
+        .period-btn:hover { border-color: #555; transform: translateY(-2px); }
+        .period-btn.active { border-color: var(--dark-gold); color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); background-color: rgba(197,160,40,0.08); }
+        .steam-progress { display: none; margin-top: 24px; }
+        .steam-progress.visible { display: block; }
+        .steam-results { display: none; margin-top: 30px; }
+        .steam-results.visible { display: block; animation: fadeIn 0.6s ease; }
+        .profile-header { background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .profile-header { border-color: #e0e0e0; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--dark-gold); object-fit: cover; }
+        .profile-info { flex: 1; min-width: 200px; }
+        .profile-info h2 { color: var(--dark-gold); font-size: 1.4rem; margin-bottom: 6px; }
+        .profile-info-meta { color: #888; font-size: 0.95rem; }
+        .profile-medal { padding: 6px 16px; border-radius: 8px; font-weight: 700; font-size: 1rem; }
+        .hero-stats-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
+        html.light-theme .hero-stats-row { border-color: #eee; }
+        .hero-stats-row:last-child { border-bottom: none; }
+        .hero-stats-img { width: 48px; height: 28px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+        .hero-stats-name { flex: 1; font-size: 0.95rem; }
+        .hero-stats-games { color: #888; font-size: 0.85rem; }
+        .hero-stats-wr { font-weight: 700; font-size: 0.95rem; min-width: 60px; text-align: right; }
+        .hero-stats-wr.good { color: var(--green); }
+        .hero-stats-wr.bad { color: var(--red); }
+        .steam-hint { color: #666; font-size: 0.85rem; }
+
         @media (max-width: 768px) {
             .content-area { padding: 30px 20px; }
             .navbar { padding: 18px 20px 18px 70px; }
@@ -288,24 +322,20 @@
             .farm-table th, .farm-table td { padding: 6px; font-size: 0.85rem; }
             .ga-logo-text { font-size: 1.2rem; }
             .auth-logo .ga-logo-text { font-size: 1.6rem; }
+            .profile-header { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
-    <!-- ===== ШАБЛОН ЛОГОТИПА (SVG, используется в 2-х местах) ===== -->
     <svg style="display:none;">
         <symbol id="ga-logo-icon" viewBox="0 0 48 48">
-            <!-- Щит -->
             <path class="ga-shield" d="M24 4 L42 12 L42 26 Q42 38 24 44 Q6 38 6 26 L6 12 Z"/>
-            <!-- Прицел/радар -->
             <circle class="ga-crosshair" cx="24" cy="24" r="12"/>
             <line class="ga-crosshair" x1="24" y1="8" x2="24" y2="16"/>
             <line class="ga-crosshair" x1="24" y1="32" x2="24" y2="40"/>
             <line class="ga-crosshair" x1="8" y1="24" x2="16" y2="24"/>
             <line class="ga-crosshair" x1="32" y1="24" x2="40" y2="24"/>
-            <!-- Центральная точка -->
             <circle class="ga-dot" cx="24" cy="24" r="3"/>
-            <!-- График-полоски внизу щита (аналитика) -->
             <rect class="ga-bar-bg" x="12" y="34" width="4" height="6" rx="1"/>
             <rect class="ga-bar" x="12" y="36" width="4" height="4" rx="1"/>
             <rect class="ga-bar-bg" x="18" y="32" width="4" height="8" rx="1"/>
@@ -384,6 +414,7 @@
                     <div class="feature-card"><div class="feature-icon">🏆</div><div class="feature-title">Определение роли</div><div class="feature-text">ИИ определяет вашу идеальную роль на основе 20+ параметров поведения в матче.</div></div>
                     <div class="feature-card"><div class="feature-icon">📈</div><div class="feature-title">Отслеживание прогресса</div><div class="feature-text">История разборов и графики роста по неделям — следите за улучшениями.</div></div>
                     <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальный тир-лист по рангам и позициям — от Рекрута до Титана. На основе статистики.</div></div>
+                    <div class="feature-card"><div class="feature-icon">👤</div><div class="feature-title">Личная статистика</div><div class="feature-text">Введите Steam ID — получите статистику за период: винрейт, лучшие герои, средние показатели.</div></div>
                 </div>
             </div>
             <div class="section" id="section-subscriptions">
@@ -423,6 +454,10 @@
                         <span class="dota-subtab-icon">📋</span>
                         <span class="dota-subtab-text">Тир-лист героев</span>
                     </div>
+                    <div class="dota-subtab" data-subtab="stats">
+                        <span class="dota-subtab-icon">👤</span>
+                        <span class="dota-subtab-text">Моя статистика</span>
+                    </div>
                 </div>
                 <div class="dota-subcontent active" id="dotaSub-analysis">
                     <div class="game-block">
@@ -456,6 +491,29 @@
                     <div class="tierlist-updated" id="tierlistUpdated"></div>
                     <div id="tierlistContent">
                         <div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div>
+                    </div>
+                </div>
+                <div class="dota-subcontent" id="dotaSub-stats">
+                    <div class="steam-block">
+                        <div class="game-icon">👤</div>
+                        <div class="section-title">Моя статистика</div>
+                        <div class="section-desc">Введите ваш Steam ID, ссылку на профиль Steam или Dota 2 friend code — сервис выгрузит статистику за выбранный период.</div>
+                        <div class="steam-form">
+                            <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль / friend code" id="steamInput" />
+                            <div class="period-selector">
+                                <div class="period-btn active" data-period="7">7 дней</div>
+                                <div class="period-btn" data-period="30">30 дней</div>
+                                <div class="period-btn" data-period="90">90 дней</div>
+                                <div class="period-btn" data-period="0">Всё время</div>
+                            </div>
+                            <button class="steam-btn" id="steamFetchBtn">Получить статистику</button>
+                        </div>
+                        <div class="steam-hint">Steam ID можно найти на сайте steamid.xyz — введите ссылку на профиль, и сайт выдаст номер. Для работы нужен 32-битный Steam ID (account_id).</div>
+                        <div class="steam-progress" id="steamProgress">
+                            <div class="progress-bar"><div class="progress-fill" id="steamProgressFill"></div></div>
+                            <div class="progress-text" id="steamProgressText">Загрузка...</div>
+                        </div>
+                        <div class="steam-results" id="steamResults"></div>
                     </div>
                 </div>
             </div>
@@ -991,158 +1049,4 @@
                 var farmText = '';
                 if (lh10 != null) {
                     if (lh10 < bm.lh10 * 0.7) farmText += '<strong style="color:var(--red);">Слабый старт:</strong> к 10-й минуте у вас ' + lh10 + ' ластхитов — про-игроки на позиции ' + bm.name + ' добивают ' + bm.lh10 + '. ';
-                    else if (lh10 >= bm.lh10) farmText += '<strong style="color:var(--green);">Отличный старт:</strong> ' + lh10 + ' ластхитов к 10-й минуте — на уровне про-сцены. ';
-                    else farmText += '<strong style="color:var(--orange);">Средний старт:</strong> ' + lh10 + ' из ' + bm.lh10 + ' ластхитов к 10-й минуте. ';
-                }
-                if (farmText) html += '<div class="analysis-text">' + farmText + '</div>';
-                html += '</div>';
-            }
-            if (keyPurchases.length > 0) {
-                html += '<div class="result-block"><div class="result-block-title">⏱️ Тайминги ключевых предметов</div><div class="item-timeline">';
-                keyPurchases.forEach(function(p) { html += '<div class="item-chip">' + p.name + ' — <span class="item-time">' + p.timeStr + '</span></div>'; });
-                html += '</div>';
-                if (blink) { var blinkMin = blink.time / 60; if (blinkMin > bm.blinkPro + 3) html += '<div class="analysis-text"><strong style="color:var(--red);">Blink Dagger в ' + blink.timeStr + '</strong> — на ' + Math.round(blinkMin - bm.blinkPro) + ' мин позже про-нормы.</div>'; else if (blinkMin <= bm.blinkPro + 1) html += '<div class="analysis-text"><strong style="color:var(--green);">Blink Dagger в ' + blink.timeStr + '</strong> — отличный тайминг.</div>'; }
-                html += '</div>';
-            }
-            html += '<div class="result-block"><div class="result-block-title">🏆 Сравнение с киберспортсменами</div>';
-            var gpmRatio = Math.round(gpm / bm.gpm * 100);
-            if (gpmRatio >= 95) html += '<div class="comp-item">Фарм на уровне про — <strong style="color:var(--green);">' + gpm + ' GPM</strong> (' + gpmRatio + '%).</div>';
-            else if (gpmRatio >= 75) html += '<div class="comp-item">Фарм ниже про-уровня — <strong style="color:var(--orange);">' + gpm + ' GPM</strong> (' + gpmRatio + '%). Разница: ' + Math.round((bm.gpm - gpm) * durMin / 1000) + 'K потерянного золота.</div>';
-            else html += '<div class="comp-item">Фарм значительно ниже про — <strong style="color:var(--red);">' + gpm + ' GPM</strong> (' + gpmRatio + '%).</div>';
-            html += '</div>';
-            html += '<div class="result-block"><div class="result-block-title">✅ Сильные стороны</div>';
-            if (gpm >= bm.gpm) html += '<div class="strength-item"><span class="marker">+</span> GPM ' + gpm + ' — про-уровень.</div>';
-            if (killPart >= 65) html += '<div class="strength-item"><span class="marker">+</span> Высокое участие в драках (' + killPart + '%).</div>';
-            if (deaths <= 3) html += '<div class="strength-item"><span class="marker">+</span> Мало смертей (' + deaths + ').</div>';
-            html += '</div>';
-            html += '<div class="result-block"><div class="result-block-title">❌ Слабые стороны</div>';
-            if (gpm < bm.gpm * 0.8) html += '<div class="weakness-item"><span class="marker">−</span> Низкий GPM (' + gpm + ', про: ' + bm.gpm + ').</div>';
-            if (deaths >= 8) html += '<div class="weakness-item"><span class="marker">−</span> Слишком много смертей (' + deaths + ').</div>';
-            html += '</div>';
-            html += '<div class="result-block"><div class="result-block-title">💡 Рекомендации</div>';
-            if (gpm < bm.gpm * 0.8) html += '<div class="recommendation-item"><span class="marker">1.</span><div>Улучшите фарм-паттерн.<div class="rec-exercise"><strong>Упражнение:</strong> 20 минут в лобби: крип с линии → 2 из леса → обратно. Цель: 80 LH к 10-й минуте.</div></div></div>';
-            if (deaths >= 8) html += '<div class="recommendation-item"><span class="marker">2.</span><div>Работайте над отступлением.<div class="rec-exercise"><strong>Упражнение:</strong> Смотрите реплеи своих смертей и анализируйте.</div></div></div>';
-            html += '</div>';
-            html += '<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
-            return html;
-        }
-
-        function generateDotaResultsFromAPI(data) {
-            var players = data.players || [];
-            var playerOptions = '';
-            players.forEach(function(p, i) {
-                var side = p.player_slot < 128 ? 'Radiant' : 'Dire';
-                var heroName = getHeroName(p.hero_id);
-                var nick = p.personaname || ('Аноним #' + p.account_id);
-                playerOptions += '<option value="' + i + '"' + (i === 0 ? ' selected' : '') + '>' + heroName + ' — ' + nick + ' (' + side + ') — ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
-            });
-            var player = players[0];
-            if (!player) return '<div class="problem-block"><div class="problem-text">Данные игрока не найдены</div></div>';
-            return buildDotaAnalysis(data, player, 0, playerOptions);
-        }
-
-        window.switchDotaPlayer = async function(matchId) {
-            var resultsDiv = document.getElementById('dotaResults');
-            var dropdown = resultsDiv.querySelector('.player-select-dropdown');
-            var playerIndex = parseInt(dropdown.value);
-            try {
-                var response = await fetch('https://api.opendota.com/api/matches/' + matchId);
-                var data = await response.json();
-                var player = data.players[playerIndex];
-                if (!player) return;
-                var playerOptions = '';
-                data.players.forEach(function(p, i) {
-                    var side = p.player_slot < 128 ? 'Radiant' : 'Dire';
-                    var heroName = getHeroName(p.hero_id);
-                    var nick = p.personaname || ('Аноним #' + p.account_id);
-                    playerOptions += '<option value="' + i + '"' + (i === playerIndex ? ' selected' : '') + '>' + heroName + ' — ' + nick + ' (' + side + ') — ' + p.kills + '/' + p.deaths + '/' + p.assists + '</option>';
-                });
-                resultsDiv.innerHTML = buildDotaAnalysis(data, player, playerIndex, playerOptions);
-            } catch (err) { console.error('Ошибка:', err); }
-        };
-
-        function generateCsResults() {
-            return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Выживаемость в первых контактах — 25%. Про-энтри выживают в 45-50%.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div><div class="metric-card"><div class="metric-label">Выживаемость</div><div class="metric-value">25%</div><div class="metric-sub bad">Про: 47%</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Точный аим: HS% 48%</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Выходите раньше смоков</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги.<div class="rec-exercise"><strong>Упражнение:</strong> Retake-режим 30 минут.</div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
-        }
-
-        window.resetAnalysis = function(game) {
-            var prefix = game === 'dota' ? 'dota' : 'cs';
-            document.getElementById(prefix + 'Results').classList.remove('visible');
-            document.getElementById(prefix + 'Results').innerHTML = '';
-            document.getElementById(prefix + 'Progress').classList.remove('visible');
-            document.getElementById(prefix + 'ProgressFill').style.width = '0%';
-            document.getElementById(prefix + 'Link').value = '';
-            if (game === 'cs') { var fi = document.getElementById('csFile'); if (fi) fi.value = ''; }
-        };
-
-        async function runAnalysis(game) {
-            var prefix = game === 'dota' ? 'dota' : 'cs';
-            var link = document.getElementById(prefix + 'Link').value.trim();
-            if (!link) { alert('Вставьте ссылку или match_id'); return; }
-            var matchId = link;
-            if (link.includes('/')) { var parts = link.split('/'); matchId = parts[parts.length - 1]; }
-            var wrapper = document.getElementById(prefix + 'Progress');
-            var fill = document.getElementById(prefix + 'ProgressFill');
-            var text = document.getElementById(prefix + 'ProgressText');
-            var resultsDiv = document.getElementById(prefix + 'Results');
-            resultsDiv.classList.remove('visible'); resultsDiv.innerHTML = '';
-            wrapper.classList.add('visible'); fill.style.width = '0%'; text.textContent = 'Обработка запроса...';
-            try {
-                if (game === 'dota') {
-                    fill.style.width = '15%'; text.textContent = 'Загрузка данных о героях...';
-                    if (!tierlistData) { try { var statsRes = await fetch('https://api.opendota.com/api/heroStats'); if (statsRes.ok) tierlistData = await statsRes.json(); } catch (e) {} }
-                    fill.style.width = '30%'; text.textContent = 'Получение данных матча...';
-                    var response = await fetch('https://api.opendota.com/api/matches/' + matchId);
-                    if (!response.ok) throw new Error('Матч не найден');
-                    var data = await response.json();
-                    if (!data.players || data.players.length === 0) throw new Error('Матч ещё не обработан. Попробуйте позже.');
-                    var isParsed = data.players[0] && data.players[0].lh_t && data.players[0].lh_t.length > 0;
-                    if (!isParsed) {
-                        fill.style.width = '40%'; text.textContent = 'Отправляю запрос на парсинг...';
-                        try {
-                            var parseRes = await fetch('https://api.opendota.com/api/request/' + matchId, { method: 'POST' });
-                            if (parseRes.ok) {
-                                var parseData = await parseRes.json();
-                                var jobId = parseData.job && parseData.job.jobId;
-                                if (jobId) {
-                                    fill.style.width = '50%'; text.textContent = 'Парсинг реплея...';
-                                    for (var attempt = 0; attempt < 30; attempt++) {
-                                        await new Promise(function(r) { setTimeout(r, 5000); });
-                                        fill.style.width = (50 + Math.round(attempt / 30 * 30)) + '%';
-                                        text.textContent = 'Парсинг... Попытка ' + (attempt + 1) + '/30';
-                                        var jobRes = await fetch('https://api.opendota.com/api/request/' + jobId);
-                                        if (jobRes.ok) { var jobData = await jobRes.json(); if (jobData.job && jobData.job.success) { parsed = true; break; } if (jobData.job && jobData.job.error) break; }
-                                    }
-                                    if (parsed) { fill.style.width = '85%'; response = await fetch('https://api.opendota.com/api/matches/' + matchId); data = await response.json(); }
-                                }
-                            }
-                        } catch (e) { console.error('Парсинг:', e); }
-                    }
-                    fill.style.width = '90%'; text.textContent = 'Сравнение с про-сценой...';
-                    await new Promise(function(r) { setTimeout(r, 400); });
-                    fill.style.width = '100%'; text.textContent = 'Готово!';
-                    await new Promise(function(r) { setTimeout(r, 400); });
-                    wrapper.classList.remove('visible');
-                    resultsDiv.innerHTML = generateDotaResultsFromAPI(data);
-                    resultsDiv.classList.add('visible');
-                    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-                if (game === 'cs') {
-                    fill.style.width = '50%'; text.textContent = 'Формирование разбора...';
-                    await new Promise(function(r) { setTimeout(r, 1500); });
-                    fill.style.width = '100%'; text.textContent = 'Готово!';
-                    await new Promise(function(r) { setTimeout(r, 500); }); wrapper.classList.remove('visible');
-                    resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
-                    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            } catch (err) {
-                text.textContent = 'Ошибка: ' + err.message; fill.style.width = '0%';
-                setTimeout(function() { wrapper.classList.remove('visible'); fill.style.width = '0%'; text.textContent = 'В очереди...'; }, 3000);
-            }
-        }
-        document.getElementById('dotaAnalyzeBtn').addEventListener('click', function() { runAnalysis('dota'); });
-        document.getElementById('csAnalyzeBtn').addEventListener('click', function() { runAnalysis('cs'); });
-        window.addEventListener('load', function() { var user = getCurrentUser(); if (user) enterApp(); });
-    </script>
-</body>
-</html>
+                    else if (lh10 >= bm.lh10) farmText += '<strong style="color:var(--green);">Отличный старт:</strong>
