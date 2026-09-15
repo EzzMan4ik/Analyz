@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -11,14 +12,41 @@
             --dark-gold: #c5a028; --beige: #d4c5a0; --gold-hover: #d4af37;
             --dark-bg: #14141f; --card-bg: #1e1e30; --sidebar-width: 260px;
             --error-color: #e74c3c; --green: #2ecc71; --red: #e74c3c; --orange: #e67e22;
+            --logo-primary: #c5a028;
+            --logo-secondary: #fff;
         }
-        body { background-color: var(--dark-bg); color: #fff; line-height: 1.6; overflow-x: hidden; }
+        /* Светлая тема */
+        html.light-theme {
+            --dark-bg: #f5f5f8;
+            --card-bg: #fff;
+            --logo-primary: #b8920c;
+            --logo-secondary: #1a1a2a;
+        }
+        body { background-color: var(--dark-bg); color: #fff; line-height: 1.6; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
+        html.light-theme body { color: #333; }
         html { scroll-behavior: smooth; }
+
+        /* === ЛОГОТИП SVG === */
+        .ga-logo { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+        .ga-logo-svg { width: 36px; height: 36px; flex-shrink: 0; }
+        .ga-logo-svg .ga-shield { fill: var(--card-bg); stroke: var(--logo-primary); stroke-width: 2; transition: fill 0.3s ease, stroke 0.3s ease; }
+        .ga-logo-svg .ga-crosshair { fill: none; stroke: var(--logo-primary); stroke-width: 2; transition: stroke 0.3s ease; }
+        .ga-logo-svg .ga-dot { fill: var(--logo-primary); transition: fill 0.3s ease; }
+        .ga-logo-svg .ga-bar { fill: var(--logo-primary); transition: fill 0.3s ease; }
+        .ga-logo-svg .ga-bar-bg { fill: var(--logo-primary); opacity: 0.2; transition: fill 0.3s ease; }
+        .ga-logo-text { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 800; letter-spacing: 0.5px; font-size: 1.5rem; white-space: nowrap; }
+        .ga-logo-text .ga-gold { color: var(--logo-primary); transition: color 0.3s ease; }
+        .ga-logo-text .ga-white { color: var(--logo-secondary); transition: color 0.3s ease; }
+
         .auth-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 20px; }
-        .auth-logo { font-size: 2.5rem; font-weight: bold; color: var(--dark-gold); margin-bottom: 20px; letter-spacing: 1px; }
-        .auth-box { width: 100%; max-width: 400px; background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 32px; }
+        .auth-logo { margin-bottom: 24px; }
+        .auth-logo .ga-logo-text { font-size: 2rem; }
+        .auth-logo .ga-logo-svg { width: 48px; height: 48px; }
+        .auth-box { width: 100%; max-width: 400px; background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 32px; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .auth-box { border-color: #ddd; }
         .auth-title { font-size: 1.3rem; font-weight: 600; color: var(--dark-gold); margin-bottom: 20px; text-align: center; }
-        .auth-field { width: 100%; margin: 10px 0; padding: 14px; border: 1px solid #444; border-radius: 6px; background-color: #222; color: #fff; outline: none; font-size: 1rem; transition: border 0.3s; }
+        .auth-field { width: 100%; margin: 10px 0; padding: 14px; border: 1px solid #444; border-radius: 6px; background-color: #222; color: #fff; outline: none; font-size: 1rem; transition: border 0.3s, background-color 0.3s ease, color 0.3s ease; }
+        html.light-theme .auth-field { background-color: #f9f9f9; color: #333; border-color: #ccc; }
         .auth-field:focus { border-color: var(--dark-gold); box-shadow: 0 0 0 2px rgba(197,160,40,0.2); }
         .auth-field::placeholder { color: #666; }
         .auth-btn { background-color: var(--beige); color: #333; border: none; border-radius: 6px; padding: 14px 24px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; margin-top: 10px; width: 100%; }
@@ -31,53 +59,74 @@
         .auth-switch a { color: var(--dark-gold); cursor: pointer; text-decoration: none; font-weight: 600; }
         .auth-switch a:hover { text-decoration: underline; }
         .auth-hint { text-align: center; margin-top: 14px; color: #666; font-size: 0.85rem; }
+
         .app-wrapper { display: none; min-height: 100vh; }
         .app-wrapper.active { display: block; }
-        .burger { position: fixed; top: 20px; left: 20px; z-index: 200; cursor: pointer; padding: 10px; background-color: var(--card-bg); border-radius: 8px; border: 1px solid #333; }
+        .burger { position: fixed; top: 20px; left: 20px; z-index: 200; cursor: pointer; padding: 10px; background-color: var(--card-bg); border-radius: 8px; border: 1px solid #333; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .burger { border-color: #ddd; }
         .burger span { display: block; width: 26px; height: 3px; background-color: var(--dark-gold); border-radius: 2px; margin: 5px 0; transition: all 0.3s ease; }
         .burger.open span:nth-child(1) { transform: rotate(45deg) translate(6px,6px); }
         .burger.open span:nth-child(2) { opacity: 0; }
         .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(6px,-6px); }
-        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background-color: #1a1a2a; border-right: 1px solid #333; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.25,1,0.5,1); z-index: 150; padding-top: 80px; overflow-y: auto; }
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background-color: #1a1a2a; border-right: 1px solid #333; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.25,1,0.5,1), background-color 0.3s ease; z-index: 150; padding-top: 80px; overflow-y: auto; }
+        html.light-theme .sidebar { background-color: #fff; border-color: #e0e0e0; }
         .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.5); }
         .sidebar-user { padding: 16px 24px; border-bottom: 1px solid #333; margin-bottom: 8px; }
+        html.light-theme .sidebar-user { border-color: #e0e0e0; }
         .sidebar-user-label { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
         .sidebar-user-name { color: var(--dark-gold); font-weight: 600; font-size: 1.1rem; margin-top: 4px; }
         .sidebar-user-plan { color: #888; font-size: 0.9rem; margin-top: 4px; }
         .sidebar-item { padding: 16px 24px; cursor: pointer; color: #aaa; font-size: 1.05rem; transition: all 0.25s ease; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
+        html.light-theme .sidebar-item { color: #555; }
         .sidebar-item:hover { background-color: #222240; color: #fff; }
+        html.light-theme .sidebar-item:hover { background-color: #f0f0f5; color: #1a1a2a; }
         .sidebar-item.active { color: var(--dark-gold); border-left-color: var(--dark-gold); background-color: rgba(197,160,40,0.08); font-weight: 600; }
         .sidebar-item .icon { font-size: 1.2rem; width: 24px; text-align: center; }
         .sidebar-divider { height: 1px; background-color: #333; margin: 8px 20px; }
+        html.light-theme .sidebar-divider { background-color: #e0e0e0; }
+        .theme-toggle { padding: 16px 24px; cursor: pointer; color: #aaa; font-size: 1.05rem; transition: all 0.25s ease; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
+        html.light-theme .theme-toggle { color: #555; }
+        .theme-toggle:hover { background-color: #222240; color: #fff; }
+        html.light-theme .theme-toggle:hover { background-color: #f0f0f5; color: #1a1a2a; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; z-index: 100; }
         .overlay.visible { opacity: 1; visibility: visible; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 18px 80px; border-bottom: 1px solid #333; }
-        .navbar-logo { font-size: 1.6rem; font-weight: bold; color: var(--dark-gold); letter-spacing: 1px; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 18px 80px; border-bottom: 1px solid #333; transition: border-color 0.3s ease; }
+        html.light-theme .navbar { border-color: #e0e0e0; }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
         .logout-btn { background-color: var(--beige); color: #333; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 500; transition: background 0.3s; }
         .logout-btn:hover { background-color: var(--gold-hover); }
+        .theme-btn-nav { background: none; border: 1px solid #444; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 1.1rem; transition: border 0.3s; }
+        html.light-theme .theme-btn-nav { border-color: #ccc; }
+        .theme-btn-nav:hover { border-color: var(--dark-gold); }
         .content-area { padding: 40px 40px 40px 80px; max-width: 1200px; }
         .section { display: none; animation: fadeIn 0.5s ease; }
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .section-title { font-size: 1.8rem; font-weight: bold; color: var(--dark-gold); margin-bottom: 24px; }
         .section-desc { color: #bbb; font-size: 1.05rem; margin-bottom: 30px; max-width: 700px; line-height: 1.8; }
+        html.light-theme .section-desc { color: #666; }
         .back-home-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px; padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem; transition: all 0.3s; margin-bottom: 24px; }
+        html.light-theme .back-home-btn { border-color: #ccc; color: #555; }
         .back-home-btn:hover { border-color: var(--dark-gold); color: var(--dark-gold); }
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-        .feature-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; transition: transform 0.3s, box-shadow 0.3s; }
+        .feature-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease; }
+        html.light-theme .feature-card { border-color: #e0e0e0; }
         .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         .feature-icon { font-size: 2rem; margin-bottom: 12px; }
         .feature-title { color: var(--dark-gold); font-weight: 600; font-size: 1.1rem; margin-bottom: 8px; }
         .feature-text { color: #999; font-size: 0.95rem; }
+        html.light-theme .feature-text { color: #777; }
         .subscription-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-        .subscription-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; position: relative; transform: translateY(30px); opacity: 0; transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.3s ease; }
+        .subscription-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; position: relative; transform: translateY(30px); opacity: 0; transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .subscription-card { border-color: #e0e0e0; }
         .subscription-card.visible { transform: translateY(0); opacity: 1; }
         .subscription-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.4); transform: translateY(-4px); }
         .subscription-card.active-plan { border-color: var(--dark-gold); box-shadow: 0 0 15px rgba(197,160,40,0.3); }
         .premium-badge { position: absolute; top: 0; left: 0; right: 0; height: 6px; background-color: var(--dark-gold); border-radius: 10px 10px 0 0; }
         .subscription-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 16px; color: var(--dark-gold); text-align: center; }
         .benefits-list { list-style: none; padding-left: 0; }
-        .benefit { margin-bottom: 10px; padding-left: 22px; position: relative; }
+        .benefit { margin-bottom: 10px; padding-left: 22px; position: relative; color: #999; }
+        html.light-theme .benefit { color: #666; }
         .benefit::before { content: "\2022"; color: var(--dark-gold); font-weight: bold; position: absolute; left: 0; top: 2px; }
         .card-btn { display: block; width: 100%; background-color: var(--beige); color: #333; border: none; border-radius: 6px; padding: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; margin-top: 20px; transition: all 0.3s ease; }
         .card-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 12px rgba(197,160,40,0.4); }
@@ -88,29 +137,36 @@
         .game-icon { font-size: 3rem; margin-bottom: 16px; text-align: center; }
         .dota-subtabs { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
         .dota-subtab { display: flex; align-items: center; gap: 10px; background-color: var(--card-bg); border: 2px solid #333; border-radius: 10px; padding: 14px 28px; cursor: pointer; transition: all 0.3s ease; }
+        html.light-theme .dota-subtab { border-color: #ccc; }
         .dota-subtab:hover { border-color: #555; transform: translateY(-2px); }
         .dota-subtab.active { border-color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); background-color: rgba(197,160,40,0.08); }
         .dota-subtab-icon { font-size: 1.4rem; }
         .dota-subtab-text { color: #aaa; font-weight: 600; font-size: 1rem; }
+        html.light-theme .dota-subtab-text { color: #555; }
         .dota-subtab.active .dota-subtab-text { color: var(--dark-gold); }
         .dota-subcontent { display: none; }
         .dota-subcontent.active { display: block; animation: fadeIn 0.4s ease; }
         .link-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
         .link-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
+        html.light-theme .link-input { background-color: #f9f9f9; color: #333; border-color: #ccc; }
         .link-input:focus { border-color: var(--dark-gold); box-shadow: 0 0 0 2px rgba(197,160,40,0.2); }
         .link-input::placeholder { color: #666; }
         .file-input { width: 100%; padding: 12px; border: 1px dashed #555; border-radius: 8px; background-color: #222; color: #999; font-size: 0.9rem; cursor: pointer; }
+        html.light-theme .file-input { background-color: #f9f9f9; color: #777; border-color: #aaa; }
         .file-hint { color: #666; font-size: 0.85rem; margin-top: -8px; }
         .analyze-btn { background-color: var(--beige); color: #333; border: none; border-radius: 8px; padding: 16px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
         .analyze-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 15px rgba(197,160,40,0.4); }
         .progress-wrapper { display: none; margin-top: 24px; }
         .progress-wrapper.visible { display: block; }
         .progress-bar { width: 100%; height: 8px; background-color: #333; border-radius: 4px; overflow: hidden; }
+        html.light-theme .progress-bar { background-color: #ddd; }
         .progress-fill { height: 100%; width: 0%; background-color: var(--dark-gold); border-radius: 4px; transition: width 0.5s ease; }
         .progress-text { margin-top: 10px; color: #aaa; font-size: 0.95rem; }
+        html.light-theme .progress-text { color: #666; }
         .results-wrapper { display: none; margin-top: 30px; }
         .results-wrapper.visible { display: block; animation: fadeIn 0.6s ease; }
-        .result-header { background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .result-header { background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .result-header { border-color: #e0e0e0; }
         .result-header-info { flex: 1; min-width: 200px; }
         .result-header h2 { color: var(--dark-gold); font-size: 1.4rem; margin-bottom: 6px; }
         .result-header-meta { color: #888; font-size: 0.95rem; }
@@ -120,17 +176,21 @@
         .problem-block { background-color: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; }
         .problem-title { color: var(--red); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
         .problem-text { color: #ccc; font-size: 0.98rem; line-height: 1.7; }
+        html.light-theme .problem-text { color: #555; }
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .metric-card { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 18px; text-align: center; transition: transform 0.3s, border 0.3s; }
+        .metric-card { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 18px; text-align: center; transition: transform 0.3s, border 0.3s, border-color 0.3s ease; }
+        html.light-theme .metric-card { border-color: #e0e0e0; }
         .metric-card:hover { transform: translateY(-3px); border-color: var(--dark-gold); }
         .metric-label { color: #888; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .metric-value { color: var(--dark-gold); font-size: 1.8rem; font-weight: 700; }
         .metric-sub { color: #666; font-size: 0.8rem; margin-top: 4px; }
         .metric-sub.good { color: var(--green); }
         .metric-sub.bad { color: var(--red); }
-        .result-block { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+        .result-block { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 24px; margin-bottom: 20px; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .result-block { border-color: #e0e0e0; }
         .result-block-title { color: var(--dark-gold); font-weight: 600; font-size: 1.15rem; margin-bottom: 14px; }
         .strength-item, .weakness-item, .recommendation-item { padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
+        html.light-theme .strength-item, html.light-theme .weakness-item, html.light-theme .recommendation-item { border-color: #eee; }
         .strength-item:last-child, .weakness-item:last-child, .recommendation-item:last-child { border-bottom: none; }
         .strength-item { display: flex; align-items: start; gap: 10px; }
         .strength-item .marker { color: var(--green); font-weight: bold; }
@@ -138,42 +198,53 @@
         .recommendation-item { display: flex; align-items: start; gap: 10px; }
         .recommendation-item .marker { color: var(--dark-gold); font-weight: bold; }
         .rec-exercise { margin-top: 8px; padding: 12px 16px; background-color: rgba(197,160,40,0.08); border-left: 3px solid var(--dark-gold); border-radius: 0 6px 6px 0; color: #ccc; font-size: 0.92rem; }
+        html.light-theme .rec-exercise { color: #555; }
         .rec-exercise strong { color: var(--dark-gold); }
         .new-analysis-btn { display: inline-block; background-color: var(--beige); color: #333; border: none; border-radius: 8px; padding: 14px 28px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; margin-bottom: 30px; transition: all 0.3s ease; }
         .new-analysis-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 12px rgba(197,160,40,0.4); }
         .player-select { margin: 20px 0; }
         .player-select-label { color: #888; font-size: 0.9rem; margin-bottom: 8px; }
         .player-select-dropdown { width: 100%; max-width: 500px; padding: 12px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; cursor: pointer; }
+        html.light-theme .player-select-dropdown { background-color: #f9f9f9; color: #333; border-color: #ccc; }
         .player-select-dropdown:focus { border-color: var(--dark-gold); }
         .farm-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
         .farm-table th { text-align: left; padding: 10px; color: #888; font-size: 0.85rem; border-bottom: 1px solid #333; text-transform: uppercase; letter-spacing: 0.5px; }
+        html.light-theme .farm-table th { border-color: #e0e0e0; }
         .farm-table td { padding: 10px; border-bottom: 1px solid #2a2a3a; }
+        html.light-theme .farm-table td { border-color: #eee; }
         .farm-table .gold-val { color: var(--dark-gold); font-weight: 700; text-align: center; }
         .farm-table .pro-val { color: #888; text-align: center; }
         .farm-table .diff-good { color: var(--green); text-align: center; font-size: 0.85rem; }
         .farm-table .diff-bad { color: var(--red); text-align: center; font-size: 0.85rem; }
         .item-timeline { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .item-chip { background: #222; padding: 8px 14px; border-radius: 6px; border: 1px solid #444; font-size: 0.9rem; }
+        html.light-theme .item-chip { background: #f5f5f5; border-color: #ddd; }
         .item-chip .item-time { color: var(--dark-gold); font-weight: 700; }
         .analysis-text { color: #ccc; font-size: 0.95rem; line-height: 1.8; margin-top: 12px; }
+        html.light-theme .analysis-text { color: #555; }
         .analysis-text strong { font-weight: 700; }
         .comp-item { margin-bottom: 12px; padding-left: 16px; border-left: 2px solid var(--dark-gold); line-height: 1.7; }
         .rank-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
         .rank-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid #333; transition: all 0.3s ease; min-width: 80px; }
+        html.light-theme .rank-badge { border-color: #ccc; }
         .rank-badge:hover { transform: translateY(-3px); border-color: #555; }
         .rank-badge.active { border-color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); }
         .rank-badge-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
         .rank-badge-name { font-size: 0.78rem; color: #aaa; text-align: center; }
+        html.light-theme .rank-badge-name { color: #666; }
         .rank-badge.active .rank-badge-name { color: var(--dark-gold); }
         .position-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
         .position-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 14px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid #333; transition: all 0.3s ease; min-width: 70px; }
+        html.light-theme .position-badge { border-color: #ccc; }
         .position-badge:hover { transform: translateY(-3px); border-color: #555; }
         .position-badge.active { border-color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); }
         .position-badge-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .position-badge-name { font-size: 0.72rem; color: #aaa; text-align: center; }
+        html.light-theme .position-badge-name { color: #666; }
         .position-badge.active .position-badge-name { color: var(--dark-gold); }
         .tier-table { display: flex; flex-direction: column; gap: 12px; }
-        .tier-row { display: flex; gap: 12px; align-items: stretch; background-color: var(--card-bg); border-radius: 10px; padding: 16px; border: 1px solid #333; min-height: 80px; }
+        .tier-row { display: flex; gap: 12px; align-items: stretch; background-color: var(--card-bg); border-radius: 10px; padding: 16px; border: 1px solid #333; min-height: 80px; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .tier-row { border-color: #e0e0e0; }
         .tier-label { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 70px; border-radius: 8px; font-weight: 800; font-size: 1.6rem; padding: 8px; flex-shrink: 0; }
         .tier-label.s { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
         .tier-label.a { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
@@ -183,6 +254,7 @@
         .tier-label-desc { font-size: 0.6rem; font-weight: 500; margin-top: 2px; text-align: center; line-height: 1.2; }
         .tier-heroes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1; }
         .hero-card { position: relative; width: 84px; height: 48px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 2px solid #333; transition: all 0.25s ease; }
+        html.light-theme .hero-card { border-color: #ccc; }
         .hero-card:hover { border-color: var(--dark-gold); transform: translateY(-3px) scale(1.08); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .hero-card img { width: 100%; height: 100%; object-fit: cover; }
         .hero-card-tooltip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background-color: #111; border: 1px solid var(--dark-gold); border-radius: 6px; padding: 6px 10px; white-space: nowrap; font-size: 0.78rem; color: #fff; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 20; }
@@ -193,9 +265,11 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .tierlist-error { text-align: center; padding: 40px; color: var(--error-color); }
         .tierlist-updated { font-size: 0.85rem; color: #666; margin-bottom: 16px; }
-        .tier-info-block { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+        .tier-info-block { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 20px; margin-bottom: 24px; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .tier-info-block { border-color: #e0e0e0; }
         .tier-info-title { color: var(--dark-gold); font-weight: 600; font-size: 1.05rem; margin-bottom: 12px; }
         .tier-info-item { display: flex; align-items: start; gap: 8px; margin-bottom: 6px; font-size: 0.9rem; color: #aaa; }
+        html.light-theme .tier-info-item { color: #666; }
         .tier-info-letter { font-weight: 800; min-width: 20px; }
         .tier-info-letter.s { color: #e74c3c; }
         .tier-info-letter.a { color: #e67e22; }
@@ -212,12 +286,44 @@
             .hero-card { width: 64px; height: 36px; }
             .game-block { max-width: 100%; }
             .farm-table th, .farm-table td { padding: 6px; font-size: 0.85rem; }
+            .ga-logo-text { font-size: 1.2rem; }
+            .auth-logo .ga-logo-text { font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
+    <!-- ===== ШАБЛОН ЛОГОТИПА (SVG, используется в 2-х местах) ===== -->
+    <svg style="display:none;">
+        <symbol id="ga-logo-icon" viewBox="0 0 48 48">
+            <!-- Щит -->
+            <path class="ga-shield" d="M24 4 L42 12 L42 26 Q42 38 24 44 Q6 38 6 26 L6 12 Z"/>
+            <!-- Прицел/радар -->
+            <circle class="ga-crosshair" cx="24" cy="24" r="12"/>
+            <line class="ga-crosshair" x1="24" y1="8" x2="24" y2="16"/>
+            <line class="ga-crosshair" x1="24" y1="32" x2="24" y2="40"/>
+            <line class="ga-crosshair" x1="8" y1="24" x2="16" y2="24"/>
+            <line class="ga-crosshair" x1="32" y1="24" x2="40" y2="24"/>
+            <!-- Центральная точка -->
+            <circle class="ga-dot" cx="24" cy="24" r="3"/>
+            <!-- График-полоски внизу щита (аналитика) -->
+            <rect class="ga-bar-bg" x="12" y="34" width="4" height="6" rx="1"/>
+            <rect class="ga-bar" x="12" y="36" width="4" height="4" rx="1"/>
+            <rect class="ga-bar-bg" x="18" y="32" width="4" height="8" rx="1"/>
+            <rect class="ga-bar" x="18" y="34" width="4" height="6" rx="1"/>
+            <rect class="ga-bar-bg" x="24" y="30" width="4" height="10" rx="1"/>
+            <rect class="ga-bar" x="24" y="32" width="4" height="8" rx="1"/>
+            <rect class="ga-bar-bg" x="30" y="28" width="4" height="12" rx="1"/>
+            <rect class="ga-bar" x="30" y="30" width="4" height="10" rx="1"/>
+        </symbol>
+    </svg>
+
     <div class="auth-container" id="authScreen">
-        <div class="auth-logo">GamerAnalyzer</div>
+        <div class="auth-logo">
+            <div class="ga-logo">
+                <svg class="ga-logo-svg"><use href="#ga-logo-icon"/></svg>
+                <span class="ga-logo-text"><span class="ga-gold">GAMER</span><span class="ga-white">ANALYZER</span></span>
+            </div>
+        </div>
         <div class="auth-box">
             <div id="loginForm">
                 <div class="auth-title">Вход в аккаунт</div>
@@ -254,10 +360,18 @@
             <div class="sidebar-divider"></div>
             <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
             <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
+            <div class="sidebar-divider"></div>
+            <div class="theme-toggle" id="themeToggle"><span class="icon">🌓</span> Сменить тему</div>
         </div>
         <div class="navbar">
-            <div class="navbar-logo">GamerAnalyzer</div>
-            <button class="logout-btn" id="logoutBtn">Выйти</button>
+            <div class="ga-logo">
+                <svg class="ga-logo-svg"><use href="#ga-logo-icon"/></svg>
+                <span class="ga-logo-text"><span class="ga-gold">GAMER</span><span class="ga-white">ANALYZER</span></span>
+            </div>
+            <div class="navbar-right">
+                <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему">🌓</button>
+                <button class="logout-btn" id="logoutBtn">Выйти</button>
+            </div>
         </div>
         <div class="content-area">
             <div class="section active" id="section-home">
@@ -383,6 +497,18 @@
         function getCurrentUser() { const raw = localStorage.getItem('ga_current_user'); return raw ? JSON.parse(raw) : null; }
         function clearCurrentUser() { localStorage.removeItem('ga_current_user'); }
 
+        // === ПЕРЕКЛЮЧЕНИЕ ТЕМЫ ===
+        function initTheme() {
+            var saved = localStorage.getItem('ga_theme');
+            if (saved === 'light') document.documentElement.classList.add('light-theme');
+        }
+        function toggleTheme() {
+            document.documentElement.classList.toggle('light-theme');
+            var isLight = document.documentElement.classList.contains('light-theme');
+            localStorage.setItem('ga_theme', isLight ? 'light' : 'dark');
+        }
+        initTheme();
+
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
         const logoutBtn = document.getElementById('logoutBtn');
@@ -397,6 +523,8 @@
 
         document.getElementById('goToRegister').addEventListener('click', () => { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; hideError('loginError'); });
         document.getElementById('goToLogin').addEventListener('click', () => { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; hideError('regError'); hideSuccess('regSuccess'); });
+        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.getElementById('themeBtnNav').addEventListener('click', toggleTheme);
 
         registerBtn.addEventListener('click', async () => {
             const login = document.getElementById('regLoginInput').value.trim().toLowerCase();
@@ -437,14 +565,12 @@
         });
 
         function enterApp() { authScreen.style.display = 'none'; setTimeout(() => { appWrapper.classList.add('active'); updateUserInfo(); updateSubscriptionUI(); }, 10); }
-
         function updateUserInfo() {
             const user = getCurrentUser(); if (!user) return;
             document.getElementById('userName').textContent = user.login;
             const planNames = { 'free': 'Бесплатный', 'pro_dota2': 'PRO DOTA 2', 'pro_cs2': 'PRO CS 2', 'premium': 'PREMIUM' };
             document.getElementById('userPlan').textContent = planNames[user.plan] || 'Бесплатный';
         }
-
         function updateSubscriptionUI() {
             const user = getCurrentUser(); if (!user) return;
             subscriptionCards.forEach(card => { card.classList.remove('active-plan'); const btn = card.querySelector('.card-btn'); const badge = card.querySelector('.current-badge'); btn.classList.remove('current'); btn.textContent = 'Выбрать тариф'; badge.classList.remove('visible'); });
@@ -453,24 +579,20 @@
                 if (activeCard) { activeCard.classList.add('active-plan'); const btn = activeCard.querySelector('.card-btn'); const badge = activeCard.querySelector('.current-badge'); btn.classList.add('current'); btn.textContent = 'Активна'; badge.classList.add('visible'); }
             }
         }
-
         document.getElementById('btn-dota').addEventListener('click', () => selectPlan('pro_dota2'));
         document.getElementById('btn-cs').addEventListener('click', () => selectPlan('pro_cs2'));
         document.getElementById('btn-premium').addEventListener('click', () => selectPlan('premium'));
-
         async function selectPlan(plan) {
             const user = getCurrentUser(); if (!user) return;
             user.plan = plan; setCurrentUser(user);
             try { if (supabaseClient) await supabaseClient.from('users').update({ plan }).eq('login', user.login); } catch (err) { console.error('Ошибка обновления:', err); }
             updateUserInfo(); updateSubscriptionUI(); revealCards();
         }
-
         logoutBtn.addEventListener('click', () => { clearCurrentUser(); appWrapper.classList.remove('active'); closeSidebar(); document.getElementById('loginInput').value = ''; document.getElementById('passwordInput').value = ''; setTimeout(() => { authScreen.style.display = 'flex'; }, 300); });
         burger.addEventListener('click', () => toggleSidebar());
         overlay.addEventListener('click', () => closeSidebar());
         function toggleSidebar() { sidebar.classList.toggle('open'); overlay.classList.toggle('visible'); burger.classList.toggle('open'); }
         function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); burger.classList.remove('open'); }
-
         sidebarItems.forEach(item => {
             item.addEventListener('click', () => {
                 sidebarItems.forEach(i => i.classList.remove('active')); item.classList.add('active');
@@ -482,9 +604,7 @@
                 if (window.innerWidth < 768) closeSidebar();
             });
         });
-
         function revealCards() { subscriptionCards.forEach((card, index) => { card.classList.remove('visible'); setTimeout(() => { card.classList.add('visible'); }, index * 150); }); }
-
         document.querySelectorAll('.back-home-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 sidebarItems.forEach(i => i.classList.remove('active')); sections.forEach(s => s.classList.remove('active'));
@@ -492,7 +612,6 @@
                 const homeItem = document.querySelector('.sidebar-item[data-section="home"]'); if (homeItem) homeItem.classList.add('active');
             });
         });
-
         document.querySelectorAll('.dota-subtab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.dota-subtab').forEach(t => t.classList.remove('active'));
@@ -503,7 +622,6 @@
                 if (target === 'tierlist' && !tierlistData) loadTierlist();
             });
         });
-
         function showError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
         function hideError(id) { const el = document.getElementById(id); el.classList.remove('visible'); }
         function showSuccess(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
@@ -610,7 +728,6 @@
             var hasDurable = roles.indexOf('Durable') !== -1;
             var hasInitiator = roles.indexOf('Initiator') !== -1;
             var hasNuker = roles.indexOf('Nuker') !== -1;
-            var hasDisabler = roles.indexOf('Disabler') !== -1;
             var hasEscape = roles.indexOf('Escape') !== -1;
             var hasPusher = roles.indexOf('Pusher') !== -1;
             var lane = laneRolesMap[id];
@@ -684,7 +801,6 @@
             }).join('') + '</div>';
         }
 
-        // === HERO NAME LOOKUP ===
         function getHeroName(heroId) {
             if (tierlistData) {
                 var h = tierlistData.find(function(x) { return parseInt(x.id) === parseInt(heroId); });
@@ -693,7 +809,6 @@
             return 'Hero #' + heroId;
         }
 
-        // === POSITION DETECTION FROM MATCH DATA ===
         function getMatchPosition(player) {
             var laneRole = player.lane_role || 0;
             var hero = tierlistData ? tierlistData.find(function(h) { return parseInt(h.id) === parseInt(player.hero_id); }) : null;
@@ -722,7 +837,6 @@
             return 1;
         }
 
-        // === ITEM NAME MAPPING ===
         var ITEM_NAMES = {
             'blink': 'Blink Dagger', 'black_king_bar': 'BKB', 'assault': 'Assault Cuirass',
             'shivas_guard': "Shiva's Guard", 'radiance': 'Radiance', 'manta': 'Manta Style',
@@ -788,7 +902,6 @@
             'mask_of_madness', 'ethereal_blade', 'falcon_blade', 'mage_slayer', 'witch_blade',
             'ghost_scepter', 'arcane_boots', 'phase_boots', 'power_treads', 'tranquil_boots'];
 
-        // === PRO BENCHMARKS ===
         var PRO_BENCHMARKS = {
             1: { lh10: 50, lh20: 150, lh30: 250, gpm: 700, xpm: 680, name: 'керри', blinkPro: 18 },
             2: { lh10: 45, lh20: 130, lh30: 200, gpm: 650, xpm: 720, name: 'мида', blinkPro: 12 },
@@ -797,7 +910,6 @@
             5: { lh10: 10, lh20: 25, lh30: 50, gpm: 350, xpm: 320, name: 'хард-саппорта', blinkPro: 25 },
         };
 
-        // === BUILD DETAILED ANALYSIS ===
         function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
             var durSec = data.duration || 0;
             var durMin = Math.floor(durSec / 60);
@@ -810,340 +922,107 @@
             var posNames = ['—', 'Керри', 'Мид', 'Оффлейнер', 'Саппорт', 'Хард-саппорт'];
             var posName = posNames[posNum] || 'Игрок';
             var bm = PRO_BENCHMARKS[posNum] || PRO_BENCHMARKS[1];
-
-            var kills = player.kills || 0;
-            var deaths = player.deaths || 0;
-            var assists = player.assists || 0;
-            var gpm = player.gold_per_min || 0;
-            var xpm = player.xp_per_min || 0;
-            var lastHits = player.last_hits || 0;
-            var denies = player.denies || 0;
-            var heroDamage = player.hero_damage || 0;
-            var towerDamage = player.tower_damage || 0;
-            var apm = player.actions_per_min || null;
-            var stuns = player.stuns || null;
+            var kills = player.kills || 0, deaths = player.deaths || 0, assists = player.assists || 0;
+            var gpm = player.gold_per_min || 0, xpm = player.xp_per_min || 0;
+            var lastHits = player.last_hits || 0, denies = player.denies || 0;
+            var heroDamage = player.hero_damage || 0, towerDamage = player.tower_damage || 0;
+            var apm = player.actions_per_min || null, stuns = player.stuns || null;
             var campsStacked = player.camps_stacked || null;
             var observerUses = player.obs_placed != null ? player.obs_placed : (player.obs_log ? player.obs_log.length : null);
             var sentryUses = player.sen_placed != null ? player.sen_placed : (player.sen_log ? player.sen_log.length : null);
             var pings = player.pings != null ? player.pings : null;
             var runeUses = player.runes_log ? player.runes_log.length : null;
-
-            var goldT = player.gold_t || [];
-            var lhT = player.lh_t || [];
+            var lhT = player.lh_t || [], goldT = player.gold_t || [];
             var lh10 = lhT.length > 10 ? lhT[10] : null;
             var lh20 = lhT.length > 20 ? lhT[20] : null;
             var lh30 = lhT.length > 30 ? lhT[30] : null;
             var radiantAdv = data.radiant_gold_adv || [];
-            var radiantScore = data.radiant_score || 0;
-            var direScore = data.dire_score || 0;
+            var radiantScore = data.radiant_score || 0, direScore = data.dire_score || 0;
             var firstBloodTime = data.first_blood_time || 0;
-            var fbMin = Math.floor(firstBloodTime / 60);
-            var fbSec = firstBloodTime % 60;
+            var fbMin = Math.floor(firstBloodTime / 60), fbSec = firstBloodTime % 60;
             var teamKills = isRadiant ? radiantScore : direScore;
             var killPart = teamKills > 0 ? Math.round((kills + assists) / teamKills * 100) : 0;
-
             var isParsed = lhT.length > 0 || goldT.length > 0 || apm != null;
-
             var purchaseLog = player.purchase_log || [];
-            var keyPurchases = [];
-            var seenKeys = {};
+            var keyPurchases = [], seenKeys = {};
             purchaseLog.forEach(function(p) {
                 var key = p.key;
                 if (KEY_ITEMS.indexOf(key) !== -1 && !seenKeys[key]) {
                     seenKeys[key] = true;
                     var itemName = ITEM_NAMES[key] || key;
-                    var min = Math.floor(p.time / 60);
-                    var sec = p.time % 60;
+                    var min = Math.floor(p.time / 60), sec = p.time % 60;
                     keyPurchases.push({ name: itemName, key: key, time: p.time, timeStr: min + ':' + String(sec).padStart(2, '0') });
                 }
             });
             keyPurchases.sort(function(a, b) { return a.time - b.time; });
-
             var blink = keyPurchases.find(function(p) { return p.key === 'blink'; });
             var bkb = keyPurchases.find(function(p) { return p.key === 'black_king_bar'; });
-
             var html = '';
-
             if (!isParsed) {
                 html += '<div class="problem-block" style="border-color: rgba(231,160,40,0.3); background-color: rgba(231,160,40,0.06);">';
                 html += '<div class="problem-title" style="color: var(--orange);">⚠️ Ограниченные данные</div>';
-                html += '<div class="problem-text">Этот матч не был распарсен OpenDota — таймлайн фарма, тайминги предметов, APM и саппорт-метрики недоступны. Базовые показатели (GPM, XPM, KDA, урон) отображаются корректно. Для полного разбора попробуйте другой матч или повторите попытку через несколько минут — парсинг мог запуститься.</div>';
+                html += '<div class="problem-text">Этот матч не был распарсен OpenDota — таймлайн фарма, тайминги предметов, APM и саппорт-метрики недоступны. Базовые показатели (GPM, XPM, KDA, урон) отображаются корректно. Для полного разбора попробуйте другой матч или повторите попытку через несколько минут.</div>';
                 html += '</div>';
             }
-
-            html += '<div class="result-header">';
-            html += '<div class="result-header-info">';
-            html += '<h2>' + heroName + ' — ' + posName + '</h2>';
-            html += '<div class="result-header-meta">Длительность: ' + durStr + ' · Сторона: ' + (isRadiant ? 'Radiant' : 'Dire') + ' · Счёт: ' + radiantScore + ':' + direScore + (firstBloodTime > 0 ? ' · Первая кровь: ' + fbMin + ':' + String(fbSec).padStart(2, '0') : '') + '</div>';
-            html += '</div>';
-            html += '<div class="result-badge ' + (playerWon ? 'win' : 'lose') + '">' + (playerWon ? 'Победа' : 'Поражение') + '</div>';
-            html += '</div>';
-
+            html += '<div class="result-header"><div class="result-header-info"><h2>' + heroName + ' — ' + posName + '</h2>';
+            html += '<div class="result-header-meta">Длительность: ' + durStr + ' · Сторона: ' + (isRadiant ? 'Radiant' : 'Dire') + ' · Счёт: ' + radiantScore + ':' + direScore + (firstBloodTime > 0 ? ' · Первая кровь: ' + fbMin + ':' + String(fbSec).padStart(2, '0') : '') + '</div></div>';
+            html += '<div class="result-badge ' + (playerWon ? 'win' : 'lose') + '">' + (playerWon ? 'Победа' : 'Поражение') + '</div></div>';
             html += '<div class="player-select"><div class="player-select-label">Выберите игрока для анализа:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\'' + matchId + '\')">' + playerOptions + '</select></div>';
-
-            html += '<div class="result-block"><div class="result-block-title">📊 Базовые показатели</div>';
-            html += '<div class="metrics-grid">';
+            html += '<div class="result-block"><div class="result-block-title">📊 Базовые показатели</div><div class="metrics-grid">';
             html += '<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">' + gpm + '</div><div class="metric-sub ' + (gpm >= bm.gpm ? 'good' : 'bad') + '">Про: ' + bm.gpm + '</div></div>';
             html += '<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">' + xpm + '</div><div class="metric-sub ' + (xpm >= bm.xpm ? 'good' : 'bad') + '">Про: ' + bm.xpm + '</div></div>';
             html += '<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + kills + '/' + deaths + '/' + assists + '</div><div class="metric-sub">Участие: ' + killPart + '%</div></div>';
-            if (apm != null) {
-                html += '<div class="metric-card"><div class="metric-label">APM</div><div class="metric-value">' + apm + '</div><div class="metric-sub ' + (apm >= 200 ? 'good' : 'bad') + '">Про: 250+</div></div>';
-            } else {
-                html += '<div class="metric-card"><div class="metric-label">APM</div><div class="metric-value">—</div><div class="metric-sub">Нет данных</div></div>';
-            }
+            if (apm != null) { html += '<div class="metric-card"><div class="metric-label">APM</div><div class="metric-value">' + apm + '</div><div class="metric-sub ' + (apm >= 200 ? 'good' : 'bad') + '">Про: 250+</div></div>'; }
+            else { html += '<div class="metric-card"><div class="metric-label">APM</div><div class="metric-value">—</div><div class="metric-sub">Нет данных</div></div>'; }
             html += '<div class="metric-card"><div class="metric-label">Урон по героям</div><div class="metric-value">' + (heroDamage / 1000).toFixed(1) + 'K</div></div>';
             html += '<div class="metric-card"><div class="metric-label">Урон по зданиям</div><div class="metric-value">' + (towerDamage / 1000).toFixed(1) + 'K</div></div>';
             html += '<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">' + lastHits + '</div></div>';
             html += '<div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">' + denies + '</div></div>';
             html += '</div></div>';
-
             if (isParsed && lhT.length > 0) {
-                html += '<div class="result-block"><div class="result-block-title">📈 Фарм по таймлайну</div>';
-                html += '<table class="farm-table">';
-                html += '<tr><th>Время</th><th>10 мин</th><th>20 мин</th><th>30 мин</th></tr>';
-                var row10 = lh10 != null ? '<td class="gold-val">' + lh10 + '</td>' : '<td class="pro-val">—</td>';
-                var row20 = lh20 != null ? '<td class="gold-val">' + lh20 + '</td>' : '<td class="pro-val">—</td>';
-                var row30 = lh30 != null ? '<td class="gold-val">' + lh30 + '</td>' : '<td class="pro-val">—</td>';
-                html += '<tr><td>Ваши ластхиты</td>' + row10 + row20 + row30 + '</tr>';
+                html += '<div class="result-block"><div class="result-block-title">📈 Фарм по таймлайну</div><table class="farm-table"><tr><th>Время</th><th>10 мин</th><th>20 мин</th><th>30 мин</th></tr>';
+                html += '<tr><td>Ваши ластхиты</td>' + (lh10 != null ? '<td class="gold-val">' + lh10 + '</td>' : '<td class="pro-val">—</td>') + (lh20 != null ? '<td class="gold-val">' + lh20 + '</td>' : '<td class="pro-val">—</td>') + (lh30 != null ? '<td class="gold-val">' + lh30 + '</td>' : '<td class="pro-val">—</td>') + '</tr>';
                 html += '<tr><td>Про-медиана (' + bm.name + ')</td><td class="pro-val">' + bm.lh10 + '</td><td class="pro-val">' + bm.lh20 + '</td><td class="pro-val">' + bm.lh30 + '</td></tr>';
                 if (lh10 != null && lh20 != null && lh30 != null) {
                     var d10 = lh10 - bm.lh10, d20 = lh20 - bm.lh20, d30 = lh30 - bm.lh30;
-                    html += '<tr><td>Разница</td>';
-                    html += '<td class="' + (d10 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d10 >= 0 ? '+' : '') + d10 + '</td>';
-                    html += '<td class="' + (d20 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d20 >= 0 ? '+' : '') + d20 + '</td>';
-                    html += '<td class="' + (d30 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d30 >= 0 ? '+' : '') + d30 + '</td>';
-                    html += '</tr>';
+                    html += '<tr><td>Разница</td><td class="' + (d10 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d10 >= 0 ? '+' : '') + d10 + '</td><td class="' + (d20 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d20 >= 0 ? '+' : '') + d20 + '</td><td class="' + (d30 >= 0 ? 'diff-good' : 'diff-bad') + '">' + (d30 >= 0 ? '+' : '') + d30 + '</td></tr>';
                 }
                 html += '</table>';
                 var farmText = '';
                 if (lh10 != null) {
-                    if (lh10 < bm.lh10 * 0.7) {
-                        farmText += '<strong style="color:var(--red);">Слабый старт:</strong> к 10-й минуте у вас ' + lh10 + ' ластхитов — про-игроки на позиции ' + bm.name + ' добивают ' + bm.lh10 + '. Вы теряете примерно ' + Math.round((bm.lh10 - lh10) * 40) + ' золота на ранней стадии. Про-керри в это время уже фармят лес и линию одновременно, не пропуская ни одного крипа. ';
-                    } else if (lh10 >= bm.lh10) {
-                        farmText += '<strong style="color:var(--green);">Отличный старт:</strong> ' + lh10 + ' ластхитов к 10-й минуте — на уровне про-сцены. Вы эффективно используете раннюю игру для накопления золота. ';
-                    } else {
-                        farmText += '<strong style="color:var(--orange);">Средний старт:</strong> ' + lh10 + ' из ' + bm.lh10 + ' ластхитов к 10-й минуте. Чуть ниже про-медианы, но в пределах нормы. ';
-                    }
-                }
-                if (lh10 != null && lh20 != null) {
-                    var lhDelta20 = lh20 - lh10;
-                    var lhDelta20Pro = bm.lh20 - bm.lh10;
-                    if (lhDelta20 < lhDelta20Pro * 0.7) {
-                        farmText += 'В мидгейме (10→20 мин) вы добили ' + lhDelta20 + ' крипов, про-игроки — ' + lhDelta20Pro + '. Вероятно, вы либо участвовали в драках вместо фарма, либо теряли линию. Про-игроки чередуют фарм и драки: берут драку → возвращаются на фарм за 30 секунд. ';
-                    } else if (lhDelta20 >= lhDelta20Pro) {
-                        farmText += 'В мидгейме фарм ускорился — ' + lhDelta20 + ' крипов за 10 минут, это про-уровень. Вы правильно распределили время между фармом и драками. ';
-                    }
-                }
-                if (durMin > 30 && lh20 != null && lh30 != null) {
-                    var lhDelta30 = lh30 - lh20;
-                    if (lhDelta30 < (bm.lh30 - bm.lh20) * 0.7) {
-                        farmText += 'В лейтгейме (20→30 мин) фарм замедлился: ' + lhDelta30 + ' крипов. В это время про-игроки фармят лесные лагеря между драками и не стоят без дела. ';
-                    }
+                    if (lh10 < bm.lh10 * 0.7) farmText += '<strong style="color:var(--red);">Слабый старт:</strong> к 10-й минуте у вас ' + lh10 + ' ластхитов — про-игроки на позиции ' + bm.name + ' добивают ' + bm.lh10 + '. ';
+                    else if (lh10 >= bm.lh10) farmText += '<strong style="color:var(--green);">Отличный старт:</strong> ' + lh10 + ' ластхитов к 10-й минуте — на уровне про-сцены. ';
+                    else farmText += '<strong style="color:var(--orange);">Средний старт:</strong> ' + lh10 + ' из ' + bm.lh10 + ' ластхитов к 10-й минуте. ';
                 }
                 if (farmText) html += '<div class="analysis-text">' + farmText + '</div>';
                 html += '</div>';
             }
-
             if (keyPurchases.length > 0) {
-                html += '<div class="result-block"><div class="result-block-title">⏱️ Тайминги ключевых предметов</div>';
-                html += '<div class="item-timeline">';
-                keyPurchases.forEach(function(p) {
-                    html += '<div class="item-chip">' + p.name + ' — <span class="item-time">' + p.timeStr + '</span></div>';
-                });
+                html += '<div class="result-block"><div class="result-block-title">⏱️ Тайминги ключевых предметов</div><div class="item-timeline">';
+                keyPurchases.forEach(function(p) { html += '<div class="item-chip">' + p.name + ' — <span class="item-time">' + p.timeStr + '</span></div>'; });
                 html += '</div>';
-                var itemAnalysis = '';
-                if (blink) {
-                    var blinkMin = blink.time / 60;
-                    if (blinkMin > bm.blinkPro + 3) {
-                        itemAnalysis += '<strong style="color:var(--red);">Blink Dagger в ' + blink.timeStr + '</strong> — на ' + Math.round(blinkMin - bm.blinkPro) + ' минут позже про-нормы (' + bm.blinkPro + ' мин для ' + bm.name + '). Это критично: без инициации ваша команда не могла брать драки и теряла темп. Про-игроки покупают Blink, используя стаки леса и эффективный фарм. Каждая минута задержки — это потерянные драки и контроль карты. ';
-                    } else if (blinkMin <= bm.blinkPro + 1) {
-                        itemAnalysis += '<strong style="color:var(--green);">Blink Dagger в ' + blink.timeStr + '</strong> — отличный тайминг, на уровне про-сцены. Вы смогли нафармить ключевой предмет без отставания. ';
-                    } else {
-                        itemAnalysis += 'Blink Dagger в ' + blink.timeStr + ' — приемлемо, но чуть медленнее про-нормы (' + bm.blinkPro + ' мин). ';
-                    }
-                }
-                if (bkb) {
-                    var bkbMin = bkb.time / 60;
-                    var bkbPro = (posNum <= 2) ? 17 : 20;
-                    if (bkbMin > bkbPro + 4) {
-                        itemAnalysis += '<strong style="color:var(--red);">BKB в ' + bkb.timeStr + '</strong> — поздно. Про-игроки берут BKB к ' + bkbPro + '-й минуте. Без него вы были уязвимы в каждой драке и не могли реализовать потенциал героя. ';
-                    } else {
-                        itemAnalysis += 'BKB в ' + bkb.timeStr + ' — хороший тайминг. ';
-                    }
-                }
-                if (itemAnalysis) html += '<div class="analysis-text">' + itemAnalysis + '</div>';
+                if (blink) { var blinkMin = blink.time / 60; if (blinkMin > bm.blinkPro + 3) html += '<div class="analysis-text"><strong style="color:var(--red);">Blink Dagger в ' + blink.timeStr + '</strong> — на ' + Math.round(blinkMin - bm.blinkPro) + ' мин позже про-нормы.</div>'; else if (blinkMin <= bm.blinkPro + 1) html += '<div class="analysis-text"><strong style="color:var(--green);">Blink Dagger в ' + blink.timeStr + '</strong> — отличный тайминг.</div>'; }
                 html += '</div>';
             }
-
-            if (radiantAdv.length > 0) {
-                html += '<div class="result-block"><div class="result-block-title">🗺️ Динамика матча</div>';
-                var playerAdv = isRadiant ? radiantAdv : radiantAdv.map(function(v) { return -v; });
-                var maxAdv = 0, maxAdvMin = 0, maxDis = 0, maxDisMin = 0;
-                for (var i = 0; i < playerAdv.length; i++) {
-                    if (playerAdv[i] > maxAdv) { maxAdv = playerAdv[i]; maxAdvMin = i; }
-                    if (playerAdv[i] < maxDis) { maxDis = playerAdv[i]; maxDisMin = i; }
-                }
-                var dynamics = '';
-                if (maxAdv > 5000) dynamics += 'Ваше максимальное преимущество — <strong>+' + (maxAdv / 1000).toFixed(1) + 'K золота</strong> на ' + maxAdvMin + '-й минуте. ';
-                if (maxDis < -5000) dynamics += 'Максимальное отставание — <strong>−' + (Math.abs(maxDis) / 1000).toFixed(1) + 'K золота</strong> на ' + maxDisMin + '-й минуте. ';
-                var earlyAdv = playerAdv[10] || 0;
-                if (earlyAdv > 2000) {
-                    dynamics += 'Ранняя игра прошла уверенно: к 10-й минуте +' + (earlyAdv / 1000).toFixed(1) + 'K золота в вашу пользу. Про-команды в такой ситуации давят на Рошана и захватывают контроль карты. ';
-                } else if (earlyAdv < -2000) {
-                    dynamics += 'Ранняя игра была трудной: к 10-й минуте −' + (Math.abs(earlyAdv) / 1000).toFixed(1) + 'K золота. Про-игроки в такой ситуации переходят в дефенс и фарм, избегая драк. ';
-                }
-                var midAdv = playerAdv[20] || 0;
-                if (midAdv > 3000 && earlyAdv < 0) {
-                    dynamics += '<strong style="color:var(--green);">Сумели перевернуть игру</strong> к 20-й минуте: +' + (midAdv / 1000).toFixed(1) + 'K золота. Это признак хорошей командной игры. ';
-                } else if (midAdv < -3000 && earlyAdv > 0) {
-                    dynamics += '<strong style="color:var(--red);">Потеряли преимущество</strong> к 20-й минуте: −' + (Math.abs(midAdv) / 1000).toFixed(1) + 'K золота. Вероятно, были проиграны ключевые драки или потерян Рошан. ';
-                }
-                var lastIdx = Math.min(30, playerAdv.length - 1);
-                var lateAdv = playerAdv[lastIdx] || 0;
-                if (lateAdv > 0 && playerWon) {
-                    dynamics += 'Закрепили преимущество в лейтгейме и довели игру до победы — это признак дисциплинированной команды. ';
-                } else if (lateAdv < 0 && !playerWon) {
-                    dynamics += 'Не смогли отыграться в лейтгейме — отставание сохранилось до конца. ';
-                } else if (lateAdv > 0 && !playerWon) {
-                    dynamics += '<strong style="color:var(--red);">Имели преимущество, но проиграли</strong> — это признак слабого лейтгейма, ошибок в ключевых драках или плохого использования артефактов. Про-команды в такой ситуации закрывают игру через Рошана и Barracks. ';
-                } else if (lateAdv < 0 && playerWon) {
-                    dynamics += '<strong style="color:var(--green);">Выиграли из отстающей позиции</strong> — отличный камбэк. Про-команды часто выигрывают такие игры через один удачный файт. ';
-                }
-                if (!dynamics) dynamics = 'Матч прошёл в равной борьбе, без значительного перевеса ни одной из сторон.';
-                html += '<div class="analysis-text">' + dynamics + '</div>';
-                html += '</div>';
-            }
-
-            if ((posNum === 4 || posNum === 5) && isParsed) {
-                html += '<div class="result-block"><div class="result-block-title">🌿 Саппорт-метрики</div>';
-                html += '<div class="metrics-grid">';
-                if (campsStacked != null) {
-                    html += '<div class="metric-card"><div class="metric-label">Стаки</div><div class="metric-value">' + campsStacked + '</div><div class="metric-sub ' + (campsStacked >= 5 ? 'good' : 'bad') + '">Про: 6+</div></div>';
-                }
-                if (observerUses != null) {
-                    html += '<div class="metric-card"><div class="metric-label">Обсерверы</div><div class="metric-value">' + observerUses + '</div><div class="metric-sub ' + (observerUses >= 10 ? 'good' : 'bad') + '">Про: 12+</div></div>';
-                }
-                if (sentryUses != null) {
-                    html += '<div class="metric-card"><div class="metric-label">Сентри</div><div class="metric-value">' + sentryUses + '</div><div class="metric-sub">Про: 8+</div></div>';
-                }
-                if (stuns != null) {
-                    html += '<div class="metric-card"><div class="metric-label">Стан (сек)</div><div class="metric-value">' + Math.round(stuns) + '</div><div class="metric-sub ' + (stuns >= 20 ? 'good' : 'bad') + '">Про: 25+</div></div>';
-                }
-                if (runeUses != null) {
-                    html += '<div class="metric-card"><div class="metric-label">Руны</div><div class="metric-value">' + runeUses + '</div><div class="metric-sub">Про: 4+</div></div>';
-                }
-                if (pings != null) {
-                    html += '<div class="metric-card"><div class="metric-label">Пинги</div><div class="metric-value">' + pings + '</div><div class="metric-sub">Про: 50+</div></div>';
-                }
-                html += '</div>';
-                var supText = '';
-                if (campsStacked != null && campsStacked < 3) {
-                    supText += '<strong style="color:var(--red);">Мало стеков:</strong> всего ' + campsStacked + '. Про-саппорты стакают 5-8 лагерей за игру. Стаки — это бесплатное золото для керри. Про-игроки стакают в окно 0:53, не теряя времени на линии. ';
-                } else if (campsStacked != null && campsStacked >= 5) {
-                    supText += '<strong style="color:var(--green);">Хорошая работа со стаками:</strong> ' + campsStacked + ' — на уровне про-сцены. ';
-                }
-                if (observerUses != null && observerUses < 6) {
-                    supText += '<strong style="color:var(--red);">Мало вардинга:</strong> ' + observerUses + ' обсерверов. Про-саппорты ставят 10-15 вардов за игру. Вард-карта — это контроль карты и безопасности команды. Ставьте варды на вражеский лес перед Рошаном и на свои входы при защите. ';
-                }
-                if (stuns != null && stuns < 15) {
-                    supText += '<strong style="color:var(--orange);">Мало контроля:</strong> ' + Math.round(stuns) + ' сек стана. Про-саппорты дают 25-35 секунд стана. Работайте над позиционированием в драках — используйте способности по керри врага, а не по саппортам. ';
-                }
-                if (runeUses != null && runeUses < 2) {
-                    supText += 'Вы собрали мало рун (' + runeUses + '). Про-саппорты контролируют руны воды и bounty для команды. ';
-                }
-                if (supText) html += '<div class="analysis-text">' + supText + '</div>';
-                html += '</div>';
-            }
-
             html += '<div class="result-block"><div class="result-block-title">🏆 Сравнение с киберспортсменами</div>';
-            var comp = [];
             var gpmRatio = Math.round(gpm / bm.gpm * 100);
-            if (gpmRatio >= 95) {
-                comp.push('Фарм на уровне про — <strong style="color:var(--green);">' + gpm + ' GPM</strong> (' + gpmRatio + '% от про-медианы). Это значит, что вы эффективно используете каждую секунду для заработка золота, как топ-1% игроков на позиции ' + bm.name + '.');
-            } else if (gpmRatio >= 75) {
-                comp.push('Фарм ниже про-уровня — <strong style="color:var(--orange);">' + gpm + ' GPM</strong> (' + gpmRatio + '% от про-медианы). Про-игроки на позиции ' + bm.name + ' имеют ' + bm.gpm + ' GPM. Разница в ' + (bm.gpm - gpm) + ' GPM — это примерно ' + Math.round((bm.gpm - gpm) * durMin / 1000) + 'K потерянного золота за игру, что эквивалентно одному крупному артефакту.');
-            } else {
-                comp.push('Фарм значительно ниже про-уровня — <strong style="color:var(--red);">' + gpm + ' GPM</strong> (' + gpmRatio + '% от про-медианы). Про-игроки фармят агрессивнее: они чередуют линию, лес и стак в одном цикле. Попробуйте фарм-паттерн: крип с линии → 2 крипа из леса → снова линия.');
-            }
-            if (killPart >= 70) {
-                comp.push('Отличное участие в драках — <strong style="color:var(--green);">' + killPart + '%</strong>. Вы присутствуете в большинстве драк, как и про-игроки на вашей позиции. Это значит, что вы правильно читаете карту и телепортируетесь на драки вовремя.');
-            } else if (killPart >= 45) {
-                comp.push('Участие в драках — <strong style="color:var(--orange);">' + killPart + '%</strong>. Про-игроки на позиции ' + bm.name + ' участвуют в 65-80% убийств команды. Вы либо слишком долго фармите, либо не телепортируетесь на драки. Про-игроки всегда держат TP свиток и следят за мини-картой.');
-            } else {
-                comp.push('Низкое участие в драках — <strong style="color:var(--red);">' + killPart + '%</strong>. Вы пропускаете ключевые драки. Про-игроки на вашей позиции всегда готовы к телепорту — они фармят рядом с вышкой, чтобы успеть на драку за 3 секунды.');
-            }
-            if (deaths <= 3) {
-                comp.push('Выживаемость отличная — <strong style="color:var(--green);">' + deaths + ' смертей</strong> за ' + durMin + ' мин. Про-игроки на вашей позиции умирают 3-5 раз за матч. Каждая смерть — это потеря золота, опыта и темпа, и вы минимизируете эти потери.');
-            } else if (deaths >= 8) {
-                comp.push('Слишком много смертей — <strong style="color:var(--red);">' + deaths + '</strong>. Про-игроки на позиции ' + bm.name + ' умирают 3-5 раз. Каждая смерть — потеря ~' + Math.round(gpm * 0.5 / 1000 * 60) + 'K золота и опыта. Про-игроки отступают на 40% HP, а не на 10%. Работайте над таймингами отступления.');
-            } else {
-                comp.push('Выживаемость приемлемая — <strong>' + deaths + ' смертей</strong>, близко к про-норме (3-5).');
-            }
-            if (apm != null) {
-                if (apm >= 250) {
-                    comp.push('APM <strong style="color:var(--green);">' + apm + '</strong> — на уровне про-сцены. Вы активно используете камеру, проверки руны и микроконтроль.');
-                } else if (apm < 150) {
-                    comp.push('APM <strong style="color:var(--red);">' + apm + '</strong> — низкий. Про-игроки делают 250+ действий в минуту: проверки камеры, мини-карты, контроля крипов. Низкий APM обычно означает, что вы недостаточно следите за картой.');
-                }
-            }
-            if (heroDamage > 20000 && posNum <= 3) {
-                comp.push('Высокий урон по героям — <strong>' + (heroDamage / 1000).toFixed(1) + 'K</strong>. Вы активно участвуете в драках и реализуете потенциал героя.');
-            } else if (heroDamage < 5000 && posNum <= 3) {
-                comp.push('Низкий урон по героям — <strong>' + (heroDamage / 1000).toFixed(1) + 'K</strong>. Про-игроки на вашей позиции наносят 15-30K. Вы либо избегаете драк, либо не реализуете способности.');
-            }
-            comp.forEach(function(c) { html += '<div class="comp-item">' + c + '</div>'; });
+            if (gpmRatio >= 95) html += '<div class="comp-item">Фарм на уровне про — <strong style="color:var(--green);">' + gpm + ' GPM</strong> (' + gpmRatio + '%).</div>';
+            else if (gpmRatio >= 75) html += '<div class="comp-item">Фарм ниже про-уровня — <strong style="color:var(--orange);">' + gpm + ' GPM</strong> (' + gpmRatio + '%). Разница: ' + Math.round((bm.gpm - gpm) * durMin / 1000) + 'K потерянного золота.</div>';
+            else html += '<div class="comp-item">Фарм значительно ниже про — <strong style="color:var(--red);">' + gpm + ' GPM</strong> (' + gpmRatio + '%).</div>';
             html += '</div>';
-
             html += '<div class="result-block"><div class="result-block-title">✅ Сильные стороны</div>';
-            var strengths = [];
-            if (lh10 != null && lh10 >= bm.lh10) strengths.push('Отличный фарм на старте — ' + lh10 + ' ластхитов к 10-й минуте, на уровне про-сцены.');
-            if (gpm >= bm.gpm) strengths.push('GPM ' + gpm + ' — про-уровень фарма.');
-            if (killPart >= 65) strengths.push('Высокое участие в драках (' + killPart + '%) — всегда на месте в ключевые моменты.');
-            if (deaths <= 3) strengths.push('Мало смертей (' + deaths + ') — грамотное позиционирование.');
-            if (blink && (blink.time / 60) <= bm.blinkPro + 1) strengths.push('Blink Dagger в ' + blink.timeStr + ' — отличный тайминг.');
-            if (heroDamage > 15000) strengths.push('Высокий урон по героям (' + (heroDamage / 1000).toFixed(1) + 'K) — активное участие в драках.');
-            if (campsStacked != null && campsStacked >= 5 && (posNum === 4 || posNum === 5)) strengths.push('Хорошая работа со стаками (' + campsStacked + ' стака).');
-            if (towerDamage > 2000) strengths.push('Урон по зданиям (' + (towerDamage / 1000).toFixed(1) + 'K) — помогали пушить.');
-            if (denies >= 15) strengths.push('Хорошее добивание (' + denies + ' deny) — давили оппонента на линии.');
-            if (strengths.length === 0) strengths.push('В этом матче не выявлено выраженных сильных сторон. Работайте над фундаментальными навыками — фарм и карта.');
-            strengths.forEach(function(s) { html += '<div class="strength-item"><span class="marker">+</span> ' + s + '</div>'; });
+            if (gpm >= bm.gpm) html += '<div class="strength-item"><span class="marker">+</span> GPM ' + gpm + ' — про-уровень.</div>';
+            if (killPart >= 65) html += '<div class="strength-item"><span class="marker">+</span> Высокое участие в драках (' + killPart + '%).</div>';
+            if (deaths <= 3) html += '<div class="strength-item"><span class="marker">+</span> Мало смертей (' + deaths + ').</div>';
             html += '</div>';
-
             html += '<div class="result-block"><div class="result-block-title">❌ Слабые стороны</div>';
-            var weaknesses = [];
-            if (lh10 != null && lh10 < bm.lh10 * 0.7) weaknesses.push('Слабый старт — ' + lh10 + ' ластхитов к 10-й минуте (про: ' + bm.lh10 + '). Потеря раннего золота.');
-            if (gpm < bm.gpm * 0.8) weaknesses.push('Низкий GPM (' + gpm + ', про: ' + bm.gpm + ') — недостаточный фарм.');
-            if (killPart < 45) weaknesses.push('Низкое участие в драках (' + killPart + '%) — пропускаете ключевые моменты.');
-            if (deaths >= 8) weaknesses.push('Слишком много смертей (' + deaths + ') — работайте над позиционированием.');
-            if (apm != null && apm < 150) weaknesses.push('Низкий APM (' + apm + ') — мало действий в минуту.');
-            if (blink && (blink.time / 60) > bm.blinkPro + 3) weaknesses.push('Blink Dagger в ' + blink.timeStr + ' — на ' + Math.round(blink.time / 60 - bm.blinkPro) + ' мин позже про-нормы.');
-            if (bkb && (bkb.time / 60) > ((posNum <= 2) ? 21 : 24)) weaknesses.push('BKB в ' + bkb.timeStr + ' — поздно, вы были уязвимы в драках.');
-            if (posNum >= 4 && campsStacked != null && campsStacked < 3) weaknesses.push('Мало стеков (' + campsStacked + ') — про-саппорты стакают 5-8 раз.');
-            if (posNum >= 4 && observerUses != null && observerUses < 6) weaknesses.push('Мало вардинга (' + observerUses + ' обсерверов) — недостаточный контроль карты.');
-            if (denies < 5 && posNum <= 3) weaknesses.push('Мало добиваний (' + denies + ') — про-игроки добивают 10-20 крипов.');
-            if (posNum <= 3 && heroDamage < 8000) weaknesses.push('Низкий урон по героям (' + (heroDamage / 1000).toFixed(1) + 'K) — мало участия в драках.');
-            if (weaknesses.length === 0) weaknesses.push('Ярко выраженных слабых сторон не выявлено — отличный матч!');
-            weaknesses.forEach(function(w) { html += '<div class="weakness-item"><span class="marker">−</span> ' + w + '</div>'; });
+            if (gpm < bm.gpm * 0.8) html += '<div class="weakness-item"><span class="marker">−</span> Низкий GPM (' + gpm + ', про: ' + bm.gpm + ').</div>';
+            if (deaths >= 8) html += '<div class="weakness-item"><span class="marker">−</span> Слишком много смертей (' + deaths + ').</div>';
             html += '</div>';
-
             html += '<div class="result-block"><div class="result-block-title">💡 Рекомендации</div>';
-            var recs = [];
-            if (lh10 != null && lh10 < bm.lh10 * 0.7) recs.push({ text: 'Тренируйте ластхиты под башней. Про-игроки добивают 90% крипов под башней.', exercise: 'В лобби 15 минут — добивайте крипов под башней. Цель: 95% успеха. Повторяйте 5 раз.' });
-            if (gpm < bm.gpm * 0.8) recs.push({ text: 'Улучшите фарм-паттерн. Про-игроки фармят лес и линию одновременно — чередуют крип с линии и 2 крипа из леса.', exercise: 'В лобби 20 минут: крип с линии → 2 крипа из леса → обратно. Цель: 80 LH к 10-й минуте.' });
-            if (killPart < 50) recs.push({ text: 'Всегда держите TP свиток. Про-игроки телепортируются на каждую драку.', exercise: 'За каждую игру ставьте цель: 70% участия в убийствах. Проверяйте мини-карту каждые 5 секунд.' });
-            if (deaths >= 8) recs.push({ text: 'Работайте над отступлением. Про-игроки уходят из драки на 40% HP, а не на 10%.', exercise: 'Смотрите реплеи своих смертей и анализируйте: можно ли было выжить? В 80% случаев — да.' });
-            if (apm != null && apm < 150) recs.push({ text: 'Повышайте APM через частую проверку карты и контроль крипов.', exercise: 'Привычка: каждые 3 секунды проверяйте мини-карту. Это повышает APM и ситуационную осведомлённость.' });
-            if (blink && (blink.time / 60) > bm.blinkPro + 3) recs.push({ text: 'Ускорьте тайминг Blink Dagger. Стакайте лес и используйте каждую секунду для фарма.', exercise: 'В лобби получите Blink к ' + bm.blinkPro + '-й минуте. Повторяйте 5 раз, пока не получится стабильно.' });
-            if (posNum >= 4 && campsStacked != null && campsStacked < 3) recs.push({ text: 'Стакайте лес каждые 53 секунды. Это бесплатное золото для керри.', exercise: 'В лобби — стакайте 3 разных лагеря поочерёдно. Цель: 10 стаков за 10 минут без потери линии.' });
-            if (posNum >= 4 && observerUses != null && observerUses < 6) recs.push({ text: 'Покупайте и ставьте варды каждые 6 минут. Контроль карты — ваша главная задача.', exercise: 'Изучите 10 ключевых точек для вардов на каждой стороне. Тренируйте расстановку в лобби.' });
-            if (denies < 5 && posNum <= 3) recs.push({ text: 'Добивайте своих крипов. Это лишний опыт для врага и золото для вас.', exercise: 'В лобби — 10 минут, цель: 15+ добиваний. Фокус на таймингах анимации атаки.' });
-            if (posNum <= 3 && heroDamage < 8000) recs.push({ text: 'Участвуйте в драках активнее. Про-игроки на вашей позиции наносят 15-30K урона.', exercise: 'Смотрите реплеи про-игроков на вашем герое и замечайте, когда они вступают в драку.' });
-            if (recs.length === 0) recs.push({ text: 'Продолжайте поддерживать текущий уровень игры — показатели на уровне про-сцены.', exercise: 'Смотрите реплеи профессиональных матчей на вашей позиции и замечайте микро-решения.' });
-            recs.forEach(function(r, i) {
-                html += '<div class="recommendation-item"><span class="marker">' + (i + 1) + '.</span><div>' + r.text + '<div class="rec-exercise"><strong>Упражнение:</strong> ' + r.exercise + '</div></div></div>';
-            });
+            if (gpm < bm.gpm * 0.8) html += '<div class="recommendation-item"><span class="marker">1.</span><div>Улучшите фарм-паттерн.<div class="rec-exercise"><strong>Упражнение:</strong> 20 минут в лобби: крип с линии → 2 из леса → обратно. Цель: 80 LH к 10-й минуте.</div></div></div>';
+            if (deaths >= 8) html += '<div class="recommendation-item"><span class="marker">2.</span><div>Работайте над отступлением.<div class="rec-exercise"><strong>Упражнение:</strong> Смотрите реплеи своих смертей и анализируйте.</div></div></div>';
             html += '</div>';
-
             html += '<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
             return html;
         }
@@ -1183,7 +1062,7 @@
         };
 
         function generateCsResults() {
-            return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Выживаемость в первых контактах — 25%. Про-энтри выживают в 45-50%. Вы двигаетесь раньше смоков на 2-3 секунды.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div><div class="metric-card"><div class="metric-label">Выживаемость</div><div class="metric-value">25%</div><div class="metric-sub bad">Про: 47%</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Точный аим: HS% 48% — близко к про-медиане</div><div class="strength-item"><span class="marker">+</span> Первый заход в 68% раундов — команда получает раннюю инфу</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Выходите раньше смоков: в 7 из 12 раундов</div><div class="weakness-item"><span class="marker">−</span> Мало гранат: 1.4 за раунд — про-игроки используют 2.1</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги: смок → пауза 2 сек → вход.</div><div class="rec-exercise"><strong>Упражнение:</strong> Retake-режим 30 минут с паузой 2 секунды.</div></div><div class="recommendation-item"><span class="marker">2.</span><div>Используйте flash перед входом.</div><div class="rec-exercise"><strong>Упражнение:</strong> Изучите 5 flash-раскидок на Mirage. 20 мин/день.</div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
+            return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · Раундов: 24 (11:13) · Ранг: FACEIT 7</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Главная проблема</div><div class="problem-text">Выживаемость в первых контактах — 25%. Про-энтри выживают в 45-50%.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div><div class="metric-card"><div class="metric-label">Выживаемость</div><div class="metric-value">25%</div><div class="metric-sub bad">Про: 47%</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные стороны</div><div class="strength-item"><span class="marker">+</span> Точный аим: HS% 48%</div></div><div class="result-block"><div class="result-block-title">❌ Слабые стороны</div><div class="weakness-item"><span class="marker">−</span> Выходите раньше смоков</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги.<div class="rec-exercise"><strong>Упражнение:</strong> Retake-режим 30 минут.</div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
         }
 
         window.resetAnalysis = function(game) {
@@ -1211,52 +1090,34 @@
             try {
                 if (game === 'dota') {
                     fill.style.width = '15%'; text.textContent = 'Загрузка данных о героях...';
-                    if (!tierlistData) {
-                        try {
-                            var statsRes = await fetch('https://api.opendota.com/api/heroStats');
-                            if (statsRes.ok) tierlistData = await statsRes.json();
-                        } catch (e) {}
-                    }
+                    if (!tierlistData) { try { var statsRes = await fetch('https://api.opendota.com/api/heroStats'); if (statsRes.ok) tierlistData = await statsRes.json(); } catch (e) {} }
                     fill.style.width = '30%'; text.textContent = 'Получение данных матча...';
                     var response = await fetch('https://api.opendota.com/api/matches/' + matchId);
                     if (!response.ok) throw new Error('Матч не найден');
                     var data = await response.json();
                     if (!data.players || data.players.length === 0) throw new Error('Матч ещё не обработан. Попробуйте позже.');
-
                     var isParsed = data.players[0] && data.players[0].lh_t && data.players[0].lh_t.length > 0;
-
                     if (!isParsed) {
-                        fill.style.width = '40%'; text.textContent = 'Матч не распарсен. Отправляю запрос на парсинг реплея...';
+                        fill.style.width = '40%'; text.textContent = 'Отправляю запрос на парсинг...';
                         try {
                             var parseRes = await fetch('https://api.opendota.com/api/request/' + matchId, { method: 'POST' });
                             if (parseRes.ok) {
                                 var parseData = await parseRes.json();
                                 var jobId = parseData.job && parseData.job.jobId;
                                 if (jobId) {
-                                    fill.style.width = '50%'; text.textContent = 'Парсинг реплея... Это может занять 1-3 минуты';
-                                    var maxAttempts = 30;
-                                    var parsed = false;
-                                    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+                                    fill.style.width = '50%'; text.textContent = 'Парсинг реплея...';
+                                    for (var attempt = 0; attempt < 30; attempt++) {
                                         await new Promise(function(r) { setTimeout(r, 5000); });
-                                        fill.style.width = (50 + Math.round(attempt / maxAttempts * 30)) + '%';
-                                        text.textContent = 'Парсинг реплея... Попытка ' + (attempt + 1) + '/' + maxAttempts;
+                                        fill.style.width = (50 + Math.round(attempt / 30 * 30)) + '%';
+                                        text.textContent = 'Парсинг... Попытка ' + (attempt + 1) + '/30';
                                         var jobRes = await fetch('https://api.opendota.com/api/request/' + jobId);
-                                        if (jobRes.ok) {
-                                            var jobData = await jobRes.json();
-                                            if (jobData.job && jobData.job.success) { parsed = true; break; }
-                                            if (jobData.job && jobData.job.error) break;
-                                        }
+                                        if (jobRes.ok) { var jobData = await jobRes.json(); if (jobData.job && jobData.job.success) { parsed = true; break; } if (jobData.job && jobData.job.error) break; }
                                     }
-                                    if (parsed) {
-                                        fill.style.width = '85%'; text.textContent = 'Получение распарсенных данных...';
-                                        response = await fetch('https://api.opendota.com/api/matches/' + matchId);
-                                        data = await response.json();
-                                    }
+                                    if (parsed) { fill.style.width = '85%'; response = await fetch('https://api.opendota.com/api/matches/' + matchId); data = await response.json(); }
                                 }
                             }
-                        } catch (parseErr) { console.error('Ошибка парсинга:', parseErr); }
+                        } catch (e) { console.error('Парсинг:', e); }
                     }
-
                     fill.style.width = '90%'; text.textContent = 'Сравнение с про-сценой...';
                     await new Promise(function(r) { setTimeout(r, 400); });
                     fill.style.width = '100%'; text.textContent = 'Готово!';
@@ -1267,34 +1128,12 @@
                     resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
                 if (game === 'cs') {
-                    var fileInput = document.getElementById('csFile');
-                    var hasFile = fileInput && fileInput.files[0];
-                    if (hasFile) {
-                        fill.style.width = '30%'; text.textContent = 'Обработка файла...';
-                        try {
-                            var fd = new FormData(); fd.append('file', fileInput.files[0]);
-                            var response = await fetch('http://localhost:8000/analyze/cs2', { method: 'POST', body: fd });
-                            if (!response.ok) throw new Error('Сервер недоступен');
-                            fill.style.width = '70%'; text.textContent = 'Анализ игровых метрик...';
-                            await response.json();
-                            fill.style.width = '100%'; text.textContent = 'Готово!';
-                            await new Promise(function(r) { setTimeout(r, 500); }); wrapper.classList.remove('visible');
-                            resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
-                            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        } catch (apiErr) {
-                            text.textContent = 'Сервер недоступен — показываем демонстрационные данные';
-                            await new Promise(function(r) { setTimeout(r, 2000); }); wrapper.classList.remove('visible');
-                            resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
-                            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    } else {
-                        fill.style.width = '50%'; text.textContent = 'Формирование разбора...';
-                        await new Promise(function(r) { setTimeout(r, 1500); });
-                        fill.style.width = '100%'; text.textContent = 'Готово!';
-                        await new Promise(function(r) { setTimeout(r, 500); }); wrapper.classList.remove('visible');
-                        resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
-                        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
+                    fill.style.width = '50%'; text.textContent = 'Формирование разбора...';
+                    await new Promise(function(r) { setTimeout(r, 1500); });
+                    fill.style.width = '100%'; text.textContent = 'Готово!';
+                    await new Promise(function(r) { setTimeout(r, 500); }); wrapper.classList.remove('visible');
+                    resultsDiv.innerHTML = generateCsResults(); resultsDiv.classList.add('visible');
+                    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             } catch (err) {
                 text.textContent = 'Ошибка: ' + err.message; fill.style.width = '0%';
