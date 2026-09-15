@@ -562,22 +562,52 @@ console.log('Кнопка Регистрация:', document.getElementById('reg
 
 
 // Локальный fallback
-const LOCAL_USERS_KEY = 'ga_local_users';
-function getLocalUsers() { try { return JSON.parse(localStorage.getItem(LOCAL_USERS_KEY) || '{}'); } catch { return {}; } }
-function saveLocalUsers(u) { localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(u)); }
+// === НАСТРОЙКИ ===
+const SUPABASE_URL = 'https://твой-проект.supabase.co'; // <-- ВСТАВЬ СЮДА СВОЙ URL
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6...'; // <-- ВСТАВЬ СЮДА СВОЙ ANON KEY
 
-async function hashPassword(pw) {
-    const d = new TextEncoder().encode('ga_salt_' + pw);
-    const h = await crypto.subtle.digest('SHA-256', d);
-    return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
+// === ИНИЦИАЛИЗАЦИЯ (С ЗАЩТОЙ ОТ ПАДЕНИЯ) ===
+let supabaseClient = null;
+
+try {
+    // Проверяем, загрузилась ли библиотека и валидны ли ключи
+    if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('✅ Supabase подключен успешно');
+    } else {
+        console.warn('⚠️ Supabase не настроен (неверные ключи или нет библиотеки). Работает локальный режим.');
+    }
+} catch (e) {
+    console.error('❌ Критическая ошибка при создании клиента Supabase:', e);
 }
-function setCurrentUser(u) { localStorage.setItem('ga_current_user', JSON.stringify(u)); }
-function getCurrentUser() { try { return JSON.parse(localStorage.getItem('ga_current_user')); } catch { return null; } }
-function clearCurrentUser() { localStorage.removeItem('ga_current_user'); }
 
-function initTheme() { if (localStorage.getItem('ga_theme') === 'light') document.documentElement.classList.add('light-theme'); }
-function toggleTheme() { document.documentElement.classList.toggle('light-theme'); localStorage.setItem('ga_theme', document.documentElement.classList.contains('light-theme') ? 'light' : 'dark'); }
-initTheme();
+// === ПОИСК ЭЛЕМЕНТОВ (ГЛАВНОЕ ИСПРАВЛЕНИЕ) ===
+// Мы ищем кнопки только после того, как DOM полностью загружен, чтобы они точно существовали
+document.addEventListener('DOMContentLoaded', () => {
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    
+    // Если кнопок нет в HTML, скрипт напишет об этом в консоль, но не упадет
+    if (!loginBtn || !registerBtn) {
+        console.error('❌ ОШИБКА: Не найдены кнопки с ID "loginBtn" или "registerBtn". Проверь HTML.');
+        return; // Прерываем выполнение, чтобы не было ошибок ниже
+    }
+
+    console.log('✅ Кнопки найдены. Навешиваем обработчики...');
+
+    // --- ЗДЕСЬ ТВОЯ ЛОГИКА РЕГИСТРАЦИИ (оставь свой код, но убедись, что он внутри этого блока) ---
+    registerBtn.addEventListener('click', async function() {
+        // ... твой существующий код регистрации ...
+        console.log('Нажата кнопка регистрации'); 
+    });
+
+    // --- ЗДЕСЬ ТВОЯ ЛОГИКА ВХОДА ---
+    loginBtn.addEventListener('click', async function() {
+        // ... твой существующий код входа ...
+        console.log('Нажата кнопка входа');
+    });
+});
+
 
 var loginBtn = document.getElementById('loginBtn');
 var registerBtn = document.getElementById('registerBtn');
