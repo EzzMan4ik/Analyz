@@ -540,10 +540,26 @@
     </div>
     <script>
        // === SUPABASE ===
-const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';
-const supabaseClient = (SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20)
-    ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+// === SUPABASE ===
+const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';  // ваш URL
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';                    // ваш ключ
+
+var supabaseClient = null;
+try {
+    if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log('✅ Supabase подключен');
+    } else {
+        console.log('⚠️ Supabase не настроен — работает локальный режим');
+    }
+} catch(e) {
+    console.error('❌ Ошибка Supabase:', e.message);
+}
+
+console.log('📝 Скрипт загружается...');
+console.log('Кнопка Войти:', document.getElementById('loginBtn'));
+console.log('Кнопка Регистрация:', document.getElementById('registerBtn'));
+
 
 // Локальный fallback
 const LOCAL_USERS_KEY = 'ga_local_users';
