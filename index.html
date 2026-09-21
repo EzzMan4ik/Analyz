@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GamerAnalyzer</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M24 4 L42 12 L42 26 Q42 38 24 44 Q6 38 6 26 L6 12 Z' fill='%231e1e30' stroke='%23c5a028' stroke-width='2'/%3E%3Ccircle cx='24' cy='24' r='12' fill='none' stroke='%23c5a028' stroke-width='2'/%3E%3Ccircle cx='24' cy='24' r='3' fill='%23c5a028'/%3E%3C/svg%3E">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -273,8 +274,6 @@
         .tier-info-letter.b { color: #f1c40f; }
         .tier-info-letter.c { color: #95a5a6; }
         .tier-info-letter.d { color: #636e72; }
-
-        /* === STEAM СТАТИСТИКА === */
         .steam-block { max-width: 700px; margin: 0 auto; }
         .steam-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
         .steam-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
@@ -309,7 +308,6 @@
         .hero-stats-wr.good { color: var(--green); }
         .hero-stats-wr.bad { color: var(--red); }
         .steam-hint { color: #666; font-size: 0.85rem; }
-
         @media (max-width: 768px) {
             .content-area { padding: 30px 20px; }
             .navbar { padding: 18px 20px 18px 70px; }
@@ -382,16 +380,16 @@
         <div class="sidebar" id="sidebar">
             <div class="sidebar-user">
                 <div class="sidebar-user-label">Аккаунт</div>
-                <div class="sidebar-user-name" id="userName">—</div>
+                <div class="sidebar-user-name" id="userName">&mdash;</div>
                 <div class="sidebar-user-plan" id="userPlan">Бесплатный</div>
             </div>
-            <div class="sidebar-item active" data-section="home"><span class="icon">🏠</span> Главная</div>
-            <div class="sidebar-item" data-section="subscriptions"><span class="icon">⭐</span> Подписки</div>
+            <div class="sidebar-item active" data-section="home"><span class="icon">&#127968;</span> Главная</div>
+            <div class="sidebar-item" data-section="subscriptions"><span class="icon">&#11088;</span> Подписки</div>
             <div class="sidebar-divider"></div>
-            <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
-            <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
+            <div class="sidebar-item" data-section="dota2"><span class="icon">&#9876;&#65039;</span> DOTA 2</div>
+            <div class="sidebar-item" data-section="cs2"><span class="icon">&#128299;</span> CS 2</div>
             <div class="sidebar-divider"></div>
-            <div class="theme-toggle" id="themeToggle"><span class="icon">🌓</span> Сменить тему</div>
+            <div class="theme-toggle" id="themeToggle"><span class="icon">&#127763;</span> Сменить тему</div>
         </div>
         <div class="navbar">
             <div class="ga-logo">
@@ -399,7 +397,7 @@
                 <span class="ga-logo-text"><span class="ga-gold">GAMER</span><span class="ga-white">ANALYZER</span></span>
             </div>
             <div class="navbar-right">
-                <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему">🌓</button>
+                <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему">&#127763;</button>
                 <button class="logout-btn" id="logoutBtn">Выйти</button>
             </div>
         </div>
@@ -408,17 +406,17 @@
                 <div class="section-title">Функционал сервиса</div>
                 <div class="section-desc">GamerAnalyzer — это ИИ-сервис, который анализирует ваши матчи в Dota 2 и CS 2 и выдаёт персональный разбор: сильные и слабые стороны, конкретные ошибки, рекомендации по тренировке и сравнение с профессиональными игроками.</div>
                 <div class="features-grid">
-                    <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
-                    <div class="feature-card"><div class="feature-icon">🎯</div><div class="feature-title">Сравнение с про-сценой</div><div class="feature-text">Ваши показатели сравниваются с медианными значениями профессиональных игроков.</div></div>
-                    <div class="feature-card"><div class="feature-icon">💡</div><div class="feature-title">Рекомендации по тренировке</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
-                    <div class="feature-card"><div class="feature-icon">🏆</div><div class="feature-title">Определение роли</div><div class="feature-text">ИИ определяет вашу идеальную роль на основе 20+ параметров поведения в матче.</div></div>
-                    <div class="feature-card"><div class="feature-icon">📈</div><div class="feature-title">Отслеживание прогресса</div><div class="feature-text">История разборов и графики роста по неделям — следите за улучшениями.</div></div>
-                    <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальный тир-лист по рангам и позициям — от Рекрута до Титана. На основе статистики.</div></div>
-                    <div class="feature-card"><div class="feature-icon">👤</div><div class="feature-title">Личная статистика</div><div class="feature-text">Введите Steam ID — получите статистику за период: винрейт, лучшие герои, средние показатели.</div></div>
+                    <div class="feature-card"><div class="feature-icon">&#128202;</div><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
+                    <div class="feature-card"><div class="feature-icon">&#127919;</div><div class="feature-title">Сравнение с про-сценой</div><div class="feature-text">Ваши показатели сравниваются с медианными значениями профессиональных игроков.</div></div>
+                    <div class="feature-card"><div class="feature-icon">&#128161;</div><div class="feature-title">Рекомендации по тренировке</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
+                    <div class="feature-card"><div class="feature-icon">&#127942;</div><div class="feature-title">Определение роли</div><div class="feature-text">ИИ определяет вашу идеальную роль на основе 20+ параметров поведения в матче.</div></div>
+                    <div class="feature-card"><div class="feature-icon">&#128200;</div><div class="feature-title">Отслеживание прогресса</div><div class="feature-text">История разборов и графики роста по неделям — следите за улучшениями.</div></div>
+                    <div class="feature-card"><div class="feature-icon">&#128203;</div><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальный тир-лист по рангам и позициям — от Рекрута до Титана. На основе статистики.</div></div>
+                    <div class="feature-card"><div class="feature-icon">&#128100;</div><div class="feature-title">Личная статистика</div><div class="feature-text">Введите Steam ID — получите статистику за период: винрейт, лучшие герои, средние показатели.</div></div>
                 </div>
             </div>
             <div class="section" id="section-subscriptions">
-                <button class="back-home-btn" data-back="home">← На главную страницу</button>
+                <button class="back-home-btn" data-back="home">&#8592; На главную страницу</button>
                 <div class="section-title">Тарифы и подписки</div>
                 <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
                 <div class="subscription-cards">
@@ -444,24 +442,24 @@
                 </div>
             </div>
             <div class="section" id="section-dota2">
-                <button class="back-home-btn" data-back="home">← На главную страницу</button>
+                <button class="back-home-btn" data-back="home">&#8592; На главную страницу</button>
                 <div class="dota-subtabs">
                     <div class="dota-subtab active" data-subtab="analysis">
-                        <span class="dota-subtab-icon">⚔️</span>
+                        <span class="dota-subtab-icon">&#9876;&#65039;</span>
                         <span class="dota-subtab-text">Анализ матча</span>
                     </div>
                     <div class="dota-subtab" data-subtab="tierlist">
-                        <span class="dota-subtab-icon">📋</span>
+                        <span class="dota-subtab-icon">&#128203;</span>
                         <span class="dota-subtab-text">Тир-лист героев</span>
                     </div>
                     <div class="dota-subtab" data-subtab="stats">
-                        <span class="dota-subtab-icon">👤</span>
+                        <span class="dota-subtab-icon">&#128100;</span>
                         <span class="dota-subtab-text">Моя статистика</span>
                     </div>
                 </div>
                 <div class="dota-subcontent active" id="dotaSub-analysis">
                     <div class="game-block">
-                        <div class="game-icon">⚔️</div>
+                        <div class="game-icon">&#9876;&#65039;</div>
                         <div class="section-title">Анализ матча Dota 2</div>
                         <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаёт персональный разбор.</div>
                         <div class="link-form">
@@ -495,7 +493,7 @@
                 </div>
                 <div class="dota-subcontent" id="dotaSub-stats">
                     <div class="steam-block">
-                        <div class="game-icon">👤</div>
+                        <div class="game-icon">&#128100;</div>
                         <div class="section-title">Моя статистика</div>
                         <div class="section-desc">Введите ваш Steam ID, ссылку на профиль Steam или Dota 2 friend code — сервис выгрузит статистику за выбранный период.</div>
                         <div class="steam-form">
@@ -518,9 +516,9 @@
                 </div>
             </div>
             <div class="section" id="section-cs2">
-                <button class="back-home-btn" data-back="home">← На главную страницу</button>
+                <button class="back-home-btn" data-back="home">&#8592; На главную страницу</button>
                 <div class="game-block">
-                    <div class="game-icon">🔫</div>
+                    <div class="game-icon">&#128299;</div>
                     <div class="section-title">Анализ матча CS 2</div>
                     <div class="section-desc">Вставьте ссылку на матч или загрузите .dem файл — сервис проанализирует демку и выдаёт разбор по гранатам, спотам и роли.</div>
                     <div class="link-form">
@@ -539,76 +537,40 @@
         </div>
     </div>
     <script>
-       // === SUPABASE ===
 // === SUPABASE ===
-const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';  // ваш URL
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';                    // ваш ключ
+const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5remhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';
 
 var supabaseClient = null;
 try {
     if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20) {
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('✅ Supabase подключен');
+        console.log('Supabase connected');
     } else {
-        console.log('⚠️ Supabase не настроен — работает локальный режим');
+        console.log('Supabase not configured - local mode');
     }
 } catch(e) {
-    console.error('❌ Ошибка Supabase:', e.message);
+    console.error('Supabase error:', e.message);
 }
 
-console.log('📝 Скрипт загружается...');
-console.log('Кнопка Войти:', document.getElementById('loginBtn'));
-console.log('Кнопка Регистрация:', document.getElementById('registerBtn'));
-
-
-// Локальный fallback
-// === НАСТРОЙКИ ===
-const SUPABASE_URL = 'https://твой-проект.supabase.co'; // <-- ВСТАВЬ СЮДА СВОЙ URL
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6...'; // <-- ВСТАВЬ СЮДА СВОЙ ANON KEY
-
-// === ИНИЦИАЛИЗАЦИЯ (С ЗАЩТОЙ ОТ ПАДЕНИЯ) ===
-let supabaseClient = null;
-
-try {
-    // Проверяем, загрузилась ли библиотека и валидны ли ключи
-    if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('✅ Supabase подключен успешно');
-    } else {
-        console.warn('⚠️ Supabase не настроен (неверные ключи или нет библиотеки). Работает локальный режим.');
-    }
-} catch (e) {
-    console.error('❌ Критическая ошибка при создании клиента Supabase:', e);
+// === UTILS ===
+async function hashPassword(password) {
+    var msg = new TextEncoder().encode(password);
+    var hash = await crypto.subtle.digest('SHA-256', msg);
+    var arr = Array.from(new Uint8Array(hash));
+    return arr.map(function(b){return b.toString(16).padStart(2,'0');}).join('');
 }
+function getLocalUsers() { try { return JSON.parse(localStorage.getItem('ga_users')||'{}'); } catch(e){ return {}; } }
+function saveLocalUsers(u) { localStorage.setItem('ga_users', JSON.stringify(u)); }
+function getCurrentUser() { try { return JSON.parse(sessionStorage.getItem('ga_current_user')||'null'); } catch(e){ return null; } }
+function setCurrentUser(u) { sessionStorage.setItem('ga_current_user', JSON.stringify(u)); }
+function clearCurrentUser() { sessionStorage.removeItem('ga_current_user'); }
+function showError(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
+function hideError(id) { document.getElementById(id).classList.remove('visible'); }
+function showSuccess(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
+function hideSuccess(id) { document.getElementById(id).classList.remove('visible'); }
 
-// === ПОИСК ЭЛЕМЕНТОВ (ГЛАВНОЕ ИСПРАВЛЕНИЕ) ===
-// Мы ищем кнопки только после того, как DOM полностью загружен, чтобы они точно существовали
-document.addEventListener('DOMContentLoaded', () => {
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    
-    // Если кнопок нет в HTML, скрипт напишет об этом в консоль, но не упадет
-    if (!loginBtn || !registerBtn) {
-        console.error('❌ ОШИБКА: Не найдены кнопки с ID "loginBtn" или "registerBtn". Проверь HTML.');
-        return; // Прерываем выполнение, чтобы не было ошибок ниже
-    }
-
-    console.log('✅ Кнопки найдены. Навешиваем обработчики...');
-
-    // --- ЗДЕСЬ ТВОЯ ЛОГИКА РЕГИСТРАЦИИ (оставь свой код, но убедись, что он внутри этого блока) ---
-    registerBtn.addEventListener('click', async function() {
-        // ... твой существующий код регистрации ...
-        console.log('Нажата кнопка регистрации'); 
-    });
-
-    // --- ЗДЕСЬ ТВОЯ ЛОГИКА ВХОДА ---
-    loginBtn.addEventListener('click', async function() {
-        // ... твой существующий код входа ...
-        console.log('Нажата кнопка входа');
-    });
-});
-
-
+// === DOM ELEMENTS ===
 var loginBtn = document.getElementById('loginBtn');
 var registerBtn = document.getElementById('registerBtn');
 var logoutBtn = document.getElementById('logoutBtn');
@@ -621,6 +583,7 @@ var sidebarItems = document.querySelectorAll('.sidebar-item');
 var sections = document.querySelectorAll('.section');
 var subscriptionCards = document.querySelectorAll('.subscription-card');
 
+// === AUTH UI ===
 document.getElementById('goToRegister').addEventListener('click', function() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
@@ -634,6 +597,7 @@ document.getElementById('goToLogin').addEventListener('click', function() {
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 document.getElementById('themeBtnNav').addEventListener('click', toggleTheme);
 
+// === REGISTER ===
 registerBtn.addEventListener('click', async function() {
     var login = document.getElementById('regLoginInput').value.trim().toLowerCase();
     var password = document.getElementById('regPasswordInput').value;
@@ -668,6 +632,7 @@ registerBtn.addEventListener('click', async function() {
     }, 1500);
 });
 
+// === LOGIN ===
 loginBtn.addEventListener('click', async function() {
     var login = document.getElementById('loginInput').value.trim().toLowerCase();
     var password = document.getElementById('passwordInput').value;
@@ -693,6 +658,7 @@ loginBtn.addEventListener('click', async function() {
     }
 });
 
+// === APP ===
 function enterApp() {
     authScreen.style.display = 'none';
     setTimeout(function() { appWrapper.classList.add('active'); updateUserInfo(); updateSubscriptionUI(); }, 10);
@@ -764,10 +730,15 @@ document.querySelectorAll('.dota-subtab').forEach(function(tab) {
         if (t === 'tierlist' && !tierlistData) loadTierlist();
     });
 });
-function showError(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
-function hideError(id) { document.getElementById(id).classList.remove('visible'); }
-function showSuccess(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
-function hideSuccess(id) { document.getElementById(id).classList.remove('visible'); }
+
+// === THEME ===
+function toggleTheme() {
+    document.documentElement.classList.toggle('light-theme');
+    localStorage.setItem('ga-theme', document.documentElement.classList.contains('light-theme') ? 'light' : 'dark');
+}
+(function() {
+    if (localStorage.getItem('ga-theme') === 'light') document.documentElement.classList.add('light-theme');
+})();
 
 // === STEAM ===
 var currentPeriod = 7;
@@ -829,7 +800,7 @@ async function fetchSteamStats() {
         html += '<div class="result-badge '+(wr>=50?'win':'lose')+'">'+wr+'% WR</div></div>';
         if (total === 0) { html += '<div class="result-block"><div class="problem-text">За период матчей не найдено.</div></div>'; }
         else {
-            html += '<div class="result-block"><div class="result-block-title">📊 Средние за период</div><div class="metrics-grid">';
+            html += '<div class="result-block"><div class="result-block-title">Средние за период</div><div class="metrics-grid">';
             html += '<div class="metric-card"><div class="metric-label">Винрейт</div><div class="metric-value">'+wr+'%</div><div class="metric-sub '+(wr>=50?'good':'bad')+'">'+wins+'В / '+losses+'П</div></div>';
             html += '<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+aK+'/'+aD+'/'+aA+'</div></div>';
             html += '<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+aGPM+'</div></div>';
@@ -839,7 +810,7 @@ async function fetchSteamStats() {
             html += '<div class="metric-card"><div class="metric-label">Длительность</div><div class="metric-value">'+aDur+' мин</div></div>';
             html += '</div></div>';
             if (topH.length > 0) {
-                html += '<div class="result-block"><div class="result-block-title">🏆 Топ героев</div>';
+                html += '<div class="result-block"><div class="result-block-title">Топ героев</div>';
                 topH.forEach(function(h) {
                     var hn = getHeroName(h.hero_id);
                     var hh = tierlistData ? tierlistData.find(function(x){return parseInt(x.id)===parseInt(h.hero_id);}) : null;
@@ -864,7 +835,7 @@ async function fetchSteamStats() {
     }
 }
 
-// === ТИР-ЛИСТ ===
+// === TIERLIST ===
 var RANKS = [
     {num:1,name:'Рекрут',color:'#6b6b6b'},{num:2,name:'Страж',color:'#4a9d4a'},
     {num:3,name:'Рыцарь',color:'#b8860b'},{num:4,name:'Герой',color:'#b0b0b0'},
@@ -954,7 +925,7 @@ function getMatchPosition(p) {
     if (s&&!c) { if (e||i) return 4; return 5; } return 1;
 }
 
-// === АНАЛИЗ МАТЧА ===
+// === DOTA ANALYSIS ===
 var ITEM_NAMES = {'blink':'Blink Dagger','black_king_bar':'BKB','assault':'Assault Cuirass','shivas_guard':"Shiva's Guard",'radiance':'Radiance','manta':'Manta Style','butterfly':'Butterfly','monkey_king_bar':'MKB','abyssal_blade':'Abyssal Blade','scythe_of_vyse':'Scythe of Vyse','orchid':'Orchid','bloodthorn':'Bloodthorn','hurricane_pike':'Hurricane Pike','sphere':"Linken's Sphere",'greater_crit':'Daedalus','satanic':'Satanic','heart':'Heart of Tarrasque','travel_boots':'Boots of Travel','force_staff':'Force Staff','eul':"Eul's Scepter",'gungir':'Gungir','silver_edge':'Silver Edge','spirit_vessel':'Spirit Vessel','solar_crest':'Solar Crest','guardian_greaves':'Guardian Greaves','arcane_boots':'Arcane Boots','phase_boots':'Phase Boots','power_treads':'Power Treads','tranquil_boots':'Tranquil Boots','aghanims_shard':"Aghanim's Shard",'ultimate_scepter':"Aghanim's Scepter",'ultimate_scepter_2':'Aghs +17','refresher':'Refresher Orb','pipe':'Pipe of Insight','crimson_guard':'Crimson Guard','lotus_orb':'Lotus Orb','hood_of_defiance':'Hood of Defiance','vanguard':'Vanguard','soul_ring':'Soul Ring','magic_wand':'Magic Wand','bracer':'Bracer','wraith_band':'Wraith Band','null_talisman':'Null Talisman','mekansm':'Mekansm','vladmir':"Vladmir's Offering",'vladmir_2':"Vladmir's Offering 2",'hand_of_midas':'Hand of Midas','midas':'Hand of Midas','bfury':'Battle Fury','battle_fury':'Battle Fury','desolator':'Desolator','skull_basher':'Skull Basher','crystalys':'Crystalys','armlet_of_mordiggian':'Armlet of Mordiggian','glimmer_cape':'Glimmer Cape','veil_of_discord':'Veil of Discord','rod_of_atos':'Rod of Atos','dragon_lance':'Dragon Lance','aether_lens':'Aether Lens','octarine_core':'Octarine Core','sange_and_yasha':'Sange and Yasha','kaya_and_sange':'Kaya and Sange','yasha_and_kaya':'Yasha and Kaya','mask_of_madness':'Mask of Madness','ethereal_blade':'Ethereal Blade','falcon_blade':'Falcon Blade','mage_slayer':'Mage Slayer','witch_blade':'Witch Blade','ghost_scepter':'Ghost Scepter'};
 var KEY_ITEMS = ['blink','black_king_bar','assault','shivas_guard','radiance','manta','butterfly','monkey_king_bar','abyssal_blade','scythe_of_vyse','orchid','bloodthorn','hurricane_pike','sphere','greater_crit','satanic','heart','travel_boots','force_staff','eul','gungir','silver_edge','spirit_vessel','solar_crest','guardian_greaves','aghanims_shard','ultimate_scepter','ultimate_scepter_2','refresher','pipe','crimson_guard','lotus_orb','desolator','skull_basher','crystalys','armlet_of_mordiggian','glimmer_cape','veil_of_discord','rod_of_atos','dragon_lance','aether_lens','octarine_core','sange_and_yasha','kaya_and_sange','yasha_and_kaya','mekansm','vladmir','vladmir_2','hand_of_midas','bfury','mask_of_madness','ethereal_blade','falcon_blade','mage_slayer','witch_blade','ghost_scepter','arcane_boots','phase_boots','power_treads','tranquil_boots'];
 var PRO_BENCH = {1:{lh10:50,lh20:150,lh30:250,gpm:700,xpm:680,name:'керри',blink:18},2:{lh10:45,lh20:130,lh30:200,gpm:650,xpm:720,name:'мида',blink:12},3:{lh10:30,lh20:80,lh30:150,gpm:500,xpm:480,name:'оффлейнера',blink:13},4:{lh10:15,lh20:40,lh30:80,gpm:400,xpm:380,name:'саппорта',blink:20},5:{lh10:10,lh20:25,lh30:50,gpm:350,xpm:320,name:'хард-саппорта',blink:25}};
@@ -978,10 +949,10 @@ function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
     kp2.sort(function(a,b){return a.time-b.time;});
     var blink = kp2.find(function(p){return p.key==='blink';});
     var html = '';
-    if (!parsed) { html += '<div class="problem-block" style="border-color:rgba(231,160,40,0.3);background-color:rgba(231,160,40,0.06);"><div class="problem-title" style="color:var(--orange);">⚠️ Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota. Базовые показатели отображаются корректно.</div></div>'; }
+    if (!parsed) { html += '<div class="problem-block" style="border-color:rgba(231,160,40,0.3);background-color:rgba(231,160,40,0.06);"><div class="problem-title" style="color:var(--orange);">Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota. Базовые показатели отображаются корректно.</div></div>'; }
     html += '<div class="result-header"><div class="result-header-info"><h2>'+hName+' — '+posName+'</h2><div class="result-header-meta">Длительность: '+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+(fb>0?' · FB: '+fbM+':'+String(fbS).padStart(2,'0'):'')+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
     html += '<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\''+matchId+'\')">'+playerOptions+'</select></div>';
-    html += '<div class="result-block"><div class="result-block-title">📊 Базовые показатели</div><div class="metrics-grid">';
+    html += '<div class="result-block"><div class="result-block-title">Базовые показатели</div><div class="metrics-grid">';
     html += '<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+gpm+'</div><div class="metric-sub '+(gpm>=bm.gpm?'good':'bad')+'">Про: '+bm.gpm+'</div></div>';
     html += '<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">'+xpm+'</div><div class="metric-sub '+(xpm>=bm.xpm?'good':'bad')+'">Про: '+bm.xpm+'</div></div>';
     html += '<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+k+'/'+d+'/'+a+'</div><div class="metric-sub">Участие: '+kp+'%</div></div>';
@@ -992,7 +963,7 @@ function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
     html += '<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+lh+'</div></div>';
     html += '<div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">'+dn+'</div></div></div></div>';
     if (parsed && lhT.length>0) {
-        html += '<div class="result-block"><div class="result-block-title">📈 Фарм</div><table class="farm-table"><tr><th>Время</th><th>10</th><th>20</th><th>30</th></tr>';
+        html += '<div class="result-block"><div class="result-block-title">Фарм</div><table class="farm-table"><tr><th>Время</th><th>10</th><th>20</th><th>30</th></tr>';
         html += '<tr><td>Вы</td>'+(lh10!=null?'<td class="gold-val">'+lh10+'</td>':'<td class="pro-val">—</td>')+(lh20!=null?'<td class="gold-val">'+lh20+'</td>':'<td class="pro-val">—</td>')+(lh30!=null?'<td class="gold-val">'+lh30+'</td>':'<td class="pro-val">—</td>')+'</tr>';
         html += '<tr><td>Про ('+bm.name+')</td><td class="pro-val">'+bm.lh10+'</td><td class="pro-val">'+bm.lh20+'</td><td class="pro-val">'+bm.lh30+'</td></tr>';
         if (lh10!=null&&lh20!=null&&lh30!=null) {
@@ -1005,28 +976,28 @@ function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
         html += '</div>';
     }
     if (kp2.length>0) {
-        html += '<div class="result-block"><div class="result-block-title">⏱️ Предметы</div><div class="item-timeline">';
+        html += '<div class="result-block"><div class="result-block-title">Предметы</div><div class="item-timeline">';
         kp2.forEach(function(p) { html += '<div class="item-chip">'+p.name+' — <span class="item-time">'+p.ts+'</span></div>'; });
         html += '</div>';
         if (blink) { var bm2=blink.time/60; if (bm2>bm.blink+3) html += '<div class="analysis-text"><strong style="color:var(--red);">Blink в '+blink.ts+'</strong> — поздно.</div>'; else if (bm2<=bm.blink+1) html += '<div class="analysis-text"><strong style="color:var(--green);">Blink в '+blink.ts+'</strong> — отлично.</div>'; }
         html += '</div>';
     }
-    html += '<div class="result-block"><div class="result-block-title">🏆 Сравнение</div>';
+    html += '<div class="result-block"><div class="result-block-title">Сравнение</div>';
     var gr = Math.round(gpm/bm.gpm*100);
     if (gr>=95) html += '<div class="comp-item">Фарм про-уровня — <strong style="color:var(--green);">'+gpm+' GPM</strong> ('+gr+'%).</div>';
     else if (gr>=75) html += '<div class="comp-item">Фарм ниже про — <strong style="color:var(--orange);">'+gpm+' GPM</strong> ('+gr+'%).</div>';
     else html += '<div class="comp-item">Фарм слабый — <strong style="color:var(--red);">'+gpm+' GPM</strong> ('+gr+'%).</div>';
     html += '</div>';
-    html += '<div class="result-block"><div class="result-block-title">✅ Сильные стороны</div>';
+    html += '<div class="result-block"><div class="result-block-title">Сильные стороны</div>';
     if (gpm>=bm.gpm) html += '<div class="strength-item"><span class="marker">+</span> GPM '+gpm+' — про-уровень.</div>';
     if (kp>=65) html += '<div class="strength-item"><span class="marker">+</span> Участие '+kp+'%.</div>';
     if (d<=3) html += '<div class="strength-item"><span class="marker">+</span> Мало смертей ('+d+').</div>';
     html += '</div>';
-    html += '<div class="result-block"><div class="result-block-title">❌ Слабые стороны</div>';
+    html += '<div class="result-block"><div class="result-block-title">Слабые стороны</div>';
     if (gpm<bm.gpm*0.8) html += '<div class="weakness-item"><span class="marker">−</span> Низкий GPM ('+gpm+', про: '+bm.gpm+').</div>';
     if (d>=8) html += '<div class="weakness-item"><span class="marker">−</span> Много смертей ('+d+').</div>';
     html += '</div>';
-    html += '<div class="result-block"><div class="result-block-title">💡 Рекомендации</div>';
+    html += '<div class="result-block"><div class="result-block-title">Рекомендации</div>';
     if (gpm<bm.gpm*0.8) html += '<div class="recommendation-item"><span class="marker">1.</span><div>Улучшите фарм.<div class="rec-exercise"><strong>Упражнение:</strong> 20 мин в лобби: крип → лес → крип.</div></div></div>';
     if (d>=8) html += '<div class="recommendation-item"><span class="marker">2.</span><div>Работайте над отступлением.<div class="rec-exercise"><strong>Упражнение:</strong> Смотрите реплеи смертей.</div></div></div>';
     html += '</div>';
@@ -1060,7 +1031,7 @@ window.switchDotaPlayer = async function(matchId) {
 };
 
 function generateCsResults() {
-    return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда (11:13)</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">⚠️ Проблема</div><div class="problem-text">Выживаемость 25%.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div></div><div class="result-block"><div class="result-block-title">✅ Сильные</div><div class="strength-item"><span class="marker">+</span> HS% 48%</div></div><div class="result-block"><div class="result-block-title">❌ Слабые</div><div class="weakness-item"><span class="marker">−</span> Ранние выходы</div></div><div class="result-block"><div class="result-block-title">💡 Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги.<div class="rec-exercise"><strong>Упражнение:</strong> Retake 30 мин.</div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
+    return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда (11:13)</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">Проблема</div><div class="problem-text">Выживаемость 25%.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div></div><div class="result-block"><div class="result-block-title">Сильные</div><div class="strength-item"><span class="marker">+</span> HS% 48%</div></div><div class="result-block"><div class="result-block-title">Слабые</div><div class="weakness-item"><span class="marker">−</span> Ранние выходы</div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги.<div class="rec-exercise"><strong>Упражнение:</strong> Retake 30 мин.</div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
 }
 
 window.resetAnalysis = function(game) {
@@ -1116,4 +1087,7 @@ async function runAnalysis(game) {
 document.getElementById('dotaAnalyzeBtn').addEventListener('click', function() { runAnalysis('dota'); });
 document.getElementById('csAnalyzeBtn').addEventListener('click', function() { runAnalysis('cs'); });
 window.addEventListener('load', function() { var u = getCurrentUser(); if (u) enterApp(); });
+    </script>
+</body>
+</html>
 
