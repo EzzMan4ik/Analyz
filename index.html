@@ -1,4 +1,4 @@
-с<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -549,6 +549,15 @@ try {
     console.error('Ошибка Supabase:', e.message);
 }
 
+// Проверка: блокирует ли RLS запросы (ошибка app.current_login или permission)
+function isRLSError(err) {
+    var msg = (err && err.message) ? err.message.toLowerCase() : '';
+    return msg.indexOf('app.current_login') !== -1 ||
+           msg.indexOf('row-level security') !== -1 ||
+           msg.indexOf('permission') !== -1 ||
+           msg.indexOf('policy') !== -1;
+}
+
 // === ПРОКСИ для OpenDota (через Vercel rewrites, без CORS) ===
 const DOTA_API = '/api/dota/';
 
@@ -624,15 +633,28 @@ registerBtn.addEventListener('click', async function() {
     if (!login || login.length < 3) { showError('regError', 'Логин должен быть не короче 3 символов'); return; }
     if (!password || password.length < 4) { showError('regError', 'Пароль должен быть не короче 4 символов'); return; }
     if (password !== confirm) { showError('regError', 'Пароли не совпадают'); return; }
+    var useLocal = false;
     if (supabaseClient) {
         try {
             var ex = await supabaseClient.from('users').select('login').eq('login', login).maybeSingle();
+            if (ex.error) throw ex.error;
             if (ex.data) { showError('regError', 'Этот логин уже занят'); return; }
             var hashed = await hashPassword(password);
             var ins = await supabaseClient.from('users').insert({ login: login, password: hashed, plan: 'free' });
             if (ins.error) throw ins.error;
-        } catch(err) { showError('regError', 'Ошибка: ' + (err.message||err)); return; }
+        } catch(err) {
+            if (isRLSError(err)) {
+                console.warn('RLS блокирует запросы — переключение на локальный режим');
+                useLocal = true;
+            } else {
+                showError('regError', 'Ошибка: ' + (err.message||err));
+                return;
+            }
+        }
     } else {
+        useLocal = true;
+    }
+    if (useLocal) {
         var users = getLocalUsers();
         if (users[login]) { showError('regError', 'Этот логин уже занят'); return; }
         users[login] = { password: await hashPassword(password), plan: 'free' };
@@ -656,17 +678,30 @@ loginBtn.addEventListener('click', async function() {
     var password = document.getElementById('passwordInput').value;
     hideError('loginError');
     if (!login || !password) { showError('loginError', 'Введите логин и пароль'); return; }
+    var useLocal = false;
     if (supabaseClient) {
         try {
             var hashed = await hashPassword(password);
             var res = await supabaseClient.from('users').select('*').eq('login', login).maybeSingle();
-            if (res.error) { showError('loginError', 'Ошибка базы: ' + res.error.message); return; }
+            if (res.error) throw res.error;
             if (!res.data) { showError('loginError', 'Логин не найден'); return; }
             if (res.data.password !== hashed) { showError('loginError', 'Пароль не совпадает'); return; }
             setCurrentUser({ login: res.data.login, plan: res.data.plan });
             enterApp();
-        } catch(err) { showError('loginError', 'Ошибка входа: ' + (err.message||err)); }
+            return;
+        } catch(err) {
+            if (isRLSError(err)) {
+                console.warn('RLS блокирует запросы — переключение на локальный режим');
+                useLocal = true;
+            } else {
+                showError('loginError', 'Ошибка входа: ' + (err.message||err));
+                return;
+            }
+        }
     } else {
+        useLocal = true;
+    }
+    if (useLocal) {
         var users = getLocalUsers();
         if (!users[login]) { showError('loginError', 'Логин не найден. Зарегистрируйтесь.'); return; }
         var hashed = await hashPassword(password);
@@ -940,7 +975,7 @@ function getMatchPosition(p) {
 }
 
 // === АНАЛИЗ МАТЧА ===
-var ITEM_NAMES = {'blink':'Blink Dagger','black_king_bar':'BKB','assault':'Assault Cuirass','shivas_guard':"Shiva's Guard",'radiance':'Radiance','manta':'Manta Style','butterfly':'Butterfly','monkey_king_bar':'MKB','abyssal_blade':'Abyssal Blade','scythe_of_vyse':'Scythe of Vyse','orchid':'Orchid','bloodthorn':'Bloodthorn','hurricane_pike':'Hurricane Pike','sphere':"Linken's Sphere",'greater_crit':'Daedalus','satanic':'Satanic','heart':'Heart of Tarrasque','travel_boots':'Boots of Travel','force_staff':'Force Staff','eul':"Eul's Scepter",'gungir':'Gungir','silver_edge':'Silver Edge','spirit_vessel':'Spirit Vessel','solar_crest':'Solar Crest','guardian_greaves':'Guardian Greaves','arcane_boots':'Arcane Boots','phase_boots':'Phase Boots','power_treads':'Power Treads','tranquil_boots':'Tranquil Boots','aghanims_shard':"Aghanim's Shard",'ultimate_scepter':"Aghanim's Scepter",'ultimate_scepter_2':'Aghs +17','refresher':'Refresher Orb','pipe':'Pipe of Insight','crimson_guard':'Crimson Guard','lotus_orb':'Lotus Orb','hood_of_defiance':'Hood of Defiance','vanguard':'Vanguard','soul_ring':'Soul Ring','magic_wand':'Magic Wand','bracer':'Bracer','wraith_band':'Wraith Band','null_talisman':'Null Talisman','mekansm':'Mekansm','vladmir':"Vladmir's Offering",'vladmir_2':"Vladmir's Offering 2",'hand_of_midas':'Hand of Midas','midas':'Hand of Midas','bfury':'Battle Fury','battle_fury':'Battle Fury','desolator':'Desolator','skull_basher':'Skull Basher','crystalys':'Crystalys','armlet_of_mordiggian':'Armlet of Mordiggian','glimmer_cape':'Glimmer Cape','veil_of_discord':'Veil of Discord','rod_of_atos':'Rod of Atos','dragon_lance':'Dragon Lance','aether_lens':'Aether Lens','octarine_core':'Octarine Core','sange_and_yasha':'Sange and Yasha','kaya_and_sange':'Kaya and Sange','yasha_and_kaya':'Yasha and Kaya','mask_of_madness':'Mask of Madness','ethereal_blade':'Ethereal Blade','falcon_blade':'Falcon Blade','mage_slayer':'Mage Slayer','witch_blade':'Witch Blade','ghost_scepter':'Ghost Scepter'};
+var ITEM_NAMES = {'blink':'Blink Dagger','black_king_bar':'BKB','assault':'Assault Cuirass','shivas_guard':"Shiva's Guard",'radiance':'Radiance','manta':'Manta Style','butterfly':'Butterfly','monkey_king_bar':'MKB','abyssal_blade':'Abyssal Blade','scythe_of_vyse':'Scythe of Vyse','orchid':'Orchid','bloodthorn':'Bloodthorn','hurricane_pike':'Hurricane Pike','sphere':"Linken's Sphere",'greater_crit':'Daedalus','satanic':'Satanic','heart':'Heart of Tarrasque','travel_boots':'Boots of Travel','force_staff':'Force Staff','eul':"Eul's Scepter",'gungir':'Gungir','silver_edge':'Silver Edge','spirit_vessel':'Spirit Vessel','solar_crest':'Solar Crest','guardian_greaves':'Guardian Greaves','arcane_boots':'Arcane Boots','phase_boots':'Phase Boots','power_treads':'Power Treads','tranquil_boots':'Tranquil Boots','aghanims_shard':"Aghanim's Shard",'ultimate_scepter':"Aghanim's Scepter",'ultimate_scepter_2':'Aghs +17','refresher':'Refresher Orb','pipe':'Pipe of Insight','crimson_guard':'Crimson Guard','lotus_orb':'Lotus Orb','hood_of_defiance':'Hood of Defiance','vanguard':'Vanguard','soul_ring':'Soul Ring','magic_wand':'Magic Wand','bracer':'Bracer','wraith_band':'Wraith Band','null_talisman':'Null Talisman','mekansm':'Mekansm','vladmir':"Vladmir's Offering",'vladmir_2':"Vladmir's Offering 2",'hand_of_midas':'Hand of Midas','midas':'Hand of Midas','bfury':'Battle Fury','battle_fury':'Battle Fury','desolator':'Desolator','skull_basher':'Skull Basher','crystalys':'Crystalys','armlet_of_mordiggian':'Armlet of Mordiggian','glimmer_cape':'Glimmer Cape','veil_of_discord':'Veil of Discord','rod_of_atos':'Rod of Atos','dragon_lance':'Dragon Lance','aether_lens':'Aether Lens','octarine_core':'Octarine Core','sange_and_yasha':'Sange and Yasha','kaya_and_sange':'Kaya and Sange','yasha_and_kaya':'Yaya and Kaya','mask_of_madness':'Mask of Madness','ethereal_blade':'Ethereal Blade','falcon_blade':'Falcon Blade','mage_slayer':'Mage Slayer','witch_blade':'Witch Blade','ghost_scepter':'Ghost Scepter'};
 var KEY_ITEMS = ['blink','black_king_bar','assault','shivas_guard','radiance','manta','butterfly','monkey_king_bar','abyssal_blade','scythe_of_vyse','orchid','bloodthorn','hurricane_pike','sphere','greater_crit','satanic','heart','travel_boots','force_staff','eul','gungir','silver_edge','spirit_vessel','solar_crest','guardian_greaves','aghanims_shard','ultimate_scepter','ultimate_scepter_2','refresher','pipe','crimson_guard','lotus_orb','desolator','skull_basher','crystalys','armlet_of_mordiggian','glimmer_cape','veil_of_discord','rod_of_atos','dragon_lance','aether_lens','octarine_core','sange_and_yasha','kaya_and_sange','yasha_and_kaya','mekansm','vladmir','vladmir_2','hand_of_midas','bfury','mask_of_madness','ethereal_blade','falcon_blade','mage_slayer','witch_blade','ghost_scepter','arcane_boots','phase_boots','power_treads','tranquil_boots'];
 var PRO_BENCH = {1:{lh10:50,lh20:150,lh30:250,gpm:700,xpm:680,name:'керри',blink:18},2:{lh10:45,lh20:130,lh30:200,gpm:650,xpm:720,name:'мида',blink:12},3:{lh10:30,lh20:80,lh30:150,gpm:500,xpm:480,name:'оффлейнера',blink:13},4:{lh10:15,lh20:40,lh30:80,gpm:400,xpm:380,name:'саппорта',blink:20},5:{lh10:10,lh20:25,lh30:50,gpm:350,xpm:320,name:'хард-саппорта',blink:25}};
 
