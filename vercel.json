@@ -1,8 +1,8 @@
 {
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/dota/(.*)",
-      "dest": "https://api.opendota.com/api/$1"
+      "source": "/api/dota/:path*",
+      "destination": "https://api.opendota.com/api/:path*"
     }
   ]
 }
