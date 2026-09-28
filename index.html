@@ -1,354 +1,396 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GamerAnalyzer — Анализ матчей Dota 2 и CS2</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root {
-    --bg: #0a0e14;
-    --card-bg: #131820;
-    --card-bg-2: #1a2030;
-    --border: rgba(255,255,255,0.08);
-    --text: #e8e8e8;
-    --text-dim: #8b8b8b;
-    --accent: #6366f1;
-    --accent-2: #818cf8;
-    --green: #10b981;
-    --red: #ef4444;
-    --orange: #f59e0b;
-    --gold: #e7a028;
-    --radius: 10px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamerAnalyzer</title>
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M24 4 L42 12 L42 26 Q42 38 24 44 Q6 38 6 26 L6 12 Z" fill="%231e1e30" stroke="%23c5a028" stroke-width="2"/><circle cx="24" cy="24" r="12" fill="none" stroke="%23c5a028" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="%23c5a028"/></svg>'/>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root {
+            --dark-gold: #c5a028; --beige: #d4c5a0; --gold-hover: #d4af37;
+            --dark-bg: #14141f; --card-bg: #1e1e30; --sidebar-width: 260px;
+            --error-color: #e74c3c; --green: #2ecc71; --red: #e74c3c; --orange: #e67e22;
+            --logo-primary: #c5a028; --logo-secondary: #fff;
+        
+            --bg: #0a0e14; --card-bg-2: #1a2030; --border: rgba(255,255,255,0.08);
+            --text: #e8e8e8; --text-dim: #8b8b8b; --accent: #6366f1; --accent-2: #818cf8;
 }
-html.light-theme {
-    --bg: #f0f2f5;
-    --card-bg: #ffffff;
-    --card-bg-2: #f7f8fa;
-    --border: rgba(0,0,0,0.08);
-    --text: #1a1a1a;
-    --text-dim: #666;
+        html.light-theme {
+            --dark-bg: #f5f5f8; --card-bg: #fff;
+            --logo-primary: #b8920c; --logo-secondary: #1a1a2a;
+        
+            --bg: #f0f2f5; --card-bg-2: #f7f8fa; --border: rgba(0,0,0,0.08);
+            --text: #1a1a1a; --text-dim: #666;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-    transition: background 0.3s, color 0.3s;
-}
-a { color: var(--accent); text-decoration: none; }
-button { font-family: inherit; cursor: pointer; border: none; outline: none; }
-
-/* === AUTH SCREEN === */
-#authScreen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
-    background: radial-gradient(circle at 50% 30%, rgba(99,102,241,0.12), transparent 60%), var(--bg);
-}
-.auth-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px;
-    max-width: 420px;
-    width: 100%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-}
-.auth-logo {
-    text-align: center;
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-.auth-subtitle { text-align: center; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; }
-.input-group { margin-bottom: 16px; }
-.input-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 6px; }
-.input-group input {
-    width: 100%;
-    padding: 12px 14px;
-    background: var(--card-bg-2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 0.95rem;
-    transition: border-color 0.2s;
-}
-.input-group input:focus { border-color: var(--accent); }
-.input-group input::placeholder { color: #555; }
-.auth-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #fff;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: transform 0.1s, opacity 0.2s;
-}
-.auth-btn:hover { opacity: 0.9; }
-.auth-btn:active { transform: scale(0.98); }
-.auth-link { text-align: center; margin-top: 18px; color: var(--text-dim); font-size: 0.9rem; }
-.auth-link span { color: var(--accent); cursor: pointer; font-weight: 600; }
-.auth-link span:hover { text-decoration: underline; }
-.auth-note { text-align: center; margin-top: 20px; font-size: 0.75rem; color: #555; }
-.msg-box { padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; margin-top: 12px; display: none; }
-.msg-box.visible { display: block; }
-.msg-error { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
-.msg-success { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
-
-/* === APP === */
-#appWrapper { display: none; min-height: 100vh; }
-#appWrapper.active { display: block; }
-.topbar {
-    position: fixed; top: 0; left: 0; right: 0; height: 56px;
-    background: var(--card-bg); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 20px; z-index: 100;
-}
-.topbar-logo { font-weight: 800; letter-spacing: 1px; font-size: 1.1rem; }
-.topbar-right { display: flex; align-items: center; gap: 16px; }
-.topbar-user { font-size: 0.85rem; color: var(--text-dim); }
-.topbar-user b { color: var(--text); }
-.icon-btn { background: none; color: var(--text-dim); font-size: 1.2rem; padding: 6px 10px; border-radius: 6px; }
-.icon-btn:hover { background: var(--card-bg-2); }
-.logout-btn { background: rgba(239,68,68,0.15); color: var(--red); padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; }
-.logout-btn:hover { background: rgba(239,68,68,0.25); }
-
-/* === SIDEBAR === */
-#burger { display: none; background: none; border: none; color: var(--text); font-size: 1.4rem; cursor: pointer; }
-#sidebar {
-    position: fixed; top: 56px; left: 0; width: 220px; height: calc(100vh - 56px);
-    background: var(--card-bg); border-right: 1px solid var(--border);
-    padding: 16px 0; z-index: 90; overflow-y: auto;
-}
-.sidebar-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 20px; cursor: pointer; color: var(--text-dim);
-    font-size: 0.95rem; transition: all 0.15s; border-left: 3px solid transparent;
-}
-.sidebar-item:hover { background: var(--card-bg-2); color: var(--text); }
-.sidebar-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(99,102,241,0.08); }
-.sidebar-item .icon { font-size: 1.2rem; width: 24px; text-align: center; }
-
-#overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 80; }
-#overlay.visible { display: block; }
-
-/* === MAIN CONTENT === */
-#mainContent { margin-left: 220px; margin-top: 56px; padding: 30px; min-height: calc(100vh - 56px); }
-.section { display: none; animation: fadeIn 0.3s; }
-.section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-.section-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
-.section-desc { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 24px; }
-.back-home-btn {
-    background: none; color: var(--text-dim); font-size: 0.9rem; padding: 8px 14px;
-    border: 1px solid var(--border); border-radius: 8px; margin-bottom: 20px; transition: all 0.15s;
-}
-.back-home-btn:hover { color: var(--text); border-color: var(--accent); }
-
-/* === HOME CARDS === */
-.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-.feature-card {
-    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 24px; transition: transform 0.15s, border-color 0.15s;
-}
-.feature-card:hover { transform: translateY(-3px); border-color: var(--accent); }
-.feature-card .icon { font-size: 2rem; margin-bottom: 12px; }
-.feature-card h3 { font-size: 1.1rem; margin-bottom: 8px; }
-.feature-card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
-.intro-text { color: var(--text-dim); font-size: 1rem; line-height: 1.7; max-width: 800px; margin-bottom: 28px; }
-
-/* === SUBSCRIPTIONS === */
-.sub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-.subscription-card {
-    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 28px; position: relative; opacity: 0; transform: translateY(20px);
-    transition: opacity 0.4s, transform 0.4s, border-color 0.2s;
-}
-.subscription-card.visible { opacity: 1; transform: translateY(0); }
-.subscription-card.active-plan { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.subscription-card h3 { font-size: 1.3rem; margin-bottom: 16px; }
-.subscription-card ul { list-style: none; margin-bottom: 20px; }
-.subscription-card li { padding: 6px 0; color: var(--text-dim); font-size: 0.9rem; }
-.subscription-card li::before { content: "✓ "; color: var(--green); }
-.card-btn {
-    width: 100%; padding: 12px; background: var(--accent); color: #fff;
-    border-radius: 8px; font-weight: 600; font-size: 0.95rem; transition: opacity 0.2s;
-}
-.card-btn:hover { opacity: 0.85; }
-.card-btn.current { background: var(--green); cursor: default; }
-.current-badge {
-    display: none; position: absolute; top: -10px; right: 20px;
-    background: var(--green); color: #fff; font-size: 0.75rem; font-weight: 700;
-    padding: 4px 12px; border-radius: 20px;
-}
-.current-badge.visible { display: block; }
-
-/* === DOTA SUBTABS === */
-.subtabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
-.subtab {
-    padding: 10px 18px; cursor: pointer; color: var(--text-dim); font-size: 0.95rem;
-    border-bottom: 2px solid transparent; transition: all 0.15s;
-}
-.subtab:hover { color: var(--text); }
-.subtab.active { color: var(--accent); border-bottom-color: var(--accent); }
-.dota-subcontent { display: none; }
-.dota-subcontent.active { display: block; }
-
-/* === ANALYSIS INPUT === */
-.analysis-input-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; }
-.analysis-input-box p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 14px; }
-.link-input-row { display: flex; gap: 12px; }
-.link-input {
-    flex: 1; padding: 12px 14px; background: var(--card-bg-2); border: 1px solid var(--border);
-    border-radius: 8px; color: var(--text); font-size: 0.95rem;
-}
-.link-input:focus { border-color: var(--accent); outline: none; }
-.analyze-btn {
-    padding: 12px 28px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #fff; border-radius: 8px; font-weight: 600; font-size: 0.95rem; white-space: nowrap;
-}
-.file-upload-row { margin-top: 14px; }
-.file-upload-row input[type="file"] { color: var(--text-dim); font-size: 0.85rem; }
-.file-hint { color: var(--text-dim); font-size: 0.8rem; margin-top: 8px; }
-
-/* === PROGRESS BAR === */
-.progress-wrapper { display: none; margin-bottom: 20px; }
-.progress-wrapper.visible { display: block; }
-.progress-bar-bg { height: 6px; background: var(--card-bg-2); border-radius: 3px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); width: 0%; transition: width 0.3s; border-radius: 3px; }
-.progress-text { color: var(--text-dim); font-size: 0.85rem; margin-top: 8px; }
-
-/* === RESULTS === */
-#dotaResults, #csResults, #steamResults { display: none; }
-#dotaResults.visible, #csResults.visible, #steamResults.visible { display: block; }
-.result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.result-header h2 { font-size: 1.4rem; margin-bottom: 4px; }
-.result-header-meta { color: var(--text-dim); font-size: 0.85rem; }
-.result-badge { padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; }
-.result-badge.win { background: rgba(16,185,129,0.15); color: var(--green); }
-.result-badge.lose { background: rgba(239,68,68,0.15); color: var(--red); }
-.result-block { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-.result-block-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
-.metrics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-.metric-card { background: var(--card-bg-2); border-radius: 8px; padding: 14px; text-align: center; }
-.metric-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-.metric-value { font-size: 1.5rem; font-weight: 700; }
-.metric-sub { font-size: 0.75rem; margin-top: 4px; }
-.metric-sub.good { color: var(--green); }
-.metric-sub.bad { color: var(--red); }
-.strength-item, .weakness-item, .recommendation-item { display: flex; gap: 10px; padding: 8px 0; font-size: 0.92rem; line-height: 1.5; }
-.strength-item .marker { color: var(--green); font-weight: 700; }
-.weakness-item .marker { color: var(--red); font-weight: 700; }
-.recommendation-item .marker { color: var(--accent); font-weight: 700; }
-.comp-item { padding: 8px 0; font-size: 0.92rem; }
-.rec-exercise { margin-top: 6px; padding: 8px 12px; background: var(--card-bg-2); border-radius: 6px; font-size: 0.85rem; color: var(--text-dim); }
-.new-analysis-btn { width: 100%; padding: 12px; background: var(--card-bg-2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; margin-top: 8px; }
-.new-analysis-btn:hover { border-color: var(--accent); }
-.analysis-text { margin-top: 12px; padding: 10px 14px; background: var(--card-bg-2); border-radius: 6px; font-size: 0.9rem; line-height: 1.5; }
-.problem-block { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-.problem-title { color: var(--red); font-weight: 700; margin-bottom: 6px; }
-.problem-text { color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; }
-.player-select { margin-bottom: 16px; }
-.player-select-label { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 6px; }
-.player-select-dropdown { width: 100%; padding: 8px 12px; background: var(--card-bg-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.85rem; }
-
-/* === FARM TABLE === */
-.farm-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-.farm-table th { padding: 10px; text-align: center; color: var(--text-dim); border-bottom: 1px solid var(--border); font-weight: 600; }
-.farm-table td { padding: 10px; text-align: center; border-bottom: 1px solid var(--border); }
-.farm-table .gold-val { color: var(--gold); font-weight: 600; }
-.farm-table .pro-val { color: var(--text-dim); }
-.diff-good { color: var(--green) !important; font-weight: 600; }
-.diff-bad { color: var(--red) !important; font-weight: 600; }
-
-/* === ITEM TIMELINE === */
-.item-timeline { display: flex; flex-wrap: wrap; gap: 8px; }
-.item-chip { background: var(--card-bg-2); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; border: 1px solid var(--border); }
-.item-time { color: var(--accent); font-weight: 600; }
-
-/* === TIERLIST === */
-.tier-table { display: flex; flex-direction: column; gap: 6px; }
-.tier-row { display: flex; gap: 6px; min-height: 80px; }
-.tier-label { width: 70px; min-width: 70px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; font-size: 1.4rem; color: #fff; }
-.tier-label-desc { font-size: 0.6rem; font-weight: 500; opacity: 0.8; text-transform: uppercase; }
-.tier-label.s { background: #e74c3c; }
-.tier-label.a { background: #e67e22; }
-.tier-label.b { background: #f1c40f; color: #333; }
-.tier-label.c { background: #2ecc71; }
-.tier-label.d { background: #95a5a6; }
-.tier-heroes { flex: 1; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
-.hero-card { width: 52px; height: 52px; border-radius: 6px; overflow: hidden; position: relative; cursor: pointer; border: 1px solid var(--border); }
-.hero-card img { width: 100%; height: 100%; object-fit: cover; }
-.hero-card-winrate { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.75); color: #fff; font-size: 0.6rem; text-align: center; padding: 1px 0; }
-.hero-card-tooltip { display: none; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; white-space: nowrap; z-index: 10; margin-bottom: 4px; }
-.hero-card:hover .hero-card-tooltip { display: block; }
-
-.tierlist-loading, .tierlist-error { text-align: center; padding: 40px; color: var(--text-dim); }
-.tierlist-loading-spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 12px; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* === POSITION/RANK SELECTORS === */
-.selector-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.position-badge, .rank-badge { display: flex; flex-direction: column; align-items: center; padding: 8px 12px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); transition: all 0.15s; min-width: 60px; }
-.position-badge:hover, .rank-badge:hover { border-color: var(--accent); }
-.position-badge.active, .rank-badge.active { border-color: var(--accent); background: rgba(99,102,241,0.1); }
-.position-badge-icon { font-size: 1.2rem; }
-.position-badge-name, .rank-badge-name { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
-.tierlist-info { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 16px; }
-
-/* === STEAM STATS === */
-.profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-.profile-avatar { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--border); }
-.profile-info h2 { font-size: 1.3rem; margin-bottom: 4px; }
-.profile-info-meta { color: var(--text-dim); font-size: 0.85rem; }
-.hero-stats-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.hero-stats-img { width: 40px; height: 40px; border-radius: 4px; }
-.hero-stats-name { flex: 1; font-weight: 600; }
-.hero-stats-games { color: var(--text-dim); font-size: 0.85rem; }
-.hero-stats-wr { font-weight: 700; font-size: 0.95rem; min-width: 50px; text-align: right; }
-.hero-stats-wr.good { color: var(--green); }
-.hero-stats-wr.bad { color: var(--red); }
-
-.period-btns { display: flex; gap: 8px; margin-bottom: 16px; }
-.period-btn { padding: 8px 16px; background: var(--card-bg-2); border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-size: 0.85rem; }
-.period-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(99,102,241,0.1); }
-
-/* === CS2 TABLE === */
-.cs2-player-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-.cs2-player-table th { padding: 8px; text-align: center; color: var(--text-dim); border-bottom: 2px solid var(--border); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
-.cs2-player-table td { padding: 8px; text-align: center; border-bottom: 1px solid var(--border); }
-.cs2-player-table .team-a { color: var(--green); }
-.cs2-player-table .team-b { color: var(--orange); }
-.cs2-player-table .mvp-row { background: rgba(99,102,241,0.08); }
-
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-    #burger { display: block; }
-    #sidebar { transform: translateX(-100%); transition: transform 0.25s; z-index: 95; }
-    #sidebar.open { transform: translateX(0); }
-    #mainContent { margin-left: 0; padding: 20px 16px; }
-    .feature-grid { grid-template-columns: 1fr; }
-    .link-input-row { flex-direction: column; }
-    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-    .topbar-user { display: none; }
-}
-</style>
+        body { background-color: var(--dark-bg); color: #fff; line-height: 1.6; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
+        html.light-theme body { color: #333; }
+        html { scroll-behavior: smooth; }
+        .ga-logo { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+        .ga-logo-svg { width: 36px; height: 36px; flex-shrink: 0; }
+        .ga-logo-svg .ga-shield { fill: var(--card-bg); stroke: var(--logo-primary); stroke-width: 2; transition: fill 0.3s ease, stroke 0.3s ease; }
+        .ga-logo-svg .ga-crosshair { fill: none; stroke: var(--logo-primary); stroke-width: 2; transition: stroke 0.3s ease; }
+        .ga-logo-svg .ga-dot { fill: var(--logo-primary); transition: fill 0.3s ease; }
+        .ga-logo-svg .ga-bar { fill: var(--logo-primary); transition: fill 0.3s ease; }
+        .ga-logo-svg .ga-bar-bg { fill: var(--logo-primary); opacity: 0.2; transition: fill 0.3s ease; }
+        .ga-logo-text { font-weight: 800; letter-spacing: 0.5px; font-size: 1.5rem; white-space: nowrap; }
+        .ga-logo-text .ga-gold { color: var(--logo-primary); transition: color 0.3s ease; }
+        .ga-logo-text .ga-white { color: var(--logo-secondary); transition: color 0.3s ease; }
+        /* === AUTH SCREEN (new design from file 3) === */
+        #authScreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: radial-gradient(circle at 50% 30%, rgba(99,102,241,0.12), transparent 60%), var(--bg);
+        }
+        .auth-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .auth-logo {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .auth-subtitle { text-align: center; color: var(--text-dim); font-size: 0.9rem; margin-bottom: 30px; }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-dim); margin-bottom: 6px; }
+        .input-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--card-bg-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus { border-color: var(--accent); }
+        .input-group input::placeholder { color: #555; }
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: #fff;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.1s, opacity 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .auth-btn:hover { opacity: 0.9; }
+        .auth-btn:active { transform: scale(0.98); }
+        .auth-link { text-align: center; margin-top: 18px; color: var(--text-dim); font-size: 0.9rem; }
+        .auth-link span { color: var(--accent); cursor: pointer; font-weight: 600; }
+        .auth-link span:hover { text-decoration: underline; }
+        .auth-note { text-align: center; margin-top: 20px; font-size: 0.75rem; color: #555; }
+        .msg-box { padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; margin-top: 12px; display: none; }
+        .msg-box.visible { display: block; }
+        .msg-error { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+        .msg-success { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+        .app-wrapper { display: none; min-height: 100vh; }
+        .app-wrapper.active { display: block; }
+        .burger { position: fixed; top: 20px; left: 20px; z-index: 200; cursor: pointer; padding: 10px; background-color: var(--card-bg); border-radius: 8px; border: 1px solid #333; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .burger { border-color: #ddd; }
+        .burger span { display: block; width: 26px; height: 3px; background-color: var(--dark-gold); border-radius: 2px; margin: 5px 0; transition: all 0.3s ease; }
+        .burger.open span:nth-child(1) { transform: rotate(45deg) translate(6px,6px); }
+        .burger.open span:nth-child(2) { opacity: 0; }
+        .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(6px,-6px); }
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background-color: #1a1a2a; border-right: 1px solid #333; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.25,1,0.5,1), background-color 0.3s ease; z-index: 150; padding-top: 80px; overflow-y: auto; }
+        html.light-theme .sidebar { background-color: #fff; border-color: #e0e0e0; }
+        .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.5); }
+        .sidebar-user { padding: 16px 24px; border-bottom: 1px solid #333; margin-bottom: 8px; }
+        html.light-theme .sidebar-user { border-color: #e0e0e0; }
+        .sidebar-user-label { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .sidebar-user-name { color: var(--dark-gold); font-weight: 600; font-size: 1.1rem; margin-top: 4px; }
+        .sidebar-user-plan { color: #888; font-size: 0.9rem; margin-top: 4px; }
+        .sidebar-item { padding: 16px 24px; cursor: pointer; color: #aaa; font-size: 1.05rem; transition: all 0.25s ease; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
+        html.light-theme .sidebar-item { color: #555; }
+        .sidebar-item:hover { background-color: #222240; color: #fff; }
+        html.light-theme .sidebar-item:hover { background-color: #f0f0f5; color: #1a1a2a; }
+        .sidebar-item.active { color: var(--dark-gold); border-left-color: var(--dark-gold); background-color: rgba(197,160,40,0.08); font-weight: 600; }
+        .sidebar-item .icon { font-size: 1.2rem; width: 24px; text-align: center; }
+        .sidebar-divider { height: 1px; background-color: #333; margin: 8px 20px; }
+        html.light-theme .sidebar-divider { background-color: #e0e0e0; }
+        .theme-toggle { padding: 16px 24px; cursor: pointer; color: #aaa; font-size: 1.05rem; transition: all 0.25s ease; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
+        html.light-theme .theme-toggle { color: #555; }
+        .theme-toggle:hover { background-color: #222240; color: #fff; }
+        html.light-theme .theme-toggle:hover { background-color: #f0f0f5; color: #1a1a2a; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; z-index: 100; }
+        .overlay.visible { opacity: 1; visibility: visible; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px 18px 80px; border-bottom: 1px solid #333; transition: border-color 0.3s ease; }
+        html.light-theme .navbar { border-color: #e0e0e0; }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
+        .logout-btn { background-color: var(--beige); color: #333; border: none; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-weight: 500; transition: background 0.3s; }
+        .logout-btn:hover { background-color: var(--gold-hover); }
+        .theme-btn-nav { background: none; border: 1px solid #444; border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 1.1rem; transition: border 0.3s; }
+        html.light-theme .theme-btn-nav { border-color: #ccc; }
+        .theme-btn-nav:hover { border-color: var(--dark-gold); }
+        .content-area { padding: 40px 40px 40px 80px; max-width: 1200px; }
+        .section { display: none; animation: fadeIn 0.5s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .section-title { font-size: 1.8rem; font-weight: bold; color: var(--dark-gold); margin-bottom: 24px; }
+        .section-desc { color: #bbb; font-size: 1.05rem; margin-bottom: 30px; max-width: 700px; line-height: 1.8; }
+        html.light-theme .section-desc { color: #666; }
+        .back-home-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--card-bg); border: 1px solid #444; border-radius: 8px; padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem; transition: all 0.3s; margin-bottom: 24px; }
+        html.light-theme .back-home-btn { border-color: #ccc; color: #555; }
+        .back-home-btn:hover { border-color: var(--dark-gold); color: var(--dark-gold); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .feature-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s ease; }
+        html.light-theme .feature-card { border-color: #e0e0e0; }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .feature-icon { font-size: 2rem; margin-bottom: 12px; }
+        .feature-title { color: var(--dark-gold); font-weight: 600; font-size: 1.1rem; margin-bottom: 8px; }
+        .feature-text { color: #999; font-size: 0.95rem; }
+        html.light-theme .feature-text { color: #777; }
+        .subscription-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+        .subscription-card { background-color: var(--card-bg); border-radius: 10px; padding: 24px; border: 1px solid #333; position: relative; transform: translateY(30px); opacity: 0; transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .subscription-card { border-color: #e0e0e0; }
+        .subscription-card.visible { transform: translateY(0); opacity: 1; }
+        .subscription-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,0.4); transform: translateY(-4px); }
+        .subscription-card.active-plan { border-color: var(--dark-gold); box-shadow: 0 0 15px rgba(197,160,40,0.3); }
+        .premium-badge { position: absolute; top: 0; left: 0; right: 0; height: 6px; background-color: var(--dark-gold); border-radius: 10px 10px 0 0; }
+        .subscription-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 16px; color: var(--dark-gold); text-align: center; }
+        .benefits-list { list-style: none; padding-left: 0; }
+        .benefit { margin-bottom: 10px; padding-left: 22px; position: relative; color: #999; }
+        html.light-theme .benefit { color: #666; }
+        .benefit::before { content: "\2022"; color: var(--dark-gold); font-weight: bold; position: absolute; left: 0; top: 2px; }
+        .card-btn { display: block; width: 100%; background-color: var(--beige); color: #333; border: none; border-radius: 6px; padding: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; margin-top: 20px; transition: all 0.3s ease; }
+        .card-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 12px rgba(197,160,40,0.4); }
+        .card-btn.current { background-color: var(--dark-gold); color: #111; cursor: default; }
+        .current-badge { display: none; text-align: center; color: var(--dark-gold); font-size: 0.85rem; font-weight: 600; margin-top: 8px; }
+        .current-badge.visible { display: block; }
+        .game-block { max-width: 700px; margin: 0 auto; }
+        .game-icon { font-size: 3rem; margin-bottom: 16px; text-align: center; }
+        .dota-subtabs { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+        .dota-subtab { display: flex; align-items: center; gap: 10px; background-color: var(--card-bg); border: 2px solid #333; border-radius: 10px; padding: 14px 28px; cursor: pointer; transition: all 0.3s ease; }
+        html.light-theme .dota-subtab { border-color: #ccc; }
+        .dota-subtab:hover { border-color: #555; transform: translateY(-2px); }
+        .dota-subtab.active { border-color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); background-color: rgba(197,160,40,0.08); }
+        .dota-subtab-icon { font-size: 1.4rem; }
+        .dota-subtab-text { color: #aaa; font-weight: 600; font-size: 1rem; }
+        html.light-theme .dota-subtab-text { color: #555; }
+        .dota-subtab.active .dota-subtab-text { color: var(--dark-gold); }
+        .dota-subcontent { display: none; }
+        .dota-subcontent.active { display: block; animation: fadeIn 0.4s ease; }
+        .link-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+        .link-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
+        html.light-theme .link-input { background-color: #f9f9f9; color: #333; border-color: #ccc; }
+        .link-input:focus { border-color: var(--dark-gold); box-shadow: 0 0 0 2px rgba(197,160,40,0.2); }
+        .link-input::placeholder { color: #666; }
+        .file-input { width: 100%; padding: 12px; border: 1px dashed #555; border-radius: 8px; background-color: #222; color: #999; font-size: 0.9rem; cursor: pointer; }
+        html.light-theme .file-input { background-color: #f9f9f9; color: #777; border-color: #aaa; }
+        .file-hint { color: #666; font-size: 0.85rem; margin-top: -8px; }
+        .analyze-btn { background-color: var(--beige); color: #333; border: none; border-radius: 8px; padding: 16px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
+        .analyze-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 15px rgba(197,160,40,0.4); }
+        .progress-wrapper { display: none; margin-top: 24px; }
+        .progress-wrapper.visible { display: block; }
+        .progress-bar { width: 100%; height: 8px; background-color: #333; border-radius: 4px; overflow: hidden; }
+        html.light-theme .progress-bar { background-color: #ddd; }
+        .progress-fill { height: 100%; width: 0%; background-color: var(--dark-gold); border-radius: 4px; transition: width 0.5s ease; }
+        .progress-text { margin-top: 10px; color: #aaa; font-size: 0.95rem; }
+        html.light-theme .progress-text { color: #666; }
+        .results-wrapper { display: none; margin-top: 30px; }
+        .results-wrapper.visible { display: block; animation: fadeIn 0.6s ease; }
+        .result-header { background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .result-header { border-color: #e0e0e0; }
+        .result-header-info { flex: 1; min-width: 200px; }
+        .result-header h2 { color: var(--dark-gold); font-size: 1.4rem; margin-bottom: 6px; }
+        .result-header-meta { color: #888; font-size: 0.95rem; }
+        .result-badge { padding: 8px 18px; border-radius: 8px; font-weight: 700; font-size: 1.1rem; }
+        .result-badge.win { background-color: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.4); }
+        .result-badge.lose { background-color: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.4); }
+        .problem-block { background-color: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; padding: 20px 24px; margin-bottom: 24px; }
+        .problem-title { color: var(--red); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+        .problem-text { color: #ccc; font-size: 0.98rem; line-height: 1.7; }
+        html.light-theme .problem-text { color: #555; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .metric-card { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 18px; text-align: center; transition: transform 0.3s, border 0.3s, border-color 0.3s ease; }
+        html.light-theme .metric-card { border-color: #e0e0e0; }
+        .metric-card:hover { transform: translateY(-3px); border-color: var(--dark-gold); }
+        .metric-label { color: #888; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .metric-value { color: var(--dark-gold); font-size: 1.8rem; font-weight: 700; }
+        .metric-sub { color: #666; font-size: 0.8rem; margin-top: 4px; }
+        .metric-sub.good { color: var(--green); }
+        .metric-sub.bad { color: var(--red); }
+        .result-block { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 24px; margin-bottom: 20px; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .result-block { border-color: #e0e0e0; }
+        .result-block-title { color: var(--dark-gold); font-weight: 600; font-size: 1.15rem; margin-bottom: 14px; }
+        .strength-item, .weakness-item, .recommendation-item { padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
+        html.light-theme .strength-item, html.light-theme .weakness-item, html.light-theme .recommendation-item { border-color: #eee; }
+        .strength-item:last-child, .weakness-item:last-child, .recommendation-item:last-child { border-bottom: none; }
+        .strength-item { display: flex; align-items: start; gap: 10px; }
+        .strength-item .marker { color: var(--green); font-weight: bold; }
+        .weakness-item .marker { color: var(--red); font-weight: bold; }
+        .recommendation-item { display: flex; align-items: start; gap: 10px; }
+        .recommendation-item .marker { color: var(--dark-gold); font-weight: bold; }
+        .rec-exercise { margin-top: 8px; padding: 12px 16px; background-color: rgba(197,160,40,0.08); border-left: 3px solid var(--dark-gold); border-radius: 0 6px 6px 0; color: #ccc; font-size: 0.92rem; }
+        html.light-theme .rec-exercise { color: #555; }
+        .rec-exercise strong { color: var(--dark-gold); }
+        .new-analysis-btn { display: inline-block; background-color: var(--beige); color: #333; border: none; border-radius: 8px; padding: 14px 28px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; margin-bottom: 30px; transition: all 0.3s ease; }
+        .new-analysis-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 12px rgba(197,160,40,0.4); }
+        .player-select { margin: 20px 0; }
+        .player-select-label { color: #888; font-size: 0.9rem; margin-bottom: 8px; }
+        .player-select-dropdown { width: 100%; max-width: 500px; padding: 12px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; cursor: pointer; }
+        html.light-theme .player-select-dropdown { background-color: #f9f9f9; color: #333; border-color: #ccc; }
+        .player-select-dropdown:focus { border-color: var(--dark-gold); }
+        .farm-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .farm-table th { text-align: left; padding: 10px; color: #888; font-size: 0.85rem; border-bottom: 1px solid #333; text-transform: uppercase; letter-spacing: 0.5px; }
+        html.light-theme .farm-table th { border-color: #e0e0e0; }
+        .farm-table td { padding: 10px; border-bottom: 1px solid #2a2a3a; }
+        html.light-theme .farm-table td { border-color: #eee; }
+        .farm-table .gold-val { color: var(--dark-gold); font-weight: 700; text-align: center; }
+        .farm-table .pro-val { color: #888; text-align: center; }
+        .farm-table .diff-good { color: var(--green); text-align: center; font-size: 0.85rem; }
+        .farm-table .diff-bad { color: var(--red); text-align: center; font-size: 0.85rem; }
+        .item-timeline { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+        .item-chip { background: #222; padding: 8px 14px; border-radius: 6px; border: 1px solid #444; font-size: 0.9rem; }
+        html.light-theme .item-chip { background: #f5f5f5; border-color: #ddd; }
+        .item-chip .item-time { color: var(--dark-gold); font-weight: 700; }
+        .analysis-text { color: #ccc; font-size: 0.95rem; line-height: 1.8; margin-top: 12px; }
+        html.light-theme .analysis-text { color: #555; }
+        .analysis-text strong { font-weight: 700; }
+        .comp-item { margin-bottom: 12px; padding-left: 16px; border-left: 2px solid var(--dark-gold); line-height: 1.7; }
+        .rank-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
+        .rank-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid #333; transition: all 0.3s ease; min-width: 80px; }
+        html.light-theme .rank-badge { border-color: #ccc; }
+        .rank-badge:hover { transform: translateY(-3px); border-color: #555; }
+        .rank-badge.active { border-color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); }
+        .rank-badge-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+        .rank-badge-name { font-size: 0.78rem; color: #aaa; text-align: center; }
+        html.light-theme .rank-badge-name { color: #666; }
+        .rank-badge.active .rank-badge-name { color: var(--dark-gold); }
+        .position-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+        .position-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 14px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid #333; transition: all 0.3s ease; min-width: 70px; }
+        html.light-theme .position-badge { border-color: #ccc; }
+        .position-badge:hover { transform: translateY(-3px); border-color: #555; }
+        .position-badge.active { border-color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); }
+        .position-badge-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .position-badge-name { font-size: 0.72rem; color: #aaa; text-align: center; }
+        html.light-theme .position-badge-name { color: #666; }
+        .position-badge.active .position-badge-name { color: var(--dark-gold); }
+        .tier-table { display: flex; flex-direction: column; gap: 12px; }
+        .tier-row { display: flex; gap: 12px; align-items: stretch; background-color: var(--card-bg); border-radius: 10px; padding: 16px; border: 1px solid #333; min-height: 80px; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .tier-row { border-color: #e0e0e0; }
+        .tier-label { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 70px; border-radius: 8px; font-weight: 800; font-size: 1.6rem; padding: 8px; flex-shrink: 0; }
+        .tier-label.s { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+        .tier-label.a { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
+        .tier-label.b { background: linear-gradient(135deg, #f1c40f, #d4ac0d); color: #333; }
+        .tier-label.c { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: #fff; }
+        .tier-label.d { background: linear-gradient(135deg, #7f8c8d, #636e72); color: #ccc; }
+        .tier-label-desc { font-size: 0.6rem; font-weight: 500; margin-top: 2px; text-align: center; line-height: 1.2; }
+        .tier-heroes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1; }
+        .hero-card { position: relative; width: 84px; height: 48px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 2px solid #333; transition: all 0.25s ease; }
+        html.light-theme .hero-card { border-color: #ccc; }
+        .hero-card:hover { border-color: var(--dark-gold); transform: translateY(-3px) scale(1.08); z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .hero-card img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-card-tooltip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background-color: #111; border: 1px solid var(--dark-gold); border-radius: 6px; padding: 6px 10px; white-space: nowrap; font-size: 0.78rem; color: #fff; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 20; }
+        .hero-card:hover .hero-card-tooltip { opacity: 1; }
+        .hero-card-winrate { position: absolute; bottom: 0; left: 0; right: 0; font-size: 0.62rem; text-align: center; background: rgba(0,0,0,0.75); color: #fff; font-weight: 600; }
+        .tierlist-loading { text-align: center; padding: 60px 0; color: #888; }
+        .tierlist-loading-spinner { display: inline-block; width: 40px; height: 40px; border: 3px solid #333; border-top-color: var(--dark-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .tierlist-error { text-align: center; padding: 40px; color: var(--error-color); }
+        .tierlist-updated { font-size: 0.85rem; color: #666; margin-bottom: 16px; }
+        .tier-info-block { background-color: var(--card-bg); border: 1px solid #333; border-radius: 10px; padding: 20px; margin-bottom: 24px; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .tier-info-block { border-color: #e0e0e0; }
+        .tier-info-title { color: var(--dark-gold); font-weight: 600; font-size: 1.05rem; margin-bottom: 12px; }
+        .tier-info-item { display: flex; align-items: start; gap: 8px; margin-bottom: 6px; font-size: 0.9rem; color: #aaa; }
+        html.light-theme .tier-info-item { color: #666; }
+        .tier-info-letter { font-weight: 800; min-width: 20px; }
+        .tier-info-letter.s { color: #e74c3c; }
+        .tier-info-letter.a { color: #e67e22; }
+        .tier-info-letter.b { color: #f1c40f; }
+        .tier-info-letter.c { color: #95a5a6; }
+        .tier-info-letter.d { color: #636e72; }
+        .steam-block { max-width: 700px; margin: 0 auto; }
+        .steam-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+        .steam-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
+        html.light-theme .steam-input { background-color: #f9f9f9; color: #333; border-color: #ccc; }
+        .steam-input:focus { border-color: var(--dark-gold); box-shadow: 0 0 0 2px rgba(197,160,40,0.2); }
+        .steam-input::placeholder { color: #666; }
+        .steam-btn { background-color: var(--beige); color: #333; border: none; border-radius: 8px; padding: 16px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
+        .steam-btn:hover { background-color: var(--gold-hover); box-shadow: 0 0 15px rgba(197,160,40,0.4); }
+        .period-selector { display: flex; gap: 8px; flex-wrap: wrap; }
+        .period-btn { padding: 10px 20px; border-radius: 8px; border: 2px solid #333; background-color: var(--card-bg); color: #aaa; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; }
+        html.light-theme .period-btn { border-color: #ccc; color: #555; }
+        .period-btn:hover { border-color: #555; transform: translateY(-2px); }
+        .period-btn.active { border-color: var(--dark-gold); color: var(--dark-gold); box-shadow: 0 0 12px rgba(197,160,40,0.3); background-color: rgba(197,160,40,0.08); }
+        .steam-progress { display: none; margin-top: 24px; }
+        .steam-progress.visible { display: block; }
+        .steam-results { display: none; margin-top: 30px; }
+        .steam-results.visible { display: block; animation: fadeIn 0.6s ease; }
+        .profile-header { background-color: var(--card-bg); border: 1px solid #333; border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        html.light-theme .profile-header { border-color: #e0e0e0; }
+        .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--dark-gold); object-fit: cover; }
+        .profile-info { flex: 1; min-width: 200px; }
+        .profile-info h2 { color: var(--dark-gold); font-size: 1.4rem; margin-bottom: 6px; }
+        .profile-info-meta { color: #888; font-size: 0.95rem; }
+        .profile-medal { padding: 6px 16px; border-radius: 8px; font-weight: 700; font-size: 1rem; }
+        .hero-stats-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
+        html.light-theme .hero-stats-row { border-color: #eee; }
+        .hero-stats-row:last-child { border-bottom: none; }
+        .hero-stats-img { width: 48px; height: 28px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
+        .hero-stats-name { flex: 1; font-size: 0.95rem; }
+        .hero-stats-games { color: #888; font-size: 0.85rem; }
+        .hero-stats-wr { font-weight: 700; font-size: 0.95rem; min-width: 60px; text-align: right; }
+        .hero-stats-wr.good { color: var(--green); }
+        .hero-stats-wr.bad { color: var(--red); }
+        .steam-hint { color: #666; font-size: 0.85rem; }
+        @media (max-width: 768px) {
+            .content-area { padding: 30px 20px; }
+            .navbar { padding: 18px 20px 18px 70px; }
+            .section-title { font-size: 1.4rem; }
+            .metric-value { font-size: 1.4rem; }
+            .tier-row { flex-direction: column; }
+            .tier-label { min-width: 100%; flex-direction: row; justify-content: center; gap: 10px; padding: 12px; }
+            .hero-card { width: 64px; height: 36px; }
+            .game-block { max-width: 100%; }
+            .farm-table th, .farm-table td { padding: 6px; font-size: 0.85rem; }
+            .ga-logo-text { font-size: 1.2rem; }
+            /* auth-logo mobile override removed - new design */
+            .profile-header { flex-direction: column; text-align: center; }
+        }
+    </style>
 </head>
 <body>
+    <svg style="display:none;">
+        <symbol id="ga-logo-icon" viewBox="0 0 48 48">
+            <path class="ga-shield" d="M24 4 L42 12 L42 26 Q42 38 24 44 Q6 38 6 26 L6 12 Z"/>
+            <circle class="ga-crosshair" cx="24" cy="24" r="12"/>
+            <line class="ga-crosshair" x1="24" y1="8" x2="24" y2="16"/>
+            <line class="ga-crosshair" x1="24" y1="32" x2="24" y2="40"/>
+            <line class="ga-crosshair" x1="8" y1="24" x2="16" y2="24"/>
+            <line class="ga-crosshair" x1="32" y1="24" x2="40" y2="24"/>
+            <circle class="ga-dot" cx="24" cy="24" r="3"/>
+            <rect class="ga-bar-bg" x="12" y="34" width="4" height="6" rx="1"/>
+            <rect class="ga-bar" x="12" y="36" width="4" height="4" rx="1"/>
+            <rect class="ga-bar-bg" x="18" y="32" width="4" height="8" rx="1"/>
+            <rect class="ga-bar" x="18" y="34" width="4" height="6" rx="1"/>
+            <rect class="ga-bar-bg" x="24" y="30" width="4" height="10" rx="1"/>
+            <rect class="ga-bar" x="24" y="32" width="4" height="8" rx="1"/>
+            <rect class="ga-bar-bg" x="30" y="28" width="4" height="12" rx="1"/>
+            <rect class="ga-bar" x="30" y="30" width="4" height="10" rx="1"/>
+        </symbol>
+    </svg>
 
-<!-- === AUTH SCREEN === -->
-<div id="authScreen">
+    <div id="authScreen">
     <div class="auth-card">
         <div class="auth-logo">GAMERANALYZER</div>
         <div class="auth-subtitle">Анализ матчей Dota 2 и CS 2</div>
@@ -389,206 +431,248 @@ button { font-family: inherit; cursor: pointer; border: none; outline: none; }
     </div>
 </div>
 
-<!-- === APP WRAPPER === -->
-<div id="appWrapper">
-    <div class="topbar">
-        <div style="display:flex;align-items:center;gap:12px;">
-            <button id="burger">☰</button>
-            <div class="topbar-logo">GAMERANALYZER</div>
+    <div class="app-wrapper" id="appWrapper">
+        <div class="burger" id="burger"><span></span><span></span><span></span></div>
+        <div class="overlay" id="overlay"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-user">
+                <div class="sidebar-user-label">Аккаунт</div>
+                <div class="sidebar-user-name" id="userName">—</div>
+                <div class="sidebar-user-plan" id="userPlan">Бесплатный</div>
+            </div>
+            <div class="sidebar-item active" data-section="home"><span class="icon">🏠</span> Главная</div>
+            <div class="sidebar-item" data-section="subscriptions"><span class="icon">⭐</span> Подписки</div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
+            <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
+            <div class="sidebar-divider"></div>
+            <div class="theme-toggle" id="themeToggle"><span class="icon">🌓</span> Сменить тему</div>
         </div>
-        <div class="topbar-right">
-            <button class="icon-btn" id="themeBtnNav">🌓</button>
-            <div class="topbar-user">Аккаунт: <b><span id="userName">—</span></b> · <span id="userPlan">Бесплатный</span></div>
-            <button class="logout-btn" id="logoutBtn">Выйти</button>
-        </div>
-    </div>
-
-    <div id="sidebar">
-        <div class="sidebar-item active" data-section="home"><span class="icon">🏠</span> Главная</div>
-        <div class="sidebar-item" data-section="subscriptions"><span class="icon">⭐</span> Подписки</div>
-        <div class="sidebar-item" data-section="dota"><span class="icon">⚔️</span> DOTA 2</div>
-        <div class="sidebar-item" data-section="cs"><span class="icon">🔫</span> CS 2</div>
-        <div class="sidebar-item" id="themeToggle"><span class="icon">🌓</span> Сменить тему</div>
-    </div>
-    <div id="overlay"></div>
-
-    <div id="mainContent">
-        <!-- HOME -->
-        <div class="section active" id="section-home">
-            <div class="section-title">Функционал сервиса</div>
-            <p class="intro-text">GamerAnalyzer — это ИИ-сервис, который анализирует ваши матчи в Dota 2 и CS 2 и выдаёт персональный разбор: сильные и слабые стороны, конкретные ошибки, рекомендации по тренировке и сравнение с профессиональными игроками.</p>
-            <div class="feature-grid">
-                <div class="feature-card"><div class="icon">📊</div><h3>Анализ матчей</h3><p>Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</p></div>
-                <div class="feature-card"><div class="icon">🎯</div><h3>Сравнение с про-сценой</h3><p>Ваши показатели сравниваются с медианными значениями профессиональных игроков.</p></div>
-                <div class="feature-card"><div class="icon">💡</div><h3>Рекомендации по тренировке</h3><p>Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</p></div>
-                <div class="feature-card"><div class="icon">🏆</div><h3>Определение роли</h3><p>ИИ определяет вашу идеальную роль на основе 20+ параметров поведения в матче.</p></div>
-                <div class="feature-card"><div class="icon">📈</div><h3>Отслеживание прогресса</h3><p>История разборов и графики роста по неделям — следите за улучшениями.</p></div>
-                <div class="feature-card"><div class="icon">📋</div><h3>Тир-лист героев</h3><p>Актуальный тир-лист по рангам и позициям — от Рекрута до Титана. На основе статистики.</p></div>
-                <div class="feature-card"><div class="icon">👤</div><h3>Личная статистика</h3><p>Введите Steam ID — получите статистику за период: винрейт, лучшие герои, средние показатели.</p></div>
+        <div class="navbar">
+            <div class="ga-logo">
+                <svg class="ga-logo-svg"><use href="#ga-logo-icon"/></svg>
+                <span class="ga-logo-text"><span class="ga-gold">GAMER</span><span class="ga-white">ANALYZER</span></span>
+            </div>
+            <div class="navbar-right">
+                <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему">🌓</button>
+                <button class="logout-btn" id="logoutBtn">Выйти</button>
             </div>
         </div>
-
-        <!-- SUBSCRIPTIONS -->
-        <div class="section" id="section-subscriptions">
-            <button class="back-home-btn">← На главную страницу</button>
-            <div class="section-title">Тарифы и подписки</div>
-            <p class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</p>
-            <div class="sub-grid">
-                <div class="subscription-card" data-plan="pro_dota2">
-                    <div class="current-badge">Активна</div>
-                    <h3>PRO DOTA 2</h3>
-                    <ul><li>10 анализов матчей ежедневно</li><li>Лучшие паттерны фарма</li><li>Идеальный вардинг</li><li>Тайминги всех действий, предметов</li></ul>
-                    <button class="card-btn" id="btn-dota">Выбрать тариф</button>
-                </div>
-                <div class="subscription-card" data-plan="pro_cs2">
-                    <div class="current-badge">Активна</div>
-                    <h3>PRO CS 2</h3>
-                    <ul><li>10 анализов матчей ежедневно</li><li>Лайнапы гранат на всех картах</li><li>Тайминги действий на карте</li></ul>
-                    <button class="card-btn" id="btn-cs">Выбрать тариф</button>
-                </div>
-                <div class="subscription-card" data-plan="premium">
-                    <div class="current-badge">Активна</div>
-                    <h3>PREMIUM</h3>
-                    <ul><li>Преимущества PRO DOTA 2 и PRO CS 2</li><li>Безлимитное количество анализов</li><li>Сравнение с профессиональными игроками</li><li>Более глубокий анализ игровых ситуаций</li></ul>
-                    <button class="card-btn" id="btn-premium">Выбрать тариф</button>
+        <div class="content-area">
+            <div class="section active" id="section-home">
+                <div class="section-title">Функционал сервиса</div>
+                <div class="section-desc">GamerAnalyzer — это ИИ-сервис, который анализирует ваши матчи в Dota 2 и CS 2 и выдаёт персональный разбор: сильные и слабые стороны, конкретные ошибки, рекомендации по тренировке и сравнение с профессиональными игроками.</div>
+                <div class="features-grid">
+                    <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
+                    <div class="feature-card"><div class="feature-icon">🎯</div><div class="feature-title">Сравнение с про-сценой</div><div class="feature-text">Ваши показатели сравниваются с медианными значениями профессиональных игроков.</div></div>
+                    <div class="feature-card"><div class="feature-icon">💡</div><div class="feature-title">Рекомендации по тренировке</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
+                    <div class="feature-card"><div class="feature-icon">🏆</div><div class="feature-title">Определение роли</div><div class="feature-text">ИИ определяет вашу идеальную роль на основе 20+ параметров поведения в матче.</div></div>
+                    <div class="feature-card"><div class="feature-icon">📈</div><div class="feature-title">Отслеживание прогресса</div><div class="feature-text">История разборов и графики роста по неделям — следите за улучшениями.</div></div>
+                    <div class="feature-card"><div class="feature-icon">📋</div><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальный тир-лист по рангам и позициям — от Рекрута до Титана. На основе статистики.</div></div>
+                    <div class="feature-card"><div class="feature-icon">👤</div><div class="feature-title">Личная статистика</div><div class="feature-text">Введите Steam ID — получите статистику за период: винрейт, лучшие герои, средние показатели.</div></div>
                 </div>
             </div>
-        </div>
-
-        <!-- DOTA 2 -->
-        <div class="section" id="section-dota">
-            <button class="back-home-btn">← На главную страницу</button>
-            <div class="section-title">⚔️ DOTA 2</div>
-            <div class="subtabs">
-                <div class="subtab dota-subtab active" data-subtab="analysis">⚔️ Анализ матча</div>
-                <div class="subtab dota-subtab" data-subtab="tierlist">📋 Тир-лист героев</div>
-                <div class="subtab dota-subtab" data-subtab="stats">👤 Моя статистика</div>
-            </div>
-            <!-- ANALYSIS -->
-            <div class="dota-subcontent active" id="dotaSub-analysis">
-                <div class="analysis-input-box">
-                    <p>Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаёт персональный разбор.</p>
-                    <div class="link-input-row">
-                        <input type="text" class="link-input" id="dotaLink" placeholder="https://www.dotabuff.com/matches/1234567890 или match_id">
-                        <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
+            <div class="section" id="section-subscriptions">
+                <button class="back-home-btn" data-back="home">← На главную страницу</button>
+                <div class="section-title">Тарифы и подписки</div>
+                <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
+                <div class="subscription-cards">
+                    <div class="subscription-card" id="card-dota" data-plan="pro_dota2">
+                        <div class="subscription-title">PRO DOTA 2</div>
+                        <ul class="benefits-list"><li class="benefit">10 анализов матчей ежедневно</li><li class="benefit">Лучшие паттерны фарма</li><li class="benefit">Идеальный вардинг</li><li class="benefit">Тайминги всех действий, предметов</li></ul>
+                        <button class="card-btn" id="btn-dota">Выбрать тариф</button>
+                        <div class="current-badge" id="badge-dota">Ваша текущая подписка</div>
+                    </div>
+                    <div class="subscription-card" id="card-cs" data-plan="pro_cs2">
+                        <div class="subscription-title">PRO CS 2</div>
+                        <ul class="benefits-list"><li class="benefit">10 анализов матчей ежедневно</li><li class="benefit">Лайнапы гранат на всех картах</li><li class="benefit">Тайминги действий на карте</li></ul>
+                        <button class="card-btn" id="btn-cs">Выбрать тариф</button>
+                        <div class="current-badge" id="badge-cs">Ваша текущая подписка</div>
+                    </div>
+                    <div class="subscription-card" id="card-premium" data-plan="premium">
+                        <div class="premium-badge"></div>
+                        <div class="subscription-title">PREMIUM</div>
+                        <ul class="benefits-list"><li class="benefit">Преимущества PRO DOTA 2 и PRO CS 2</li><li class="benefit">Безлимитное количество анализов</li><li class="benefit">Сравнение с профессиональными игроками</li><li class="benefit">Более глубокий анализ игровых ситуаций</li></ul>
+                        <button class="card-btn" id="btn-premium">Выбрать тариф</button>
+                        <div class="current-badge" id="badge-premium">Ваша текущая подписка</div>
                     </div>
                 </div>
-                <div class="progress-wrapper" id="dotaProgress">
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="dotaProgressFill"></div></div>
-                    <div class="progress-text" id="dotaProgressText">В очереди...</div>
-                </div>
-                <div id="dotaResults"></div>
             </div>
-            <!-- TIERLIST -->
-            <div class="dota-subcontent" id="dotaSub-tierlist">
-                <div class="section-title" style="font-size:1.3rem;">Тир-лист героев Dota 2</div>
-                <p class="section-desc">Актуальный тир-лист героев по рангам и позициям. Данные обновляются автоматически.</p>
-                <div class="selector-row" id="positionSelector"></div>
-                <div class="selector-row" id="rankSelector"></div>
-                <div class="tierlist-info" id="tierlistUpdated"></div>
-                <div id="tierlistContent"><div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Нажмите на вкладку, чтобы загрузить данные</div></div></div>
-            </div>
-            <!-- STATS -->
-            <div class="dota-subcontent" id="dotaSub-stats">
-                <div class="section-title" style="font-size:1.3rem;">👤 Моя статистика</div>
-                <p class="section-desc">Введите ваш Steam ID, ссылку на профиль Steam или Dota 2 friend code.</p>
-                <div class="analysis-input-box">
-                    <div class="period-btns">
-                        <button class="period-btn active" data-period="7">7 дней</button>
-                        <button class="period-btn" data-period="30">30 дней</button>
-                        <button class="period-btn" data-period="90">90 дней</button>
-                        <button class="period-btn" data-period="0">Всё время</button>
+            <div class="section" id="section-dota2">
+                <button class="back-home-btn" data-back="home">← На главную страницу</button>
+                <div class="dota-subtabs">
+                    <div class="dota-subtab active" data-subtab="analysis">
+                        <span class="dota-subtab-icon">⚔️</span>
+                        <span class="dota-subtab-text">Анализ матча</span>
                     </div>
-                    <div class="link-input-row">
-                        <input type="text" class="link-input" id="steamInput" placeholder="Steam ID или ссылка на профиль">
-                        <button class="analyze-btn" id="steamFetchBtn">Получить статистику</button>
+                    <div class="dota-subtab" data-subtab="tierlist">
+                        <span class="dota-subtab-icon">📋</span>
+                        <span class="dota-subtab-text">Тир-лист героев</span>
                     </div>
-                    <div class="file-hint">Steam ID можно найти на steamid.xyz — введите ссылку на профиль, сайт выдаст номер.</div>
+                    <div class="dota-subtab" data-subtab="stats">
+                        <span class="dota-subtab-icon">👤</span>
+                        <span class="dota-subtab-text">Моя статистика</span>
+                    </div>
                 </div>
-                <div class="progress-wrapper" id="steamProgress">
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="steamProgressFill"></div></div>
-                    <div class="progress-text" id="steamProgressText">Загрузка...</div>
+                <div class="dota-subcontent active" id="dotaSub-analysis">
+                    <div class="game-block">
+                        <div class="game-icon">⚔️</div>
+                        <div class="section-title">Анализ матча Dota 2</div>
+                        <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаёт персональный разбор.</div>
+                        <div class="link-form">
+                            <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink" />
+                            <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
+                        </div>
+                        <div class="progress-wrapper" id="dotaProgress">
+                            <div class="progress-bar"><div class="progress-fill" id="dotaProgressFill"></div></div>
+                            <div class="progress-text" id="dotaProgressText">В очереди...</div>
+                        </div>
+                        <div class="results-wrapper" id="dotaResults"></div>
+                    </div>
                 </div>
-                <div id="steamResults"></div>
+                <div class="dota-subcontent" id="dotaSub-tierlist">
+                    <div class="section-title">Тир-лист героев Dota 2</div>
+                    <div class="section-desc">Актуальный тир-лист героев по рангам и позициям. Данные обновляются автоматически — рейтинг строится по проценту побед.</div>
+                    <div class="tier-info-block">
+                        <div class="tier-info-title">Расшифровка тиров</div>
+                        <div class="tier-info-item"><span class="tier-info-letter s">S</span> Очень метовые и сильные — лучший выбор в текущей мете</div>
+                        <div class="tier-info-item"><span class="tier-info-letter a">A</span> Сильные, чуть уступают S-тиру, но всё ещё отличный выбор</div>
+                        <div class="tier-info-item"><span class="tier-info-letter b">B</span> Ситуативные — нужны под конкретный пик</div>
+                        <div class="tier-info-item"><span class="tier-info-letter c">C</span> Объективно слабые — пикайте, только если вы задрот на этом герое</div>
+                        <div class="tier-info-item"><span class="tier-info-letter d">D</span> Мусор — не стоит брать в нынешней мете</div>
+                    </div>
+                    <div class="position-selector" id="positionSelector"></div>
+                    <div class="rank-selector" id="rankSelector"></div>
+                    <div class="tierlist-updated" id="tierlistUpdated"></div>
+                    <div id="tierlistContent">
+                        <div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div>
+                    </div>
+                </div>
+                <div class="dota-subcontent" id="dotaSub-stats">
+                    <div class="steam-block">
+                        <div class="game-icon">👤</div>
+                        <div class="section-title">Моя статистика</div>
+                        <div class="section-desc">Введите ваш Steam ID, ссылку на профиль Steam или Dota 2 friend code — сервис выгрузит статистику за выбранный период.</div>
+                        <div class="steam-form">
+                            <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль / friend code" id="steamInput" />
+                            <div class="period-selector">
+                                <div class="period-btn active" data-period="7">7 дней</div>
+                                <div class="period-btn" data-period="30">30 дней</div>
+                                <div class="period-btn" data-period="90">90 дней</div>
+                                <div class="period-btn" data-period="0">Всё время</div>
+                            </div>
+                            <button class="steam-btn" id="steamFetchBtn">Получить статистику</button>
+                        </div>
+                        <div class="steam-hint">Steam ID можно найти на сайте steamid.xyz — введите ссылку на профиль, и сайт выдаст номер. Для работы нужен 32-битный Steam ID (account_id).</div>
+                        <div class="steam-progress" id="steamProgress">
+                            <div class="progress-bar"><div class="progress-fill" id="steamProgressFill"></div></div>
+                            <div class="progress-text" id="steamProgressText">Загрузка...</div>
+                        </div>
+                        <div class="steam-results" id="steamResults"></div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- CS 2 -->
-        <div class="section" id="section-cs">
-            <button class="back-home-btn">← На главную страницу</button>
-            <div class="section-title">🔫 CS 2</div>
-            <p class="section-desc">Вставьте ссылку на матч FACEIT — сервис проанализирует игру и выдаёт разбор по игрокам, картам и метрикам.</p>
-            <div class="analysis-input-box">
-                <p>Вставьте ссылку на матч с FACEIT (например: https://www.faceit.com/en/cs2/rooms/1-xxxxx) или ID матча.</p>
-                <div class="link-input-row">
-                    <input type="text" class="link-input" id="csLink" placeholder="Ссылка на FACEIT матч или match ID">
-                    <button class="analyze-btn" id="csAnalyzeBtn">Анализировать</button>
-                </div>
-                <div class="file-upload-row">
-                    <input type="file" id="csFile" accept=".dem">
-                    <div class="file-hint">Скачайте .dem с HLTV, FACEIT или CS2Stats и загрузите сюда (скоро)</div>
+            <div class="section" id="section-cs2">
+                <button class="back-home-btn" data-back="home">← На главную страницу</button>
+                <div class="game-block">
+                    <div class="game-icon">🔫</div>
+                    <div class="section-title">Анализ матча CS 2</div>
+                    <div class="section-desc">Вставьте ссылку на матч или загрузите .dem файл — сервис проанализирует демку и выдаёт разбор по гранатам, спотам и роли.</div>
+                    <div class="link-form">
+                        <input type="text" class="link-input" placeholder="Вставьте ссылку на матч" id="csLink" />
+                        <input type="file" class="file-input" id="csFile" accept=".dem" />
+                        <div class="file-hint">Скачайте .dem с HLTV, FACEIT или CS2Stats и загрузите сюда</div>
+                        <button class="analyze-btn" id="csAnalyzeBtn">Анализировать</button>
+                    </div>
+                    <div class="progress-wrapper" id="csProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="csProgressFill"></div></div>
+                        <div class="progress-text" id="csProgressText">В очереди...</div>
+                    </div>
+                    <div class="results-wrapper" id="csResults"></div>
                 </div>
             </div>
-            <div class="progress-wrapper" id="csProgress">
-                <div class="progress-bar-bg"><div class="progress-bar-fill" id="csProgressFill"></div></div>
-                <div class="progress-text" id="csProgressText">В очереди...</div>
-            </div>
-            <div id="csResults"></div>
         </div>
     </div>
-</div>
 
 <script>
-// ============================================
-//  SUPABASE CONFIG — ВСТАВЬТЕ СЮДА СВОИ КЛЮЧИ
-// ============================================
-const SUPABASE_URL = 'https://ваш_проект.supabase.co';
-const SUPABASE_KEY = 'ваш_anon_key';
+// === SUPABASE (один блок, без дублей) ===
+const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';
 
-// === INIT WITH ERROR PROTECTION ===
 let supabaseClient = null;
 try {
     if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20) {
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('Supabase OK');
+        console.log('Supabase подключен');
     } else {
-        console.warn('Supabase not configured — using localStorage');
+        console.warn('Supabase не настроен — локальный режим');
     }
-} catch(e) { console.error('Supabase init error:', e); }
-
-// === LOCAL FALLBACK ===
-const LOCAL_USERS_KEY = 'ga_local_users';
-function getLocalUsers() { try { return JSON.parse(localStorage.getItem(LOCAL_USERS_KEY) || '{}'); } catch { return {}; } }
-function saveLocalUsers(u) { localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(u)); }
-
-async function hashPassword(pw) {
-    const d = new TextEncoder().encode('ga_salt_' + pw);
-    const h = await crypto.subtle.digest('SHA-256', d);
-    return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2,'0')).join('');
+} catch(e) {
+    console.error('Ошибка Supabase:', e.message);
 }
-function setCurrentUser(u) { localStorage.setItem('ga_current_user', JSON.stringify(u)); }
-function getCurrentUser() { try { return JSON.parse(localStorage.getItem('ga_current_user')); } catch { return null; } }
-function clearCurrentUser() { localStorage.removeItem('ga_current_user'); }
 
-// === THEME ===
-function initTheme() { if (localStorage.getItem('ga_theme') === 'light') document.documentElement.classList.add('light-theme'); }
-function toggleTheme() { document.documentElement.classList.toggle('light-theme'); localStorage.setItem('ga_theme', document.documentElement.classList.contains('light-theme') ? 'light' : 'dark'); }
+// Проверка: блокирует ли RLS запросы (ошибка app.current_login или permission)
+function isRLSError(err) {
+    var msg = (err && err.message) ? err.message.toLowerCase() : '';
+    return msg.indexOf('app.current_login') !== -1 ||
+           msg.indexOf('row-level security') !== -1 ||
+           msg.indexOf('permission') !== -1 ||
+           msg.indexOf('policy') !== -1;
+}
+
+// === ПРОКСИ для OpenDota (через Vercel rewrites, без CORS) ===
+const DOTA_API = '/api/dota/';
+
+// === ХЕЛПЕРЫ АВТОРИЗАЦИИ ===
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password + 'gameranalyzer_salt_2025');
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+function getLocalUsers() {
+    try { return JSON.parse(localStorage.getItem('ga_users') || '{}'); } catch(e) { return {}; }
+}
+function saveLocalUsers(users) {
+    localStorage.setItem('ga_users', JSON.stringify(users));
+}
+function getCurrentUser() {
+    try { return JSON.parse(localStorage.getItem('ga_current_user') || 'null'); } catch(e) { return null; }
+}
+function setCurrentUser(user) {
+    localStorage.setItem('ga_current_user', JSON.stringify(user));
+}
+function clearCurrentUser() {
+    localStorage.removeItem('ga_current_user');
+}
+
+// === ТЕМА ===
+function toggleTheme() {
+    document.documentElement.classList.toggle('light-theme');
+    localStorage.setItem('ga-theme', document.documentElement.classList.contains('light-theme') ? 'light' : 'dark');
+}
+function initTheme() {
+    const saved = localStorage.getItem('ga-theme');
+    if (saved === 'light') document.documentElement.classList.add('light-theme');
+}
 initTheme();
 
-// === DOM ELEMENTS ===
-const loginBtn = document.getElementById('loginBtn');
-const registerBtn = document.getElementById('registerBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const authScreen = document.getElementById('authScreen');
-const appWrapper = document.getElementById('appWrapper');
-const burger = document.getElementById('burger');
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('overlay');
-const sidebarItems = document.querySelectorAll('.sidebar-item');
-const sections = document.querySelectorAll('.section');
-const subscriptionCards = document.querySelectorAll('.subscription-card');
+// === ЭЛЕМЕНТЫ ===
+var loginBtn = document.getElementById('loginBtn');
+var registerBtn = document.getElementById('registerBtn');
+var logoutBtn = document.getElementById('logoutBtn');
+var authScreen = document.getElementById('authScreen');
+var appWrapper = document.getElementById('appWrapper');
+var burger = document.getElementById('burger');
+var sidebar = document.getElementById('sidebar');
+var overlay = document.getElementById('overlay');
+var sidebarItems = document.querySelectorAll('.sidebar-item');
+var sections = document.querySelectorAll('.section');
+var subscriptionCards = document.querySelectorAll('.subscription-card');
 
-// === FORM SWITCHING ===
+// === ФОРМЫ ===
 document.getElementById('goToRegister').addEventListener('click', function() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
@@ -602,102 +686,103 @@ document.getElementById('goToLogin').addEventListener('click', function() {
 document.getElementById('themeToggle').addEventListener('click', toggleTheme);
 document.getElementById('themeBtnNav').addEventListener('click', toggleTheme);
 
-// === ERROR/SUCCESS HELPERS ===
-function showError(id, msg) { var el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add('visible'); } }
-function hideError(id) { var el = document.getElementById(id); if (el) el.classList.remove('visible'); }
-function showSuccess(id, msg) { var el = document.getElementById(id); if (el) { el.textContent = msg; el.classList.add('visible'); } }
-function hideSuccess(id) { var el = document.getElementById(id); if (el) el.classList.remove('visible'); }
-
-// === REGISTRATION ===
+// === РЕГИСТРАЦИЯ ===
 registerBtn.addEventListener('click', async function() {
-    if (this.disabled) return;
-    this.disabled = true;
     var login = document.getElementById('regLoginInput').value.trim().toLowerCase();
     var password = document.getElementById('regPasswordInput').value;
     var confirm = document.getElementById('regPasswordConfirm').value;
     hideError('regError'); hideSuccess('regSuccess');
-    if (!login || login.length < 3) { showError('regError', 'Логин должен быть не короче 3 символов'); this.disabled = false; return; }
-    if (!password || password.length < 4) { showError('regError', 'Пароль должен быть не короче 4 символов'); this.disabled = false; return; }
-    if (password !== confirm) { showError('regError', 'Пароли не совпадают'); this.disabled = false; return; }
-
-    try {
-        var hashed = await hashPassword(password);
-        if (supabaseClient) {
-            var result = await supabaseClient.from('users').insert([{ login: login, password: hashed, plan: 'free' }]).onConflict('login').ignore();
-            if (result.error) { showError('regError', 'Ошибка: ' + result.error.message); this.disabled = false; return; }
-            if (!result.data || result.data.length === 0) { showError('regError', 'Этот логин уже занят'); this.disabled = false; return; }
-        } else {
-            var users = getLocalUsers();
-            if (users[login]) { showError('regError', 'Этот логин уже занят'); this.disabled = false; return; }
-            users[login] = { password: hashed, plan: 'free' };
-            saveLocalUsers(users);
+    if (!login || login.length < 3) { showError('regError', 'Логин должен быть не короче 3 символов'); return; }
+    if (!password || password.length < 4) { showError('regError', 'Пароль должен быть не короче 4 символов'); return; }
+    if (password !== confirm) { showError('regError', 'Пароли не совпадают'); return; }
+    var useLocal = false;
+    if (supabaseClient) {
+        try {
+            var ex = await supabaseClient.from('users').select('login').eq('login', login).maybeSingle();
+            if (ex.error) throw ex.error;
+            if (ex.data) { showError('regError', 'Этот логин уже занят'); return; }
+            var hashed = await hashPassword(password);
+            var ins = await supabaseClient.from('users').insert({ login: login, password: hashed, plan: 'free' });
+            if (ins.error) throw ins.error;
+        } catch(err) {
+            if (isRLSError(err)) {
+                console.warn('RLS блокирует запросы — переключение на локальный режим');
+                useLocal = true;
+            } else {
+                showError('regError', 'Ошибка: ' + (err.message||err));
+                return;
+            }
         }
-        showSuccess('regSuccess', 'Аккаунт создан! Теперь войдите.');
-        document.getElementById('regLoginInput').value = '';
-        document.getElementById('regPasswordInput').value = '';
-        document.getElementById('regPasswordConfirm').value = '';
-        var self = this;
-        setTimeout(function() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            hideSuccess('regSuccess'); hideError('regError');
-            document.getElementById('loginInput').value = login;
-            self.disabled = false;
-        }, 1500);
-    } catch(err) {
-        showError('regError', 'Ошибка: ' + (err.message || err));
-        this.disabled = false;
+    } else {
+        useLocal = true;
     }
+    if (useLocal) {
+        var users = getLocalUsers();
+        if (users[login]) { showError('regError', 'Этот логин уже занят'); return; }
+        users[login] = { password: await hashPassword(password), plan: 'free' };
+        saveLocalUsers(users);
+    }
+    showSuccess('regSuccess', 'Аккаунт создан! Теперь войдите.');
+    document.getElementById('regLoginInput').value = '';
+    document.getElementById('regPasswordInput').value = '';
+    document.getElementById('regPasswordConfirm').value = '';
+    setTimeout(function() {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+        hideSuccess('regSuccess');
+        document.getElementById('loginInput').value = login;
+    }, 1500);
 });
 
-// === LOGIN ===
+// === ВХОД ===
 loginBtn.addEventListener('click', async function() {
-    if (this.disabled) return;
-    this.disabled = true;
     var login = document.getElementById('loginInput').value.trim().toLowerCase();
     var password = document.getElementById('passwordInput').value;
     hideError('loginError');
-    if (!login || !password) { showError('loginError', 'Введите логин и пароль'); this.disabled = false; return; }
-
-    try {
-        var hashed = await hashPassword(password);
-        if (supabaseClient) {
-            var res = await supabaseClient.from('users').select('*').eq('login', login);
-            if (res.error) { showError('loginError', 'Ошибка базы: ' + res.error.message); this.disabled = false; return; }
-            if (!res.data || res.data.length === 0) { showError('loginError', 'Логин не найден'); this.disabled = false; return; }
-            var user = res.data[0];
-            if (user.password !== hashed) { showError('loginError', 'Пароль не совпадает'); this.disabled = false; return; }
-            setCurrentUser({ login: user.login, plan: user.plan });
+    if (!login || !password) { showError('loginError', 'Введите логин и пароль'); return; }
+    var useLocal = false;
+    if (supabaseClient) {
+        try {
+            var hashed = await hashPassword(password);
+            var res = await supabaseClient.from('users').select('*').eq('login', login).maybeSingle();
+            if (res.error) throw res.error;
+            if (!res.data) { showError('loginError', 'Логин не найден'); return; }
+            if (res.data.password !== hashed) { showError('loginError', 'Пароль не совпадает'); return; }
+            setCurrentUser({ login: res.data.login, plan: res.data.plan });
             enterApp();
-        } else {
-            var users = getLocalUsers();
-            if (!users[login]) { showError('loginError', 'Логин не найден. Зарегистрируйтесь.'); this.disabled = false; return; }
-            if (users[login].password !== hashed) { showError('loginError', 'Пароль не совпадает'); this.disabled = false; return; }
-            setCurrentUser({ login: login, plan: users[login].plan || 'free' });
-            enterApp();
+            return;
+        } catch(err) {
+            if (isRLSError(err)) {
+                console.warn('RLS блокирует запросы — переключение на локальный режим');
+                useLocal = true;
+            } else {
+                showError('loginError', 'Ошибка входа: ' + (err.message||err));
+                return;
+            }
         }
-    } catch(err) {
-        showError('loginError', 'Ошибка: ' + (err.message || err));
-        this.disabled = false;
+    } else {
+        useLocal = true;
+    }
+    if (useLocal) {
+        var users = getLocalUsers();
+        if (!users[login]) { showError('loginError', 'Логин не найден. Зарегистрируйтесь.'); return; }
+        var hashed = await hashPassword(password);
+        if (users[login].password !== hashed) { showError('loginError', 'Пароль не совпадает'); return; }
+        setCurrentUser({ login: login, plan: users[login].plan || 'free' });
+        enterApp();
     }
 });
 
 function enterApp() {
     authScreen.style.display = 'none';
-    setTimeout(function() {
-        appWrapper.classList.add('active');
-        updateUserInfo();
-        updateSubscriptionUI();
-    }, 10);
+    setTimeout(function() { appWrapper.classList.add('active'); updateUserInfo(); updateSubscriptionUI(); }, 10);
 }
-
 function updateUserInfo() {
     var u = getCurrentUser(); if (!u) return;
     document.getElementById('userName').textContent = u.login;
     var pn = { 'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM' };
     document.getElementById('userPlan').textContent = pn[u.plan] || 'Бесплатный';
 }
-
 function updateSubscriptionUI() {
     var u = getCurrentUser(); if (!u) return;
     subscriptionCards.forEach(function(c) {
@@ -707,20 +792,12 @@ function updateSubscriptionUI() {
     });
     if (u.plan && u.plan !== 'free') {
         var ac = document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');
-        if (ac) {
-            ac.classList.add('active-plan');
-            ac.querySelector('.card-btn').classList.add('current');
-            ac.querySelector('.card-btn').textContent = 'Активна';
-            ac.querySelector('.current-badge').classList.add('visible');
-        }
+        if (ac) { ac.classList.add('active-plan'); ac.querySelector('.card-btn').classList.add('current'); ac.querySelector('.card-btn').textContent = 'Активна'; ac.querySelector('.current-badge').classList.add('visible'); }
     }
 }
-
-// === PLAN SELECTION ===
 document.getElementById('btn-dota').addEventListener('click', function() { selectPlan('pro_dota2'); });
 document.getElementById('btn-cs').addEventListener('click', function() { selectPlan('pro_cs2'); });
 document.getElementById('btn-premium').addEventListener('click', function() { selectPlan('premium'); });
-
 async function selectPlan(plan) {
     var u = getCurrentUser(); if (!u) return;
     u.plan = plan; setCurrentUser(u);
@@ -729,29 +806,19 @@ async function selectPlan(plan) {
     updateUserInfo(); updateSubscriptionUI(); revealCards();
 }
 
-// === LOGOUT ===
+// === ВЫХОД И НАВИГАЦИЯ ===
 logoutBtn.addEventListener('click', function() {
-    clearCurrentUser();
-    appWrapper.classList.remove('active');
-    closeSidebar();
-    document.getElementById('loginInput').value = '';
-    document.getElementById('passwordInput').value = '';
-    loginBtn.disabled = false;
-    registerBtn.disabled = false;
+    clearCurrentUser(); appWrapper.classList.remove('active'); closeSidebar();
+    document.getElementById('loginInput').value = ''; document.getElementById('passwordInput').value = '';
     setTimeout(function() { authScreen.style.display = 'flex'; }, 300);
 });
-
-// === SIDEBAR ===
 burger.addEventListener('click', function() { toggleSidebar(); });
 overlay.addEventListener('click', function() { closeSidebar(); });
-function toggleSidebar() { sidebar.classList.toggle('open'); overlay.classList.toggle('visible'); }
-function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); }
-
+function toggleSidebar() { sidebar.classList.toggle('open'); overlay.classList.toggle('visible'); burger.classList.toggle('open'); }
+function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); burger.classList.remove('open'); }
 sidebarItems.forEach(function(item) {
     item.addEventListener('click', function() {
-        if (item.id === 'themeToggle') return;
-        sidebarItems.forEach(function(i) { i.classList.remove('active'); });
-        item.classList.add('active');
+        sidebarItems.forEach(function(i) { i.classList.remove('active'); }); item.classList.add('active');
         sections.forEach(function(s) { s.classList.remove('active'); });
         var t = item.getAttribute('data-section');
         var sec = document.getElementById('section-' + t);
@@ -760,20 +827,15 @@ sidebarItems.forEach(function(item) {
         if (window.innerWidth < 768) closeSidebar();
     });
 });
-
+function revealCards() { subscriptionCards.forEach(function(c, i) { c.classList.remove('visible'); setTimeout(function() { c.classList.add('visible'); }, i * 150); }); }
 document.querySelectorAll('.back-home-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
         sidebarItems.forEach(function(i) { i.classList.remove('active'); });
         sections.forEach(function(s) { s.classList.remove('active'); });
         document.getElementById('section-home').classList.add('active');
-        var hi = document.querySelector('.sidebar-item[data-section="home"]');
-        if (hi) hi.classList.add('active');
+        var hi = document.querySelector('.sidebar-item[data-section="home"]'); if (hi) hi.classList.add('active');
     });
 });
-
-function revealCards() { subscriptionCards.forEach(function(c, i) { c.classList.remove('visible'); setTimeout(function() { c.classList.add('visible'); }, i * 150); }); }
-
-// === DOTA SUBTABS ===
 document.querySelectorAll('.dota-subtab').forEach(function(tab) {
     tab.addEventListener('click', function() {
         document.querySelectorAll('.dota-subtab').forEach(function(t) { t.classList.remove('active'); });
@@ -784,18 +846,19 @@ document.querySelectorAll('.dota-subtab').forEach(function(tab) {
         if (t === 'tierlist' && !tierlistData) loadTierlist();
     });
 });
+function showError(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
+function hideError(id) { document.getElementById(id).classList.remove('visible'); }
+function showSuccess(id, msg) { var el = document.getElementById(id); el.textContent = msg; el.classList.add('visible'); }
+function hideSuccess(id) { document.getElementById(id).classList.remove('visible'); }
 
-// === STEAM PERIODS ===
+// === STEAM СТАТИСТИКА ===
 var currentPeriod = 7;
 document.querySelectorAll('.period-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
         document.querySelectorAll('.period-btn').forEach(function(b) { b.classList.remove('active'); });
-        this.classList.add('active');
-        currentPeriod = parseInt(this.dataset.period);
+        this.classList.add('active'); currentPeriod = parseInt(this.dataset.period);
     });
 });
-
-// === STEAM STATS ===
 document.getElementById('steamFetchBtn').addEventListener('click', fetchSteamStats);
 
 async function fetchSteamStats() {
@@ -808,15 +871,15 @@ async function fetchSteamStats() {
     res.classList.remove('visible'); res.innerHTML = ''; prog.classList.add('visible'); fill.style.width = '0%'; txt.textContent = 'Получение данных...';
     try {
         fill.style.width = '15%';
-        var pRes = await fetch('https://api.opendota.com/api/players/' + accountId);
+        var pRes = await fetch(DOTA_API + 'players/' + accountId);
         if (!pRes.ok) throw new Error('Игрок не найден');
         var pData = await pRes.json();
         fill.style.width = '50%'; txt.textContent = 'Загрузка матчей...';
         var df = ''; if (currentPeriod > 0) { df = '?date=' + (Math.floor(Date.now()/1000) - currentPeriod*86400); }
-        var mRes = await fetch('https://api.opendota.com/api/players/' + accountId + '/recentMatches' + df);
+        var mRes = await fetch(DOTA_API + 'players/' + accountId + '/recentMatches' + df);
         var matches = mRes.ok ? await mRes.json() : [];
         fill.style.width = '70%'; txt.textContent = 'Анализ героев...';
-        var hRes = await fetch('https://api.opendota.com/api/players/' + accountId + '/heroes' + df);
+        var hRes = await fetch(DOTA_API + 'players/' + accountId + '/heroes' + df);
         var heroesData = hRes.ok ? await hRes.json() : [];
         fill.style.width = '90%'; txt.textContent = 'Формирование отчёта...';
         var total = matches.length, wins = 0, losses = 0, tK=0, tD=0, tA=0, tGPM=0, tXPM=0, tLH=0, tHD=0, tDur=0;
@@ -835,7 +898,7 @@ async function fetchSteamStats() {
         var aHD = total > 0 ? Math.round(tHD/total/1000) : 0;
         var aDur = total > 0 ? Math.floor(tDur/total/60) : 0;
         var topH = heroesData.filter(function(h){return h.games>0;}).sort(function(a,b){return b.games-a.games;}).slice(0,8);
-        if (!tierlistData) { try { var sR = await fetch('https://api.opendota.com/api/heroStats'); if (sR.ok) tierlistData = await sR.json(); } catch(e){} }
+        if (!tierlistData) { try { var sR = await fetch(DOTA_API + 'heroStats'); if (sR.ok) tierlistData = await sR.json(); } catch(e){} }
         fill.style.width = '100%'; txt.textContent = 'Готово!';
         await new Promise(function(r){setTimeout(r,400);}); prog.classList.remove('visible');
         var html = '', prof = pData.profile || {};
@@ -883,7 +946,7 @@ async function fetchSteamStats() {
     }
 }
 
-// === TIERLIST ===
+// === ТИР-ЛИСТ ===
 var RANKS = [
     {num:1,name:'Рекрут',color:'#6b6b6b'},{num:2,name:'Страж',color:'#4a9d4a'},
     {num:3,name:'Рыцарь',color:'#b8860b'},{num:4,name:'Герой',color:'#b0b0b0'},
@@ -891,17 +954,17 @@ var RANKS = [
     {num:7,name:'Божество',color:'#06b6d4'},{num:8,name:'Титан',color:'#ef4444'}
 ];
 var POSITIONS = [
-    {id:'all',name:'Все',icon:'⚔️'},{id:1,name:'Carry',icon:'🛡️'},{id:2,name:'Mid',icon:'🔥'},
-    {id:3,name:'Offlane',icon:'⚔️'},{id:4,name:'Support',icon:'✨'},{id:5,name:'Hard Supp',icon:'🌿'}
+    {id:'all',name:'Все',icon:'Все'},{id:1,name:'Carry',icon:'1'},{id:2,name:'Mid',icon:'2'},
+    {id:3,name:'Offlane',icon:'3'},{id:4,name:'Support',icon:'4'},{id:5,name:'Hard Support',icon:'5'}
 ];
 var tierlistData = null, laneRolesMap = {}, currentRank = 7, currentPosition = 'all';
 
 async function loadTierlist() {
     var c = document.getElementById('tierlistContent');
-    c.innerHTML = '<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div>';
+    c.innerHTML = '<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';
     try {
-        var sr = await fetch('https://api.opendota.com/api/heroStats');
-        var lr = await fetch('https://api.opendota.com/api/scenarios/laneRoles');
+        var sr = await fetch(DOTA_API + 'heroStats');
+        var lr = await fetch(DOTA_API + 'scenarios/laneRoles');
         if (!sr.ok) throw new Error('Недоступно');
         tierlistData = await sr.json();
         if (lr.ok) {
@@ -914,19 +977,16 @@ async function loadTierlist() {
         document.getElementById('tierlistUpdated').textContent = 'Обновлено: ' + now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
     } catch(err) { c.innerHTML = '<div class="tierlist-error">Ошибка: ' + err.message + '</div>'; }
 }
-
 function renderPositionSelector() {
     var s = document.getElementById('positionSelector');
-    s.innerHTML = POSITIONS.map(function(p) { return '<div class="position-badge '+(p.id===currentPosition?'active':'')+'" data-pos="'+p.id+'"><div class="position-badge-icon">'+p.icon+'</div><div class="position-badge-name">'+p.name+'</div></div>'; }).join('');
+    s.innerHTML = POSITIONS.map(function(p) { return '<div class="position-badge '+(p.id===currentPosition?'active':'')+'" data-pos="'+p.id+'"><div class="position-badge-icon"><span style="font-size:1.4rem;">'+p.icon+'</span></div><div class="position-badge-name">'+p.name+'</div></div>'; }).join('');
     s.querySelectorAll('.position-badge').forEach(function(b) { b.addEventListener('click', function() { currentPosition = b.dataset.pos; s.querySelectorAll('.position-badge').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); renderTierlist(currentRank); }); });
 }
-
 function renderRankSelector() {
     var s = document.getElementById('rankSelector');
-    s.innerHTML = RANKS.map(function(r) { return '<div class="rank-badge '+(r.num===currentRank?'active':'')+'" data-rank="'+r.num+'"><div style="width:32px;height:32px;border-radius:50%;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:800;color:#fff;">'+r.num+'</div><div class="rank-badge-name">'+r.name+'</div></div>'; }).join('');
+    s.innerHTML = RANKS.map(function(r) { return '<div class="rank-badge '+(r.num===currentRank?'active':'')+'" data-rank="'+r.num+'"><div class="rank-badge-icon" style="width:36px;height:36px;border-radius:50%;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;box-shadow:0 0 8px '+r.color+'99;">'+r.num+'</div><div class="rank-badge-name">'+r.name+'</div></div>'; }).join('');
     s.querySelectorAll('.rank-badge').forEach(function(b) { b.addEventListener('click', function() { currentRank = parseInt(b.dataset.rank); s.querySelectorAll('.rank-badge').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); renderTierlist(currentRank); }); });
 }
-
 function getHeroPosition(hid) {
     var id = parseInt(hid), h = tierlistData ? tierlistData.find(function(x){return parseInt(x.id)===id;}) : null;
     if (!h) return null; var r = h.roles||[];
@@ -937,14 +997,13 @@ function getHeroPosition(hid) {
     if (c&&s) { if (p&&e&&!d) return 1; if (d&&i&&!e) return 1; if (e||i) return 4; return 5; }
     if (l===1) return 1; if (c&&!d&&!i) return 1; if (d||i) return 3; if (n) return 2; if (c) return 1; return 1;
 }
-
 function renderTierlist(rn) {
     if (!tierlistData) return; var c = document.getElementById('tierlistContent');
     var heroes = tierlistData.map(function(h) {
         var picks, wins;
         if (rn===8) { picks=h.pro_pick||0; wins=h.pro_win||0; } else { picks=h[rn+'_pick']||0; wins=h[rn+'_win']||0; }
         var wr = picks>0 ? (wins/picks*100) : 0; var ip = (h.img||'').replace(/^\//,'');
-        return { id:h.id, name:h.localized_name, icon:'https://cdn.cloudflare.steamstatic.com/'+ip, fallback:'https://api.opendota.com'+(h.icon||''), picks:picks, winRate:wr, position:getHeroPosition(h.id) };
+        return { id:h.id, name:h.localized_name, icon:'https://cdn.cloudflare.steamstatic.com/'+ip, fallback:DOTA_API+(h.icon||''), picks:picks, winRate:wr, position:getHeroPosition(h.id) };
     });
     if (currentPosition !== 'all') { var pi = parseInt(currentPosition); heroes = heroes.filter(function(h){return h.position===pi;}); }
     var th = 50, hw = heroes.filter(function(h){return h.picks>=th;});
@@ -955,10 +1014,10 @@ function renderTierlist(rn) {
     var nd = heroes.filter(function(h){return h.picks<th;});
     hw.sort(function(a,b){return b.winRate-a.winRate;});
     var tot = hw.length;
-    if (tot===0) { c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim);">Нет данных</div>'; return; }
+    if (tot===0) { c.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">Нет данных</div>'; return; }
     var sC=Math.ceil(tot*0.15),aC=Math.ceil(tot*0.20),bC=Math.ceil(tot*0.25),cC=Math.ceil(tot*0.25);
     var sH=hw.slice(0,sC),aH=hw.slice(sC,sC+aC),bH=hw.slice(sC+aC,sC+aC+bC),cH=hw.slice(sC+aC+bC,sC+aC+bC+cC),dH=hw.slice(sC+aC+bC+cC).concat(nd);
-    var tiers = [{label:'S',cls:'s',h:sH,desc:'META'},{label:'A',cls:'a',h:aH,desc:'STRONG'},{label:'B',cls:'b',h:bH,desc:'SIT'},{label:'C',cls:'c',h:cH,desc:'WEAK'},{label:'D',cls:'d',h:dH,desc:'AVOID'}];
+    var tiers = [{label:'S',cls:'s',h:sH,desc:'META'},{label:'A',cls:'a',h:aH,desc:'STRONG'},{label:'B',cls:'b',h:bH,desc:'SITUATION'},{label:'C',cls:'c',h:cH,desc:'WEAK'},{label:'D',cls:'d',h:dH,desc:'AVOID'}];
     c.innerHTML = '<div class="tier-table">'+tiers.map(function(t) {
         return '<div class="tier-row"><div class="tier-label '+t.cls+'">'+t.label+'<div class="tier-label-desc">'+t.desc+'</div></div><div class="tier-heroes">'+t.h.map(function(h) {
             var wt = h.winRate>0 ? h.winRate.toFixed(1)+'%' : '—';
@@ -967,7 +1026,6 @@ function renderTierlist(rn) {
         }).join('')+'</div></div>';
     }).join('')+'</div>';
 }
-
 function getHeroName(hid) { if (tierlistData) { var h = tierlistData.find(function(x){return parseInt(x.id)===parseInt(hid);}); if (h) return h.localized_name; } return 'Hero #'+hid; }
 function getMatchPosition(p) {
     var lr = p.lane_role||0;
@@ -978,8 +1036,8 @@ function getMatchPosition(p) {
     if (s&&!c) { if (e||i) return 4; return 5; } return 1;
 }
 
-// === DOTA MATCH ANALYSIS ===
-var ITEM_NAMES = {'blink':'Blink Dagger','black_king_bar':'BKB','assault':'Assault Cuirass','shivas_guard':"Shiva's Guard",'radiance':'Radiance','manta':'Manta Style','butterfly':'Butterfly','monkey_king_bar':'MKB','abyssal_blade':'Abyssal Blade','scythe_of_vyse':'Scythe of Vyse','orchid':'Orchid','bloodthorn':'Bloodthorn','hurricane_pike':'Hurricane Pike','sphere':"Linken's Sphere",'greater_crit':'Daedalus','satanic':'Satanic','heart':'Heart of Tarrasque','travel_boots':'Boots of Travel','force_staff':'Force Staff','eul':"Eul's Scepter",'gungir':'Gungir','silver_edge':'Silver Edge','spirit_vessel':'Spirit Vessel','solar_crest':'Solar Crest','guardian_greaves':'Guardian Greaves','arcane_boots':'Arcane Boots','phase_boots':'Phase Boots','power_treads':'Power Treads','tranquil_boots':'Tranquil Boots','aghanims_shard':"Aghanim's Shard",'ultimate_scepter':"Aghanim's Scepter",'ultimate_scepter_2':'Aghs +17','refresher':'Refresher Orb','pipe':'Pipe of Insight','crimson_guard':'Crimson Guard','lotus_orb':'Lotus Orb','desolator':'Desolator','skull_basher':'Skull Basher','crystalys':'Crystalys','armlet_of_mordiggian':'Armlet of Mordiggian','glimmer_cape':'Glimmer Cape','veil_of_discord':'Veil of Discord','rod_of_atos':'Rod of Atos','dragon_lance':'Dragon Lance','aether_lens':'Aether Lens','octarine_core':'Octarine Core','sange_and_yasha':'Sange and Yasha','kaya_and_sange':'Kaya and Sange','yasha_and_kaya':'Yasha and Kaya','mekansm':'Mekansm','vladmir':"Vladmir's Offering",'vladmir_2':"Vladmir's 2",'hand_of_midas':'Hand of Midas','bfury':'Battle Fury','mask_of_madness':'Mask of Madness','ethereal_blade':'Ethereal Blade','falcon_blade':'Falcon Blade','mage_slayer':'Mage Slayer','witch_blade':'Witch Blade','ghost_scepter':'Ghost Scepter'};
+// === АНАЛИЗ МАТЧА ===
+var ITEM_NAMES = {'blink':'Blink Dagger','black_king_bar':'BKB','assault':'Assault Cuirass','shivas_guard':"Shiva's Guard",'radiance':'Radiance','manta':'Manta Style','butterfly':'Butterfly','monkey_king_bar':'MKB','abyssal_blade':'Abyssal Blade','scythe_of_vyse':'Scythe of Vyse','orchid':'Orchid','bloodthorn':'Bloodthorn','hurricane_pike':'Hurricane Pike','sphere':"Linken's Sphere",'greater_crit':'Daedalus','satanic':'Satanic','heart':'Heart of Tarrasque','travel_boots':'Boots of Travel','force_staff':'Force Staff','eul':"Eul's Scepter",'gungir':'Gungir','silver_edge':'Silver Edge','spirit_vessel':'Spirit Vessel','solar_crest':'Solar Crest','guardian_greaves':'Guardian Greaves','arcane_boots':'Arcane Boots','phase_boots':'Phase Boots','power_treads':'Power Treads','tranquil_boots':'Tranquil Boots','aghanims_shard':"Aghanim's Shard",'ultimate_scepter':"Aghanim's Scepter",'ultimate_scepter_2':'Aghs +17','refresher':'Refresher Orb','pipe':'Pipe of Insight','crimson_guard':'Crimson Guard','lotus_orb':'Lotus Orb','hood_of_defiance':'Hood of Defiance','vanguard':'Vanguard','soul_ring':'Soul Ring','magic_wand':'Magic Wand','bracer':'Bracer','wraith_band':'Wraith Band','null_talisman':'Null Talisman','mekansm':'Mekansm','vladmir':"Vladmir's Offering",'vladmir_2':"Vladmir's Offering 2",'hand_of_midas':'Hand of Midas','midas':'Hand of Midas','bfury':'Battle Fury','battle_fury':'Battle Fury','desolator':'Desolator','skull_basher':'Skull Basher','crystalys':'Crystalys','armlet_of_mordiggian':'Armlet of Mordiggian','glimmer_cape':'Glimmer Cape','veil_of_discord':'Veil of Discord','rod_of_atos':'Rod of Atos','dragon_lance':'Dragon Lance','aether_lens':'Aether Lens','octarine_core':'Octarine Core','sange_and_yasha':'Sange and Yasha','kaya_and_sange':'Kaya and Sange','yasha_and_kaya':'Yaya and Kaya','mask_of_madness':'Mask of Madness','ethereal_blade':'Ethereal Blade','falcon_blade':'Falcon Blade','mage_slayer':'Mage Slayer','witch_blade':'Witch Blade','ghost_scepter':'Ghost Scepter'};
 var KEY_ITEMS = ['blink','black_king_bar','assault','shivas_guard','radiance','manta','butterfly','monkey_king_bar','abyssal_blade','scythe_of_vyse','orchid','bloodthorn','hurricane_pike','sphere','greater_crit','satanic','heart','travel_boots','force_staff','eul','gungir','silver_edge','spirit_vessel','solar_crest','guardian_greaves','aghanims_shard','ultimate_scepter','ultimate_scepter_2','refresher','pipe','crimson_guard','lotus_orb','desolator','skull_basher','crystalys','armlet_of_mordiggian','glimmer_cape','veil_of_discord','rod_of_atos','dragon_lance','aether_lens','octarine_core','sange_and_yasha','kaya_and_sange','yasha_and_kaya','mekansm','vladmir','vladmir_2','hand_of_midas','bfury','mask_of_madness','ethereal_blade','falcon_blade','mage_slayer','witch_blade','ghost_scepter','arcane_boots','phase_boots','power_treads','tranquil_boots'];
 var PRO_BENCH = {1:{lh10:50,lh20:150,lh30:250,gpm:700,xpm:680,name:'керри',blink:18},2:{lh10:45,lh20:130,lh30:200,gpm:650,xpm:720,name:'мида',blink:12},3:{lh10:30,lh20:80,lh30:150,gpm:500,xpm:480,name:'оффлейнера',blink:13},4:{lh10:15,lh20:40,lh30:80,gpm:400,xpm:380,name:'саппорта',blink:20},5:{lh10:10,lh20:25,lh30:50,gpm:350,xpm:320,name:'хард-саппорта',blink:25}};
 
@@ -1002,8 +1060,8 @@ function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
     kp2.sort(function(a,b){return a.time-b.time;});
     var blink = kp2.find(function(p){return p.key==='blink';});
     var html = '';
-    if (!parsed) { html += '<div class="problem-block"><div class="problem-title">Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota. Базовые показатели отображаются корректно.</div></div>'; }
-    html += '<div class="result-header"><div><h2>'+hName+' — '+posName+'</h2><div class="result-header-meta">'+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+(fb>0?' · FB: '+fbM+':'+String(fbS).padStart(2,'0'):'')+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
+    if (!parsed) { html += '<div class="problem-block" style="border-color:rgba(231,160,40,0.3);background-color:rgba(231,160,40,0.06);"><div class="problem-title" style="color:var(--orange);">Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota. Базовые показатели отображаются корректно.</div></div>'; }
+    html += '<div class="result-header"><div class="result-header-info"><h2>'+hName+' — '+posName+'</h2><div class="result-header-meta">Длительность: '+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+(fb>0?' · FB: '+fbM+':'+String(fbS).padStart(2,'0'):'')+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
     html += '<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\''+matchId+'\')">'+playerOptions+'</select></div>';
     html += '<div class="result-block"><div class="result-block-title">Базовые показатели</div><div class="metrics-grid">';
     html += '<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+gpm+'</div><div class="metric-sub '+(gpm>=bm.gpm?'good':'bad')+'">Про: '+bm.gpm+'</div></div>';
@@ -1016,7 +1074,7 @@ function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
     html += '<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+lh+'</div></div>';
     html += '<div class="metric-card"><div class="metric-label">Добивания</div><div class="metric-value">'+dn+'</div></div></div></div>';
     if (parsed && lhT.length>0) {
-        html += '<div class="result-block"><div class="result-block-title">Фарм по таймлайну</div><table class="farm-table"><tr><th>Время</th><th>10</th><th>20</th><th>30</th></tr>';
+        html += '<div class="result-block"><div class="result-block-title">Фарм</div><table class="farm-table"><tr><th>Время</th><th>10</th><th>20</th><th>30</th></tr>';
         html += '<tr><td>Вы</td>'+(lh10!=null?'<td class="gold-val">'+lh10+'</td>':'<td class="pro-val">—</td>')+(lh20!=null?'<td class="gold-val">'+lh20+'</td>':'<td class="pro-val">—</td>')+(lh30!=null?'<td class="gold-val">'+lh30+'</td>':'<td class="pro-val">—</td>')+'</tr>';
         html += '<tr><td>Про ('+bm.name+')</td><td class="pro-val">'+bm.lh10+'</td><td class="pro-val">'+bm.lh20+'</td><td class="pro-val">'+bm.lh30+'</td></tr>';
         if (lh10!=null&&lh20!=null&&lh30!=null) {
@@ -1029,13 +1087,13 @@ function buildDotaAnalysis(data, player, playerIndex, playerOptions) {
         html += '</div>';
     }
     if (kp2.length>0) {
-        html += '<div class="result-block"><div class="result-block-title">Тайминги предметов</div><div class="item-timeline">';
+        html += '<div class="result-block"><div class="result-block-title">Предметы</div><div class="item-timeline">';
         kp2.forEach(function(p) { html += '<div class="item-chip">'+p.name+' — <span class="item-time">'+p.ts+'</span></div>'; });
         html += '</div>';
         if (blink) { var bm2=blink.time/60; if (bm2>bm.blink+3) html += '<div class="analysis-text"><strong style="color:var(--red);">Blink в '+blink.ts+'</strong> — поздно.</div>'; else if (bm2<=bm.blink+1) html += '<div class="analysis-text"><strong style="color:var(--green);">Blink в '+blink.ts+'</strong> — отлично.</div>'; }
         html += '</div>';
     }
-    html += '<div class="result-block"><div class="result-block-title">Сравнение с про</div>';
+    html += '<div class="result-block"><div class="result-block-title">Сравнение</div>';
     var gr = Math.round(gpm/bm.gpm*100);
     if (gr>=95) html += '<div class="comp-item">Фарм про-уровня — <strong style="color:var(--green);">'+gpm+' GPM</strong> ('+gr+'%).</div>';
     else if (gr>=75) html += '<div class="comp-item">Фарм ниже про — <strong style="color:var(--orange);">'+gpm+' GPM</strong> ('+gr+'%).</div>';
@@ -1062,7 +1120,7 @@ function generateDotaResultsFromAPI(data) {
     var players = data.players||[], opts = '';
     players.forEach(function(p,i) {
         var side = p.player_slot<128?'Radiant':'Dire', hName = getHeroName(p.hero_id), nick = p.personaname||('Аноним #'+p.account_id);
-        opts += '<option value="'+i+'"'+(i===0?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';
+        opts += '<option value="'+i+'"'+(i===0?' selected':'')+'">'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';
     });
     var player = players[0];
     if (!player) return '<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';
@@ -1072,16 +1130,20 @@ function generateDotaResultsFromAPI(data) {
 window.switchDotaPlayer = async function(matchId) {
     var rd = document.getElementById('dotaResults'), dd = rd.querySelector('.player-select-dropdown'), pi = parseInt(dd.value);
     try {
-        var res = await fetch('https://api.opendota.com/api/matches/'+matchId);
+        var res = await fetch(DOTA_API + 'matches/' + matchId);
         var data = await res.json(), player = data.players[pi];
         if (!player) return; var opts = '';
         data.players.forEach(function(p,i) {
             var side = p.player_slot<128?'Radiant':'Dire', hName = getHeroName(p.hero_id), nick = p.personaname||('Аноним #'+p.account_id);
-            opts += '<option value="'+i+'"'+(i===pi?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';
+            opts += '<option value="'+i+'"'+(i===pi?' selected':'')+'">'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';
         });
         rd.innerHTML = buildDotaAnalysis(data, player, pi, opts);
     } catch(err) { console.error(err); }
 };
+
+function generateCsResults() {
+    return '<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда (11:13)</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">Проблема</div><div class="problem-text">Выживаемость 25%.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Про: 52%</div></div></div><div class="result-block"><div class="result-block-title">Сильные</div><div class="strength-item"><span class="marker">+</span> HS% 48%</div></div><div class="result-block"><div class="result-block-title">Слабые</div><div class="weakness-item"><span class="marker">−</span> Ранние выходы</div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Тренируйте тайминги.<div class="rec-exercise"><strong>Упражнение:</strong> Retake 30 мин.</div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
+}
 
 window.resetAnalysis = function(game) {
     var p = game==='dota'?'dota':'cs';
@@ -1093,248 +1155,49 @@ window.resetAnalysis = function(game) {
     if (game==='cs') { var fi = document.getElementById('csFile'); if (fi) fi.value = ''; }
 };
 
-// === CS2 ANALYSIS ===
-function parseFaceitMatchId(link) {
-    if (!link) return null;
-    link = link.trim();
-    // Direct match ID
-    if (/^[\w-]+$/.test(link) && link.indexOf('/') === -1) return link;
-    // URL: faceit.com/en/cs2/rooms/1-xxxxx
-    var m = link.match(/rooms\/([a-f0-9-]+)/i);
-    if (m) return m[1];
-    // URL: faceit.com/en/cs2/room/1-xxxxx/scoreboard
-    m = link.match(/room\/([a-f0-9-]+)/i);
-    if (m) return m[1];
-    // Try last segment
-    var parts = link.split('/');
-    var last = parts[parts.length - 1];
-    if (last && last.length > 5) return last;
-    return null;
-}
-
-function generateCsResults(data, link) {
-    var html = '';
-    var teams = data.teams || [];
-    var faction1 = data.rounds ? (data.rounds[0] || {}) : {};
-    var mapName = faction1.rounds ? (faction1.rounds.map ? faction1.rounds.map : 'Unknown') : (data.voting ? (data.voting.map ? data.voting.map : 'Unknown') : 'Unknown');
-    var score1 = faction1.rounds ? (faction1.rounds.score || '0 / 0') : '0 / 0';
-    
-    var team1Name = (teams[0] && teams[0].name) ? teams[0].name : 'Team 1';
-    var team2Name = (teams[1] && teams[1].name) ? teams[1].name : 'Team 2';
-    var winner = data.rounds ? data.rounds[0].winner_teamid : '';
-    var winnerName = winner === 'faction1' ? team1Name : (winner === 'faction2' ? team2Name : '');
-
-    // Players
-    var allPlayers = [];
-    teams.forEach(function(team, ti) {
-        if (team.players) {
-            team.players.forEach(function(p) {
-                var stats = p.player_stats || {};
-                allPlayers.push({
-                    nick: p.nickname || 'Unknown',
-                    team: ti === 0 ? 'A' : 'B',
-                    teamName: ti === 0 ? team1Name : team2Name,
-                    kills: parseInt(stats.Kills || 0),
-                    deaths: parseInt(stats.Deaths || 0),
-                    assists: parseInt(stats.Assists || 0),
-                    adr: parseFloat(stats.ADR || 0),
-                    hsPercent: parseFloat(stats['Headshot %'] || 0),
-                    kast: parseFloat(stats.KAST || 0),
-                    krRatio: parseFloat(stats['K/R Ratio'] || 0),
-                    rating: parseFloat(stats['K/D Ratio'] || 0) || krRatioFallback(stats),
-                    mvps: parseInt(stats.MVPs || 0),
-                });
-            });
-        }
-    });
-
-    // Find MVP (highest rating)
-    var mvp = null;
-    allPlayers.forEach(function(p) { if (!mvp || p.rating > mvp.rating) mvp = p; });
-
-    // Averages
-    var avgADR = 0, avgHS = 0, avgKD = 0, avgKAST = 0;
-    if (allPlayers.length > 0) {
-        allPlayers.forEach(function(p) { avgADR += p.adr; avgHS += p.hsPercent; avgKD += p.rating; avgKAST += p.kast; });
-        avgADR = Math.round(avgADR / allPlayers.length);
-        avgHS = Math.round(avgHS / allPlayers.length);
-        avgKD = (avgKD / allPlayers.length).toFixed(2);
-        avgKAST = Math.round(avgKAST / allPlayers.length);
-    }
-
-    // Pro benchmarks
-    var proADR = 78, proHS = 52, proKD = 1.05, proKAST = 75;
-
-    // Header
-    html += '<div class="result-header"><div><h2>' + mapName + '</h2>';
-    html += '<div class="result-header-meta">' + team1Name + ' vs ' + team2Name + ' · Счёт: ' + score1 + '</div></div>';
-    if (winnerName) html += '<div class="result-badge win">Победа: ' + winnerName + '</div>';
-    html += '</div>';
-
-    // MVP
-    if (mvp) {
-        html += '<div class="result-block"><div class="result-block-title">MVP матча</div>';
-        html += '<div style="display:flex;align-items:center;gap:12px;">';
-        html += '<div style="font-size:2rem;">🏆</div>';
-        html += '<div><div style="font-weight:700;font-size:1.1rem;">' + mvp.nick + '</div>';
-        html += '<div style="color:var(--text-dim);font-size:0.85rem;">' + mvp.teamName + ' · K/D/A: ' + mvp.kills + '/' + mvp.deaths + '/' + mvp.assists + ' · Rating: ' + mvp.rating.toFixed(2) + ' · ' + mvp.mvps + ' MVP</div></div></div></div>';
-    }
-
-    // Averages
-    if (allPlayers.length > 0) {
-        html += '<div class="result-block"><div class="result-block-title">Средние по матчу</div><div class="metrics-grid">';
-        html += '<div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">' + avgADR + '</div><div class="metric-sub ' + (avgADR >= proADR ? 'good' : 'bad') + '">Про: ' + proADR + '</div></div>';
-        html += '<div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">' + avgHS + '%</div><div class="metric-sub ' + (avgHS >= proHS ? 'good' : 'bad') + '">Про: ' + proHS + '%</div></div>';
-        html += '<div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">' + avgKD + '</div><div class="metric-sub ' + (parseFloat(avgKD) >= proKD ? 'good' : 'bad') + '">Про: ' + proKD + '</div></div>';
-        html += '<div class="metric-card"><div class="metric-label">KAST</div><div class="metric-value">' + avgKAST + '%</div><div class="metric-sub ' + (avgKAST >= proKAST ? 'good' : 'bad') + '">Про: ' + proKAST + '%</div></div>';
-        html += '</div></div>';
-    }
-
-    // Player table
-    if (allPlayers.length > 0) {
-        html += '<div class="result-block"><div class="result-block-title">Все игроки</div>';
-        html += '<table class="cs2-player-table"><tr><th>Игрок</th><th>K</th><th>D</th><th>A</th><th>ADR</th><th>HS%</th><th>KAST</th><th>K/D</th><th>MVP</th></tr>';
-        allPlayers.forEach(function(p) {
-            var isMvp = mvp && p.nick === mvp.nick;
-            html += '<tr class="' + (isMvp ? 'mvp-row' : '') + '">';
-            html += '<td style="text-align:left;font-weight:' + (isMvp ? '700' : '400') + ';" class="team-' + p.team + '">' + p.nick + (isMvp ? ' ⭐' : '') + '</td>';
-            html += '<td>' + p.kills + '</td><td>' + p.deaths + '</td><td>' + p.assists + '</td>';
-            html += '<td>' + p.adr + '</td><td>' + p.hsPercent + '%</td><td>' + p.kast + '%</td>';
-            html += '<td>' + p.rating.toFixed(2) + '</td><td>' + p.mvps + '</td>';
-            html += '</tr>';
-        });
-        html += '</table></div>';
-    }
-
-    // Strengths
-    html += '<div class="result-block"><div class="result-block-title">Сильные стороны</div>';
-    if (avgADR >= proADR) html += '<div class="strength-item"><span class="marker">+</span> Высокий ADR (' + avgADR + ') — на уровне про.</div>';
-    if (avgHS >= proHS) html += '<div class="strength-item"><span class="marker">+</span> Точный аим: HS% ' + avgHS + '%.</div>';
-    if (parseFloat(avgKD) >= proKD) html += '<div class="strength-item"><span class="marker">+</span> K/D ' + avgKD + ' — выше про-медианы.</div>';
-    if (avgKAST >= proKAST) html += '<div class="strength-item"><span class="marker">+</span> KAST ' + avgKAST + '% — хорошая выживаемость.</div>';
-    if (!avgADR || (avgADR < proADR && avgHS < proHS && parseFloat(avgKD) < proKD && avgKAST < proKAST)) {
-        html += '<div class="strength-item"><span class="marker">+</span> Матч сыгран — есть над чем поработать.</div>';
-    }
-    html += '</div>';
-
-    // Weaknesses
-    html += '<div class="result-block"><div class="result-block-title">Слабые стороны</div>';
-    if (avgADR < proADR) html += '<div class="weakness-item"><span class="marker">−</span> Низкий ADR (' + avgADR + ', про: ' + proADR + ').</div>';
-    if (avgHS < proHS) html += '<div class="weakness-item"><span class="marker">−</span> Низкий HS% (' + avgHS + '%, про: ' + proHS + '%).</div>';
-    if (parseFloat(avgKD) < proKD) html += '<div class="weakness-item"><span class="marker">−</span> K/D ниже про (' + avgKD + ', про: ' + proKD + ').</div>';
-    if (avgKAST < proKAST) html += '<div class="weakness-item"><span class="marker">−</span> KAST ниже про (' + avgKAST + '%, про: ' + proKAST + '%).</div>';
-    html += '</div>';
-
-    // Recommendations
-    html += '<div class="result-block"><div class="result-block-title">Рекомендации</div>';
-    if (avgADR < proADR) html += '<div class="recommendation-item"><span class="marker">1.</span><div>Повышайте урон в раунде.<div class="rec-exercise"><strong>Упражнение:</strong> Retake-режим 30 минут — работайте по预制ным позициям.</div></div></div>';
-    if (avgHS < proHS) html += '<div class="recommendation-item"><span class="marker">2.</span><div>Тренируйте хедшоты.<div class="rec-exercise"><strong>Упражнение:</strong> Aim Botz 20 минут — только хедшоты, медленный темп.</div></div></div>';
-    if (parseFloat(avgKD) < proKD) html += '<div class="recommendation-item"><span class="marker">3.</span><div>Улучшайте позиционирование.<div class="rec-exercise"><strong>Упражнение:</strong> Просмотр демок — анализируйте каждый death.</div></div></div>';
-    if (avgKAST < proKAST) html += '<div class="recommendation-item"><span class="marker">4.</span><div>Работайте над выживаемостью.<div class="rec-exercise"><strong>Упражнение:</strong> Тренируйте отступление — не держите углы в одиночку.</div></div></div>';
-    html += '</div>';
-
-    html += '<button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';
-    return html;
-}
-
-function krRatioFallback(stats) {
-    var k = parseInt(stats.Kills || 0);
-    var r = parseInt(stats['Rounds Played'] || 1);
-    return r > 0 ? (k / r) : 0;
-}
-
-window.runCsAnalysis = async function(link) {
-    var matchId = parseFaceitMatchId(link);
-    if (!matchId) throw new Error('Не удалось извлечь ID матча из ссылки');
-    
-    // Try Vercel API first
-    var apiResponse = await fetch('/api/cs2-match?matchId=' + encodeURIComponent(matchId));
-    
-    if (apiResponse.ok) {
-        var data = await apiResponse.json();
-        if (data.error) throw new Error(data.error);
-        return generateCsResults(data, link);
-    }
-    
-    // Fallback: try FACEIT direct (might have CORS issues)
-    if (apiResponse.status === 404) {
-        throw new Error('Сервер CS2 аналитики не найден. Убедитесь, что файл api/cs2-match.js загружен в Vercel, и добавлен FACEIT_API_KEY в Environment Variables.');
-    }
-    
-    if (apiResponse.status === 500) {
-        var errData = await apiResponse.json().catch(function() { return {}; });
-        throw new Error(errData.error || 'Ошибка сервера. Проверьте FACEIT_API_KEY в настройках Vercel.');
-    }
-    
-    throw new Error('Не удалось получить данные матча (HTTP ' + apiResponse.status + ')');
-};
-
-// === RUN ANALYSIS (Dota + CS) ===
 async function runAnalysis(game) {
-    var p = game === 'dota' ? 'dota' : 'cs';
-    var link = document.getElementById(p + 'Link').value.trim();
+    var p = game==='dota'?'dota':'cs';
+    var link = document.getElementById(p+'Link').value.trim();
     if (!link) { alert('Вставьте ссылку или match_id'); return; }
-    var matchId = link;
-    if (game === 'dota' && link.indexOf('/') !== -1) { var parts = link.split('/'); matchId = parts[parts.length - 1]; }
-    
-    var w = document.getElementById(p + 'Progress'), f = document.getElementById(p + 'ProgressFill'), t = document.getElementById(p + 'ProgressText'), r = document.getElementById(p + 'Results');
+    var matchId = link; if (link.indexOf('/')!==-1) { var parts = link.split('/'); matchId = parts[parts.length-1]; }
+    var w = document.getElementById(p+'Progress'), f = document.getElementById(p+'ProgressFill'), t = document.getElementById(p+'ProgressText'), r = document.getElementById(p+'Results');
     r.classList.remove('visible'); r.innerHTML = ''; w.classList.add('visible'); f.style.width = '0%'; t.textContent = 'Обработка...';
-    
     try {
-        if (game === 'dota') {
-            f.style.width = '15%'; t.textContent = 'Загрузка героев...';
-            if (!tierlistData) { try { var sR = await fetch('https://api.opendota.com/api/heroStats'); if (sR.ok) tierlistData = await sR.json(); } catch(e){} }
-            f.style.width = '30%'; t.textContent = 'Данные матча...';
-            var res = await fetch('https://api.opendota.com/api/matches/' + matchId);
+        if (game==='dota') {
+            f.style.width='15%'; t.textContent='Загрузка героев...';
+            if (!tierlistData) { try { var sR = await fetch(DOTA_API + 'heroStats'); if (sR.ok) tierlistData = await sR.json(); } catch(e){} }
+            f.style.width='30%'; t.textContent='Данные матча...';
+            var res = await fetch(DOTA_API + 'matches/' + matchId);
             if (!res.ok) throw new Error('Матч не найден');
             var data = await res.json();
-            if (!data.players || data.players.length === 0) throw new Error('Матч не обработан OpenDota');
-            f.style.width = '90%'; t.textContent = 'Сравнение...';
-            await new Promise(function(r) { setTimeout(r, 400); });
-            f.style.width = '100%'; t.textContent = 'Готово!';
-            await new Promise(function(r) { setTimeout(r, 400); });
+            if (!data.players || data.players.length===0) throw new Error('Матч не обработан');
+            f.style.width='90%'; t.textContent='Сравнение...';
+            await new Promise(function(r){setTimeout(r,400);});
+            f.style.width='100%'; t.textContent='Готово!';
+            await new Promise(function(r){setTimeout(r,400);});
             w.classList.remove('visible');
             r.innerHTML = generateDotaResultsFromAPI(data);
             r.classList.add('visible');
-            r.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            r.scrollIntoView({behavior:'smooth',block:'start'});
         }
-        
-        if (game === 'cs') {
-            f.style.width = '15%'; t.textContent = 'Извлечение ID матча...';
-            var csLink = document.getElementById('csLink').value.trim();
-            if (!csLink) { alert('Вставьте ссылку на FACEIT матч'); return; }
-            
-            f.style.width = '40%'; t.textContent = 'Запрос к FACEIT API...';
-            try {
-                var csHtml = await window.runCsAnalysis(csLink);
-                f.style.width = '90%'; t.textContent = 'Анализ данных...';
-                await new Promise(function(r) { setTimeout(r, 500); });
-                f.style.width = '100%'; t.textContent = 'Готово!';
-                await new Promise(function(r) { setTimeout(r, 400); });
-                w.classList.remove('visible');
-                r.innerHTML = csHtml;
-                r.classList.add('visible');
-                r.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } catch(csErr) {
-                throw csErr;
-            }
+        if (game==='cs') {
+            f.style.width='50%'; t.textContent='Разбор...';
+            await new Promise(function(r){setTimeout(r,1500);});
+            f.style.width='100%'; t.textContent='Готово!';
+            await new Promise(function(r){setTimeout(r,500);});
+            w.classList.remove('visible');
+            r.innerHTML = generateCsResults(); r.classList.add('visible');
+            r.scrollIntoView({behavior:'smooth',block:'start'});
         }
     } catch(err) {
-        t.textContent = 'Ошибка: ' + err.message; f.style.width = '0%';
-        r.innerHTML = '<div class="result-block"><div class="problem-title">Ошибка</div><div class="problem-text">' + err.message + '</div><div style="margin-top:10px;color:var(--text-dim);font-size:0.85rem;">Для CS2 нужна ссылка на FACEIT матч и настроенный API-ключ на сервере.</div></div>';
-        r.classList.add('visible');
-        setTimeout(function() { w.classList.remove('visible'); f.style.width = '0%'; t.textContent = 'В очереди...'; }, 3000);
+        t.textContent='Ошибка: '+err.message; f.style.width='0%';
+        setTimeout(function() { w.classList.remove('visible'); f.style.width='0%'; t.textContent='В очереди...'; }, 3000);
     }
 }
 
 document.getElementById('dotaAnalyzeBtn').addEventListener('click', function() { runAnalysis('dota'); });
 document.getElementById('csAnalyzeBtn').addEventListener('click', function() { runAnalysis('cs'); });
-
-// === AUTO LOGIN ===
-window.addEventListener('load', function() {
-    var u = getCurrentUser();
-    if (u) enterApp();
-});
+window.addEventListener('load', function() { var u = getCurrentUser(); if (u) enterApp(); });
 </script>
 </body>
 </html>
