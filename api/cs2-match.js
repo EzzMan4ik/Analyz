@@ -1,7 +1,7 @@
 module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
@@ -10,14 +10,12 @@ module.exports = async function handler(req, res) {
     const FACEIT_KEY = process.env.FACEIT_API_KEY;
 
     if (!FACEIT_KEY) {
-        return res.status(500).json({ error: 'FACEIT_API_KEY не настроен в Vercel' });
+        return res.status(500).json({ error: 'FACEIT_API_KEY не настроен в Vercel Environment Variables' });
     }
 
-    // Получаем путь из query
     const { path } = req.query;
     const pathStr = Array.isArray(path) ? path.join('/') : (path || '');
 
-    // Убираем path из query params
     const params = { ...req.query };
     delete params.path;
     const qs = new URLSearchParams(params).toString();
@@ -38,4 +36,4 @@ module.exports = async function handler(req, res) {
     } catch (err) {
         return res.status(500).json({ error: err.message });
     }
-}
+};
