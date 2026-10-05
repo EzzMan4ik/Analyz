@@ -167,6 +167,7 @@
         .subscription-card.active-plan { border-color: var(--dark-gold); box-shadow: 0 0 15px rgba(197,160,40,0.3); }
         .premium-badge { position: absolute; top: 0; left: 0; right: 0; height: 6px; background-color: var(--dark-gold); border-radius: 10px 10px 0 0; }
         .subscription-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 16px; color: var(--dark-gold); text-align: center; }
+        .subscription-price { font-size: 2rem; font-weight: 700; color: var(--dark-gold); text-align: center; margin-bottom: 12px; }
         .benefits-list { list-style: none; padding-left: 0; }
         .benefit { margin-bottom: 10px; padding-left: 22px; position: relative; color: #999; }
         html.light-theme .benefit { color: #666; }
@@ -476,23 +477,46 @@
                 <button class="back-home-btn" data-back="home">← На главную страницу</button>
                 <div class="section-title">Тарифы и подписки</div>
                 <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
+                <!-- NEW SUBSCRIPTION CARDS WITH PRICES -->
                 <div class="subscription-cards">
+                    <!-- PRO DOTA 2 -->
                     <div class="subscription-card" id="card-dota" data-plan="pro_dota2">
                         <div class="subscription-title">PRO DOTA 2</div>
-                        <ul class="benefits-list"><li class="benefit">10 анализов матчей ежедневно</li><li class="benefit">Лучшие паттерны фарма</li><li class="benefit">Идеальный вардинг</li><li class="benefit">Тайминги всех действий, предметов</li></ul>
+                        <div class="subscription-price">250 ₽</div>
+                        <ul class="benefits-list">
+                            <li class="benefit">10 анализов матчей ежедневно</li>
+                            <li class="benefit">Лучшие паттерны фарма</li>
+                            <li class="benefit">Идеальный вардинг</li>
+                            <li class="benefit">Тайминги всех действий, предметов</li>
+                        </ul>
                         <button class="card-btn" id="btn-dota">Выбрать тариф</button>
                         <div class="current-badge" id="badge-dota">Ваша текущая подписка</div>
                     </div>
+
+                    <!-- PRO CS 2 -->
                     <div class="subscription-card" id="card-cs" data-plan="pro_cs2">
                         <div class="subscription-title">PRO CS 2</div>
-                        <ul class="benefits-list"><li class="benefit">10 анализов матчей ежедневно</li><li class="benefit">Лайнапы гранат на всех картах</li><li class="benefit">Тайминги действий на карте</li></ul>
+                        <div class="subscription-price">250 ₽</div>
+                        <ul class="benefits-list">
+                            <li class="benefit">10 анализов матчей ежедневно</li>
+                            <li class="benefit">Лайнапы гранат на всех картах</li>
+                            <li class="benefit">Тайминги действий на карте</li>
+                        </ul>
                         <button class="card-btn" id="btn-cs">Выбрать тариф</button>
                         <div class="current-badge" id="badge-cs">Ваша текущая подписка</div>
                     </div>
+
+                    <!-- PREMIUM -->
                     <div class="subscription-card" id="card-premium" data-plan="premium">
                         <div class="premium-badge"></div>
                         <div class="subscription-title">PREMIUM</div>
-                        <ul class="benefits-list"><li class="benefit">Преимущества PRO DOTA 2 и PRO CS 2</li><li class="benefit">Безлимитное количество анализов</li><li class="benefit">Сравнение с профессиональными игроками</li><li class="benefit">Более глубокий анализ игровых ситуаций</li></ul>
+                        <div class="subscription-price" style="font-size:2.2rem;">499 ₽</div>
+                        <ul class="benefits-list">
+                            <li class="benefit">Преимущества PRO DOTA 2 и PRO CS 2</li>
+                            <li class="benefit">Безлимитное количество анализов</li>
+                            <li class="benefit">Сравнение с профессиональными игроками</li>
+                            <li class="benefit">Более глубокий анализ игровых ситуаций</li>
+                        </ul>
                         <button class="card-btn" id="btn-premium">Выбрать тариф</button>
                         <div class="current-badge" id="badge-premium">Ваша текущая подписка</div>
                     </div>
