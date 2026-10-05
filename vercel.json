@@ -3,6 +3,10 @@
     {
       "source": "/api/dota/:path*",
       "destination": "https://api.opendota.com/api/:path*"
+    },
+    {
+      "source": "/api/faceit/:path*",
+      "destination": "/api/cs2-match"
     }
   ]
 }
