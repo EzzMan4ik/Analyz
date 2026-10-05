@@ -1,23 +1,41 @@
-// api/cs2-match.js
 export default async function handler(req, res) {
-    const matchId = req.query.matchId;
-    const apiKey = process.env.FACEIT_API_KEY;
-    
-    if (!matchId) return res.status(400).json({ error: 'matchId required' });
-    if (!apiKey) return res.status(500).json({ error: 'FACEIT_API_KEY not set' });
-    
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
+    const FACEIT_KEY = process.env.FACEIT_API_KEY;
+
+    if (!FACEIT_KEY) {
+        return res.status(500).json({ error: 'FACEIT_API_KEY не настроен в Vercel' });
+    }
+
+    // Получаем путь из query
+    const { path } = req.query;
+    const pathStr = Array.isArray(path) ? path.join('/') : (path || '');
+
+    // Убираем path из query params
+    const params = { ...req.query };
+    delete params.path;
+    const qs = new URLSearchParams(params).toString();
+
+    const url = `https://open.faceit.com/data/v4/${pathStr}${qs ? '?' + qs : ''}`;
+
     try {
-        const resp = await fetch(`https://open.faceit.com/data/v4/matches/${matchId}`, {
-            headers: { 'Authorization': 'Bearer ' + apiKey }
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${FACEIT_KEY}`,
+                'Accept': 'application/json'
+            }
         });
-        if (!resp.ok) {
-            const text = await resp.text();
-            return res.status(resp.status).json({ error: `FACEIT API error: ${resp.status}` });
-        }
-        const data = await resp.json();
-        res.setHeader('Cache-Control', 's-maxage=3600');
-        return res.status(200).json(data);
-    } catch(e) {
-        return res.status(500).json({ error: e.message });
+
+        const data = await response.json();
+        return res.status(response.status).json(data);
+
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
     }
 }
