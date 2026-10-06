@@ -697,7 +697,7 @@ async function runGroqAnalysis(game, stats, containerId) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ game: game, stats: stats })
         });
-        if (!response.ok) throw new Error('Groq API недоступен');
+        if (!response.ok) throw new Error('Gemini API недоступен');
         var data = await response.json();
         if (data.error) throw new Error(data.error);
         var text = data.analysis || 'Анализ недоступен';
