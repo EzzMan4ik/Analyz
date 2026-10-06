@@ -112,32 +112,23 @@
         .account-plan-badge.free { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
         .account-plan-badge.pro { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
         .account-plan-badge.premium { background: rgba(197,160,40,0.15); color: var(--dark-gold); border: 1px solid rgba(197,160,40,0.3); }
-
-        /* Лимит анализов */
         .limit-bar-wrap { margin-top: 10px; }
         .limit-bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: #888; margin-bottom: 6px; }
         .limit-bar { height: 6px; background: rgba(99,102,241,0.15); border-radius: 3px; overflow: hidden; }
         .limit-bar-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 3px; transition: width 0.5s ease; }
         .limit-bar-fill.danger { background: linear-gradient(90deg, #e74c3c, #c0392b); }
         .limit-reset-time { font-size: 0.78rem; color: #666; margin-top: 6px; }
-
-        /* Достижения */
         .achievements-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 32px; }
         .achievement { display: flex; align-items: center; gap: 10px; background: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 10px; padding: 12px 16px; }
         .achievement-icon { font-size: 1.6rem; }
-        .achievement-info { }
         .achievement-name { font-weight: 700; font-size: 0.9rem; color: #a5b4fc; }
         .achievement-desc { font-size: 0.78rem; color: #888; }
-
-        /* График */
         .chart-block { background: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
         .chart-block-title { font-size: 1.1rem; font-weight: 700; color: var(--dark-gold); margin-bottom: 8px; }
         .chart-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
         .chart-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.2); background: transparent; color: #aaa; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
         .chart-tab.active { background: rgba(99,102,241,0.12); border-color: #6366f1; color: #818cf8; }
         .chart-empty { text-align: center; padding: 40px; color: #666; font-size: 0.95rem; }
-
-        /* История анализов */
         .history-list { display: flex; flex-direction: column; gap: 10px; }
         .history-item { display: flex; align-items: center; gap: 14px; background: var(--card-bg); border: 1px solid rgba(99,102,241,0.12); border-radius: 10px; padding: 14px 18px; transition: border-color 0.2s; }
         .history-item:hover { border-color: rgba(99,102,241,0.3); }
@@ -151,12 +142,25 @@
         .history-badge.dota { background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.2); }
         .history-badge.cs { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid rgba(52,152,219,0.2); }
         .history-empty { text-align: center; padding: 40px; color: #666; }
-
-        /* Лимит-блок внутри анализа */
         .limit-warning { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; text-align: center; }
         .limit-warning-title { color: var(--red); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
         .limit-warning-text { color: #ccc; font-size: 0.95rem; }
         .limit-warning-time { color: #888; font-size: 0.85rem; margin-top: 8px; }
+
+        /* ===== GROQ AI БЛОК ===== */
+        .ai-analysis-block { background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(129,140,248,0.04)); border: 1px solid rgba(99,102,241,0.25); border-radius: 12px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .ai-analysis-block::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #6366f1, #818cf8, #a5b4fc); }
+        .ai-analysis-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .ai-analysis-icon { font-size: 1.6rem; }
+        .ai-analysis-title { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #6366f1, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .ai-analysis-badge { padding: 3px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+        .ai-analysis-content { color: #ccc; font-size: 0.93rem; line-height: 1.8; white-space: pre-wrap; }
+        html.light-theme .ai-analysis-content { color: #444; }
+        .ai-analysis-content strong, .ai-analysis-content b { color: #a5b4fc; font-weight: 700; }
+        html.light-theme .ai-analysis-content strong { color: #4f46e5; }
+        .ai-loading { display: flex; align-items: center; gap: 12px; color: #888; font-size: 0.9rem; }
+        .ai-loading-spinner { width: 20px; height: 20px; border: 2px solid rgba(99,102,241,0.2); border-top-color: #6366f1; border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
+        .ai-error { color: #888; font-size: 0.88rem; font-style: italic; }
 
         /* SUBSCRIPTIONS */
         .subscription-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
@@ -440,7 +444,7 @@
             </div>
             <div class="features-grid">
                 <div class="feature-card"><span class="feature-icon">📊</span><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
-                <div class="feature-card"><span class="feature-icon">🎯</span><div class="feature-title">Сравнение с про-сценой</div><div class="feature-text">Ваши показатели сравниваются с актуальными данными профессиональных игроков 2026 года.</div></div>
+                <div class="feature-card"><span class="feature-icon">🤖</span><div class="feature-title">ИИ-тренер (Groq)</div><div class="feature-text">Нейросеть анализирует ваш матч как профессиональный тренер и даёт конкретные советы.</div></div>
                 <div class="feature-card"><span class="feature-icon">💡</span><div class="feature-title">Рекомендации тренера</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
                 <div class="feature-card"><span class="feature-icon">👤</span><div class="feature-title">Личный кабинет</div><div class="feature-text">История анализов, график прогресса и статистика достижений.</div></div>
                 <div class="feature-card"><span class="feature-icon">📈</span><div class="feature-title">График прогресса</div><div class="feature-text">Отслеживай рост KD, ADR и GPM на основе реальных матчей.</div></div>
@@ -452,8 +456,6 @@
         <div class="section" id="section-account">
             <div class="section-title">👤 Личный кабинет</div>
             <p class="section-desc">Ваша статистика, прогресс и история анализов.</p>
-
-            <!-- Статы -->
             <div class="account-grid" id="accountStats">
                 <div class="account-card">
                     <div class="account-card-title">Всего анализов</div>
@@ -476,20 +478,14 @@
                     <div class="account-card-sub" style="margin-top:8px;" id="statLimitInfo"></div>
                 </div>
             </div>
-
-            <!-- Лимиты -->
             <div class="chart-block" id="limitsBlock">
                 <div class="chart-block-title">📊 Лимиты анализов сегодня</div>
                 <div id="limitsContent"></div>
             </div>
-
-            <!-- Достижения -->
             <div class="chart-block">
                 <div class="chart-block-title">🏆 Достижения</div>
                 <div class="achievements-row" id="achievementsList"></div>
             </div>
-
-            <!-- График прогресса -->
             <div class="chart-block">
                 <div class="chart-block-title">📈 График прогресса</div>
                 <div class="chart-tabs">
@@ -498,18 +494,12 @@
                     <button class="chart-tab" data-chart="gpm">GPM (Dota2)</button>
                     <button class="chart-tab" data-chart="wr">Винрейт (Dota2)</button>
                 </div>
-                <div style="position:relative;height:260px;">
-                    <canvas id="progressChart"></canvas>
-                </div>
+                <div style="position:relative;height:260px;"><canvas id="progressChart"></canvas></div>
                 <div class="chart-empty" id="chartEmpty" style="display:none;">Недостаточно данных. Проведите минимум 2 анализа для отображения графика.</div>
             </div>
-
-            <!-- История анализов -->
             <div class="chart-block">
                 <div class="chart-block-title">🕐 История анализов</div>
-                <div id="historyList" class="history-list">
-                    <div class="history-empty">История пуста. Проведите первый анализ!</div>
-                </div>
+                <div id="historyList" class="history-list"><div class="history-empty">История пуста. Проведите первый анализ!</div></div>
             </div>
         </div>
 
@@ -524,8 +514,8 @@
                     <div class="subscription-price">250 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">10 анализов матчей ежедневно</li>
+                        <li class="benefit">ИИ-разбор тренера (Groq)</li>
                         <li class="benefit">Лучшие паттерны фарма</li>
-                        <li class="benefit">Идеальный вардинг</li>
                         <li class="benefit">Тайминги всех действий, предметов</li>
                     </ul>
                     <button class="card-btn" id="btn-dota">Выбрать тариф</button>
@@ -536,8 +526,8 @@
                     <div class="subscription-price">250 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">10 анализов матчей ежедневно</li>
+                        <li class="benefit">ИИ-разбор тренера (Groq)</li>
                         <li class="benefit">Лайнапы гранат на всех картах</li>
-                        <li class="benefit">Тайминги действий на карте</li>
                         <li class="benefit">FACEIT анализ с про-сравнением</li>
                     </ul>
                     <button class="card-btn" id="btn-cs">Выбрать тариф</button>
@@ -550,8 +540,8 @@
                     <ul class="benefits-list">
                         <li class="benefit">Всё из PRO DOTA 2 и PRO CS 2</li>
                         <li class="benefit">Безлимитное количество анализов</li>
-                        <li class="benefit">Сравнение с профессиональными игроками</li>
-                        <li class="benefit">Более глубокий анализ игровых ситуаций</li>
+                        <li class="benefit">Приоритетный ИИ-анализ</li>
+                        <li class="benefit">Более глубокий анализ ситуаций</li>
                     </ul>
                     <button class="card-btn" id="btn-premium">Выбрать тариф</button>
                     <div class="current-badge" id="badge-premium">✓ Ваша текущая подписка</div>
@@ -572,7 +562,7 @@
                 <div class="game-block">
                     <div class="game-icon">⚔️</div>
                     <div class="section-title">Анализ матча Dota 2</div>
-                    <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор.</div>
+                    <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор от ИИ-тренера.</div>
                     <div id="dotaLimitWarning"></div>
                     <div class="link-form">
                         <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink"/>
@@ -665,7 +655,7 @@
                 <div class="game-block" style="max-width:900px;">
                     <div class="game-icon">🎯</div>
                     <div class="section-title">FACEIT Анализ матча</div>
-                    <div class="section-desc">Вставьте ссылку на матч FACEIT — получите глубокий разбор с анализом стиля игры и сравнением с актуальными про-игроками 2026 года.</div>
+                    <div class="section-desc">Вставьте ссылку на матч FACEIT — получите глубокий разбор с ИИ-анализом от тренера и сравнением с про-игроками 2026 года.</div>
                     <div id="faceitLimitWarning"></div>
                     <div class="link-form">
                         <input type="text" class="link-input" placeholder="https://www.faceit.com/en/cs2/room/1-xxxxxxxx-..." id="faceitLink"/>
@@ -690,13 +680,35 @@
 const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';
 let supabaseClient = null;
-try {
-    if (typeof supabase !== 'undefined') supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-} catch(e) { console.error('Supabase:', e.message); }
-
+try { if (typeof supabase !== 'undefined') supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.error('Supabase:', e.message); }
 function isRLSError(err) { var msg=(err&&err.message)?err.message.toLowerCase():''; return msg.indexOf('row-level security')!==-1||msg.indexOf('permission')!==-1||msg.indexOf('policy')!==-1; }
-
 const DOTA_API = '/api/dota/';
+
+// ============================================================
+// GROQ ИИ АНАЛИЗ
+// ============================================================
+async function runGroqAnalysis(game, stats, containerId) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">Groq AI</span></div><div class="ai-loading"><div class="ai-loading-spinner"></div><span>Нейросеть анализирует матч...</span></div></div>';
+    try {
+        var response = await fetch('/api/ai-analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ game: game, stats: stats })
+        });
+        if (!response.ok) throw new Error('Groq API недоступен');
+        var data = await response.json();
+        if (data.error) throw new Error(data.error);
+        var text = data.analysis || 'Анализ недоступен';
+        // Форматируем markdown-подобный текст
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">Groq AI · Llama 3</span></div><div class="ai-analysis-content">'+text+'</div></div>';
+    } catch(err) {
+        el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">Groq AI</span></div><div class="ai-error">ИИ-анализ временно недоступен. Проверьте GROQ_API_KEY в Vercel. (' + err.message + ')</div></div>';
+    }
+}
 
 // ============================================================
 // ЛИМИТЫ ПОДПИСОК
@@ -707,390 +719,118 @@ const PLAN_LIMITS = {
     'pro_cs2':  { dota: 3,  cs: 10, label: 'PRO CS 2' },
     'premium':  { dota: 999,cs: 999,label: 'PREMIUM' }
 };
-
-function getTimeUntilMidnight() {
-    var now = new Date();
-    var midnight = new Date(now); midnight.setHours(24,0,0,0);
-    var diff = midnight - now;
-    var h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000);
-    return h + 'ч ' + m + 'мин';
-}
-
+function getTimeUntilMidnight() { var now=new Date(),midnight=new Date(now);midnight.setHours(24,0,0,0);var diff=midnight-now,h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000);return h+'ч '+m+'мин'; }
 async function getUsage() {
-    var u = getCurrentUser(); if (!u) return { dota_today: 0, cs_today: 0 };
-    var today = new Date().toISOString().split('T')[0];
-    if (supabaseClient) {
-        try {
-            var r = await supabaseClient.from('usage_limits').select('*').eq('user_login', u.login).maybeSingle();
-            if (r.data) {
-                if (r.data.last_reset !== today) {
-                    await supabaseClient.from('usage_limits').update({ dota_today: 0, cs_today: 0, last_reset: today }).eq('user_login', u.login);
-                    return { dota_today: 0, cs_today: 0 };
-                }
-                return { dota_today: r.data.dota_today || 0, cs_today: r.data.cs_today || 0 };
-            } else {
-                await supabaseClient.from('usage_limits').insert({ user_login: u.login, dota_today: 0, cs_today: 0, last_reset: today });
-                return { dota_today: 0, cs_today: 0 };
-            }
-        } catch(e) { return getLocalUsage(); }
-    }
+    var u=getCurrentUser();if(!u)return{dota_today:0,cs_today:0};
+    var today=new Date().toISOString().split('T')[0];
+    if(supabaseClient){try{var r=await supabaseClient.from('usage_limits').select('*').eq('user_login',u.login).maybeSingle();if(r.data){if(r.data.last_reset!==today){await supabaseClient.from('usage_limits').update({dota_today:0,cs_today:0,last_reset:today}).eq('user_login',u.login);return{dota_today:0,cs_today:0};}return{dota_today:r.data.dota_today||0,cs_today:r.data.cs_today||0};}else{await supabaseClient.from('usage_limits').insert({user_login:u.login,dota_today:0,cs_today:0,last_reset:today});return{dota_today:0,cs_today:0};}}catch(e){return getLocalUsage();}}
     return getLocalUsage();
 }
-
-function getLocalUsage() {
-    var today = new Date().toISOString().split('T')[0];
-    try { var d = JSON.parse(localStorage.getItem('ga_usage')||'{}'); if (d.date !== today) return { dota_today: 0, cs_today: 0 }; return { dota_today: d.dota||0, cs_today: d.cs||0 }; } catch(e) { return { dota_today: 0, cs_today: 0 }; }
-}
-
-async function incrementUsage(game) {
-    var u = getCurrentUser(); if (!u) return;
-    var today = new Date().toISOString().split('T')[0];
-    if (supabaseClient) {
-        try {
-            var cur = await getUsage();
-            var upd = game === 'dota' ? { dota_today: (cur.dota_today||0)+1, last_reset: today } : { cs_today: (cur.cs_today||0)+1, last_reset: today };
-            await supabaseClient.from('usage_limits').upsert({ user_login: u.login, ...upd });
-        } catch(e) { incrementLocalUsage(game); }
-    } else { incrementLocalUsage(game); }
-}
-
-function incrementLocalUsage(game) {
-    var today = new Date().toISOString().split('T')[0];
-    try { var d = JSON.parse(localStorage.getItem('ga_usage')||'{}'); if (d.date !== today) d = { date: today, dota: 0, cs: 0 }; if (game==='dota') d.dota++; else d.cs++; localStorage.setItem('ga_usage', JSON.stringify(d)); } catch(e) {}
-}
-
-async function checkLimit(game) {
-    var u = getCurrentUser(); if (!u) return true;
-    var plan = u.plan || 'free';
-    var limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free'];
-    if (plan === 'premium') return true;
-    var usage = await getUsage();
-    var used = game === 'dota' ? usage.dota_today : usage.cs_today;
-    var max = game === 'dota' ? limits.dota : limits.cs;
-    return used < max;
-}
-
-async function showLimitWarning(containerId, game) {
-    var u = getCurrentUser(); if (!u) return;
-    var plan = u.plan || 'free';
-    var limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free'];
-    var usage = await getUsage();
-    var used = game === 'dota' ? usage.dota_today : usage.cs_today;
-    var max = game === 'dota' ? limits.dota : limits.cs;
-    var el = document.getElementById(containerId); if (!el) return;
-    if (plan === 'premium') { el.innerHTML = ''; return; }
-    var pct = Math.min(100, Math.round(used/max*100));
-    var isFull = used >= max;
-    el.innerHTML = isFull
-        ? '<div class="limit-warning"><div class="limit-warning-title">🚫 Лимит исчерпан</div><div class="limit-warning-text">Вы использовали все ' + max + ' анализов на сегодня (' + limits.label + ').</div><div class="limit-warning-time">Обновление через: ' + getTimeUntilMidnight() + ' (в 00:00)</div></div>'
-        : '<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#888;margin-bottom:6px;"><span>Анализов сегодня: ' + used + ' / ' + max + '</span><span>' + pct + '%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(pct>=80?' danger':'')+'" style="width:'+pct+'%"></div></div><div class="limit-reset-time">Обновление в 00:00 · осталось ' + getTimeUntilMidnight() + '</div></div>';
-}
+function getLocalUsage(){var today=new Date().toISOString().split('T')[0];try{var d=JSON.parse(localStorage.getItem('ga_usage')||'{}');if(d.date!==today)return{dota_today:0,cs_today:0};return{dota_today:d.dota||0,cs_today:d.cs||0};}catch(e){return{dota_today:0,cs_today:0};}}
+async function incrementUsage(game){var u=getCurrentUser();if(!u)return;var today=new Date().toISOString().split('T')[0];if(supabaseClient){try{var cur=await getUsage();var upd=game==='dota'?{dota_today:(cur.dota_today||0)+1,last_reset:today}:{cs_today:(cur.cs_today||0)+1,last_reset:today};await supabaseClient.from('usage_limits').upsert({user_login:u.login,...upd});}catch(e){incrementLocalUsage(game);}}else{incrementLocalUsage(game);}}
+function incrementLocalUsage(game){var today=new Date().toISOString().split('T')[0];try{var d=JSON.parse(localStorage.getItem('ga_usage')||'{}');if(d.date!==today)d={date:today,dota:0,cs:0};if(game==='dota')d.dota++;else d.cs++;localStorage.setItem('ga_usage',JSON.stringify(d));}catch(e){}}
+async function checkLimit(game){var u=getCurrentUser();if(!u)return true;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];if(plan==='premium')return true;var usage=await getUsage();var used=game==='dota'?usage.dota_today:usage.cs_today;var max=game==='dota'?limits.dota:limits.cs;return used<max;}
+async function showLimitWarning(containerId,game){var u=getCurrentUser();if(!u)return;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];var usage=await getUsage();var used=game==='dota'?usage.dota_today:usage.cs_today;var max=game==='dota'?limits.dota:limits.cs;var el=document.getElementById(containerId);if(!el)return;if(plan==='premium'){el.innerHTML='';return;}var pct=Math.min(100,Math.round(used/max*100));var isFull=used>=max;el.innerHTML=isFull?'<div class="limit-warning"><div class="limit-warning-title">🚫 Лимит исчерпан</div><div class="limit-warning-text">Вы использовали все '+max+' анализов на сегодня ('+limits.label+').</div><div class="limit-warning-time">Обновление через: '+getTimeUntilMidnight()+' (в 00:00)</div></div>':'<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#888;margin-bottom:6px;"><span>Анализов сегодня: '+used+' / '+max+'</span><span>'+pct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(pct>=80?' danger':'')+'" style="width:'+pct+'%"></div></div><div class="limit-reset-time">Обновление в 00:00 · осталось '+getTimeUntilMidnight()+'</div></div>';}
 
 // ============================================================
 // ИСТОРИЯ АНАЛИЗОВ
 // ============================================================
-async function saveAnalysis(game, matchId, summary, kd, adr, gpm, wr) {
-    var u = getCurrentUser(); if (!u) return;
-    var rec = { user_login: u.login, game: game, match_id: matchId || '', result_summary: summary || '', kd: kd||0, adr: adr||0, gpm: gpm||0, wr: wr||0 };
-    if (supabaseClient) {
-        try { await supabaseClient.from('analyses').insert(rec); } catch(e) { saveLocalAnalysis(rec); }
-    } else { saveLocalAnalysis(rec); }
-}
-
-function saveLocalAnalysis(rec) {
-    try { var list = JSON.parse(localStorage.getItem('ga_analyses')||'[]'); list.unshift({ ...rec, created_at: new Date().toISOString() }); if (list.length > 100) list = list.slice(0,100); localStorage.setItem('ga_analyses', JSON.stringify(list)); } catch(e) {}
-}
-
-async function loadAnalyses(game) {
-    var u = getCurrentUser(); if (!u) return [];
-    if (supabaseClient) {
-        try {
-            var q = supabaseClient.from('analyses').select('*').eq('user_login', u.login).order('created_at', { ascending: false }).limit(50);
-            if (game) q = q.eq('game', game);
-            var r = await q; if (r.data) return r.data;
-        } catch(e) {}
-    }
-    var list = JSON.parse(localStorage.getItem('ga_analyses')||'[]');
-    return game ? list.filter(function(a){return a.game===game;}) : list;
-}
-
-function timeAgo(dateStr) {
-    var d = new Date(dateStr), now = new Date(), diff = Math.floor((now-d)/1000);
-    if (diff < 60) return 'только что';
-    if (diff < 3600) return Math.floor(diff/60) + ' мин назад';
-    if (diff < 86400) return Math.floor(diff/3600) + ' ч назад';
-    return Math.floor(diff/86400) + ' дн назад';
-}
-
-function renderHistoryList(analyses, containerId, game) {
-    var el = document.getElementById(containerId); if (!el) return;
-    if (!analyses || analyses.length === 0) { el.innerHTML = '<div class="history-empty">История пуста. Проведите первый анализ!</div>'; return; }
-    var html = analyses.map(function(a) {
-        var icon = a.game==='dota2' ? '⚔️' : '🔫';
-        var badge = a.game==='dota2' ? '<span class="history-badge dota">Dota 2</span>' : '<span class="history-badge cs">CS 2</span>';
-        var summary = a.result_summary || (a.game==='dota2' ? 'GPM: '+a.gpm : 'KD: '+a.kd.toFixed(2));
-        var mid = a.match_id ? 'Match: ' + a.match_id.substring(0,12)+'...' : '';
-        return '<div class="history-item">'+
-            '<div class="history-game-icon">'+icon+'</div>'+
-            '<div class="history-info">'+
-                '<div class="history-summary">'+summary+'</div>'+
-                '<div class="history-match-id">'+mid+'</div>'+
-            '</div>'+
-            badge+
-            '<div class="history-time">'+timeAgo(a.created_at)+'</div>'+
-        '</div>';
-    }).join('');
-    el.innerHTML = html;
-}
+async function saveAnalysis(game,matchId,summary,kd,adr,gpm,wr){var u=getCurrentUser();if(!u)return;var rec={user_login:u.login,game:game,match_id:matchId||'',result_summary:summary||'',kd:kd||0,adr:adr||0,gpm:gpm||0,wr:wr||0};if(supabaseClient){try{await supabaseClient.from('analyses').insert(rec);}catch(e){saveLocalAnalysis(rec);}}else{saveLocalAnalysis(rec);}}
+function saveLocalAnalysis(rec){try{var list=JSON.parse(localStorage.getItem('ga_analyses')||'[]');list.unshift({...rec,created_at:new Date().toISOString()});if(list.length>100)list=list.slice(0,100);localStorage.setItem('ga_analyses',JSON.stringify(list));}catch(e){}}
+async function loadAnalyses(game){var u=getCurrentUser();if(!u)return[];if(supabaseClient){try{var q=supabaseClient.from('analyses').select('*').eq('user_login',u.login).order('created_at',{ascending:false}).limit(50);if(game)q=q.eq('game',game);var r=await q;if(r.data)return r.data;}catch(e){}}var list=JSON.parse(localStorage.getItem('ga_analyses')||'[]');return game?list.filter(function(a){return a.game===game;}):list;}
+function timeAgo(dateStr){var d=new Date(dateStr),now=new Date(),diff=Math.floor((now-d)/1000);if(diff<60)return'только что';if(diff<3600)return Math.floor(diff/60)+' мин назад';if(diff<86400)return Math.floor(diff/3600)+' ч назад';return Math.floor(diff/86400)+' дн назад';}
+function renderHistoryList(analyses,containerId,game){var el=document.getElementById(containerId);if(!el)return;if(!analyses||analyses.length===0){el.innerHTML='<div class="history-empty">История пуста. Проведите первый анализ!</div>';return;}var html=analyses.map(function(a){var icon=a.game==='dota2'?'⚔️':'🔫';var badge=a.game==='dota2'?'<span class="history-badge dota">Dota 2</span>':'<span class="history-badge cs">CS 2</span>';var summary=a.result_summary||(a.game==='dota2'?'GPM: '+a.gpm:'KD: '+parseFloat(a.kd||0).toFixed(2));var mid=a.match_id?'Match: '+a.match_id.substring(0,12)+'...':'';return'<div class="history-item"><div class="history-game-icon">'+icon+'</div><div class="history-info"><div class="history-summary">'+summary+'</div><div class="history-match-id">'+mid+'</div></div>'+badge+'<div class="history-time">'+timeAgo(a.created_at)+'</div></div>';}).join('');el.innerHTML=html;}
 
 // ============================================================
 // ГРАФИК ПРОГРЕССА
 // ============================================================
-var progressChartInstance = null;
-var currentChartMetric = 'kd';
-
-async function renderProgressChart(metric) {
-    currentChartMetric = metric;
-    var analyses = await loadAnalyses(null);
-    var canvas = document.getElementById('progressChart');
-    var emptyEl = document.getElementById('chartEmpty');
-    if (!canvas) return;
-
-    var filtered = analyses.filter(function(a) {
-        if (metric==='kd'||metric==='adr') return a.game==='cs2'||a.game==='cs';
-        return a.game==='dota2'||a.game==='dota';
-    }).reverse().slice(-20);
-
-    if (filtered.length < 2) {
-        canvas.style.display = 'none';
-        emptyEl.style.display = 'block';
-        return;
-    }
-    canvas.style.display = 'block';
-    emptyEl.style.display = 'none';
-
-    var labels = filtered.map(function(a,i) { return '#'+(i+1); });
-    var values = filtered.map(function(a) {
-        if (metric==='kd') return parseFloat(a.kd)||0;
-        if (metric==='adr') return parseFloat(a.adr)||0;
-        if (metric==='gpm') return parseInt(a.gpm)||0;
-        if (metric==='wr') return parseInt(a.wr)||0;
-        return 0;
-    });
-
-    var metricLabels = { kd:'K/D', adr:'ADR', gpm:'GPM', wr:'Винрейт %' };
-    var isDark = !document.documentElement.classList.contains('light-theme');
-    var gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-    var textColor = isDark ? '#888' : '#666';
-
-    if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
-
-    progressChartInstance = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: metricLabels[metric],
-                data: values,
-                borderColor: '#6366f1',
-                backgroundColor: 'rgba(99,102,241,0.08)',
-                borderWidth: 2.5,
-                pointBackgroundColor: '#818cf8',
-                pointBorderColor: '#6366f1',
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#1e1e30',
-                    titleColor: '#818cf8',
-                    bodyColor: '#ccc',
-                    borderColor: '#6366f1',
-                    borderWidth: 1
-                }
-            },
-            scales: {
-                x: { grid: { color: gridColor }, ticks: { color: textColor } },
-                y: { grid: { color: gridColor }, ticks: { color: textColor }, beginAtZero: metric!=='kd' }
-            }
-        }
-    });
+var progressChartInstance=null,currentChartMetric='kd';
+async function renderProgressChart(metric){
+    currentChartMetric=metric;
+    var analyses=await loadAnalyses(null),canvas=document.getElementById('progressChart'),emptyEl=document.getElementById('chartEmpty');
+    if(!canvas)return;
+    var filtered=analyses.filter(function(a){if(metric==='kd'||metric==='adr')return a.game==='cs2'||a.game==='cs';return a.game==='dota2'||a.game==='dota';}).reverse().slice(-20);
+    if(filtered.length<2){canvas.style.display='none';emptyEl.style.display='block';return;}
+    canvas.style.display='block';emptyEl.style.display='none';
+    var labels=filtered.map(function(a,i){return'#'+(i+1);});
+    var values=filtered.map(function(a){if(metric==='kd')return parseFloat(a.kd)||0;if(metric==='adr')return parseFloat(a.adr)||0;if(metric==='gpm')return parseInt(a.gpm)||0;if(metric==='wr')return parseInt(a.wr)||0;return 0;});
+    var metricLabels={kd:'K/D',adr:'ADR',gpm:'GPM',wr:'Винрейт %'};
+    var isDark=!document.documentElement.classList.contains('light-theme');
+    var gridColor=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)',textColor=isDark?'#888':'#666';
+    if(progressChartInstance){progressChartInstance.destroy();progressChartInstance=null;}
+    progressChartInstance=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[{label:metricLabels[metric],data:values,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,0.08)',borderWidth:2.5,pointBackgroundColor:'#818cf8',pointBorderColor:'#6366f1',pointRadius:5,pointHoverRadius:7,fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e1e30',titleColor:'#818cf8',bodyColor:'#ccc',borderColor:'#6366f1',borderWidth:1}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor}},y:{grid:{color:gridColor},ticks:{color:textColor},beginAtZero:metric!=='kd'}}}});
 }
 
 // ============================================================
 // ДОСТИЖЕНИЯ
 // ============================================================
-function renderAchievements(total, dota, cs) {
-    var el = document.getElementById('achievementsList'); if (!el) return;
-    var achievements = [
-        { icon:'🎮', name:'Первый анализ', desc:'Проведён 1 анализ', earned: total >= 1 },
-        { icon:'📊', name:'Аналитик', desc:'5 анализов проведено', earned: total >= 5 },
-        { icon:'🏆', name:'Про-игрок', desc:'20 анализов проведено', earned: total >= 20 },
-        { icon:'⚔️', name:'Dota 2 мастер', desc:'10 анализов Dota 2', earned: dota >= 10 },
-        { icon:'🔫', name:'CS 2 снайпер', desc:'10 анализов CS 2', earned: cs >= 10 },
-        { icon:'💯', name:'Сотня', desc:'100 анализов проведено', earned: total >= 100 }
-    ];
-    el.innerHTML = achievements.map(function(a) {
-        return '<div class="achievement" style="opacity:'+(a.earned?1:0.35)+'">' +
-            '<div class="achievement-icon">'+a.icon+'</div>' +
-            '<div class="achievement-info"><div class="achievement-name">'+a.name+'</div><div class="achievement-desc">'+a.desc+'</div></div>' +
-            '</div>';
-    }).join('');
-}
+function renderAchievements(total,dota,cs){var el=document.getElementById('achievementsList');if(!el)return;var achievements=[{icon:'🎮',name:'Первый анализ',desc:'Проведён 1 анализ',earned:total>=1},{icon:'📊',name:'Аналитик',desc:'5 анализов проведено',earned:total>=5},{icon:'🏆',name:'Про-игрок',desc:'20 анализов проведено',earned:total>=20},{icon:'⚔️',name:'Dota 2 мастер',desc:'10 анализов Dota 2',earned:dota>=10},{icon:'🔫',name:'CS 2 снайпер',desc:'10 анализов CS 2',earned:cs>=10},{icon:'💯',name:'Сотня',desc:'100 анализов проведено',earned:total>=100}];el.innerHTML=achievements.map(function(a){return'<div class="achievement" style="opacity:'+(a.earned?1:0.35)+'"><div class="achievement-icon">'+a.icon+'</div><div class="achievement-info"><div class="achievement-name">'+a.name+'</div><div class="achievement-desc">'+a.desc+'</div></div></div>';}).join('');}
 
-// ============================================================
-// ЗАГРУЗКА ДАННЫХ ЛИЧНОГО КАБИНЕТА
-// ============================================================
-async function loadAccountData() {
-    var u = getCurrentUser(); if (!u) return;
-    var allAnalyses = await loadAnalyses(null);
-    var dotaAnalyses = allAnalyses.filter(function(a){return a.game==='dota2'||a.game==='dota';});
-    var csAnalyses = allAnalyses.filter(function(a){return a.game==='cs2'||a.game==='cs';});
-    var total = allAnalyses.length, dota = dotaAnalyses.length, cs = csAnalyses.length;
-
-    document.getElementById('statTotalAnalyses').textContent = total;
-    document.getElementById('statDotaAnalyses').textContent = dota;
-    document.getElementById('statCsAnalyses').textContent = cs;
-
-    var plan = u.plan || 'free';
-    var planLabels = { free:'Бесплатный', pro_dota2:'PRO DOTA 2', pro_cs2:'PRO CS 2', premium:'PREMIUM' };
-    var planCls = plan==='premium'?'premium':plan==='free'?'free':'pro';
-    document.getElementById('statPlan').innerHTML = '<span class="account-plan-badge '+planCls+'">'+planLabels[plan]+'</span>';
-
-    renderAchievements(total, dota, cs);
-    renderHistoryList(allAnalyses, 'historyList', null);
-    await renderLimitsBlock();
-    await renderProgressChart(currentChartMetric);
-}
-
-async function renderLimitsBlock() {
-    var u = getCurrentUser(); if (!u) return;
-    var plan = u.plan || 'free';
-    var limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free'];
-    var usage = await getUsage();
-    var el = document.getElementById('limitsContent'); if (!el) return;
-
-    if (plan === 'premium') {
-        el.innerHTML = '<div class="analysis-item positive">✅ PREMIUM: безлимитное количество анализов</div>';
-        return;
-    }
-
-    var dotaPct = Math.min(100, Math.round((usage.dota_today||0)/limits.dota*100));
-    var csPct = Math.min(100, Math.round((usage.cs_today||0)/limits.cs*100));
-
-    el.innerHTML =
-        '<div class="limit-bar-wrap">'+
-            '<div class="limit-bar-label"><span>⚔️ Dota 2: '+usage.dota_today+' / '+limits.dota+'</span><span>'+dotaPct+'%</span></div>'+
-            '<div class="limit-bar"><div class="limit-bar-fill'+(dotaPct>=80?' danger':'')+'" style="width:'+dotaPct+'%"></div></div>'+
-        '</div>'+
-        '<div class="limit-bar-wrap" style="margin-top:12px;">'+
-            '<div class="limit-bar-label"><span>🔫 CS 2: '+usage.cs_today+' / '+limits.cs+'</span><span>'+csPct+'%</span></div>'+
-            '<div class="limit-bar"><div class="limit-bar-fill'+(csPct>=80?' danger':'')+'" style="width:'+csPct+'%"></div></div>'+
-        '</div>'+
-        '<div class="limit-reset-time" style="margin-top:10px;">🕐 Обновление лимитов в 00:00 · осталось '+getTimeUntilMidnight()+'</div>';
-}
+async function loadAccountData(){var u=getCurrentUser();if(!u)return;var allAnalyses=await loadAnalyses(null);var dotaAnalyses=allAnalyses.filter(function(a){return a.game==='dota2'||a.game==='dota';});var csAnalyses=allAnalyses.filter(function(a){return a.game==='cs2'||a.game==='cs';});var total=allAnalyses.length,dota=dotaAnalyses.length,cs=csAnalyses.length;document.getElementById('statTotalAnalyses').textContent=total;document.getElementById('statDotaAnalyses').textContent=dota;document.getElementById('statCsAnalyses').textContent=cs;var plan=u.plan||'free';var planLabels={free:'Бесплатный',pro_dota2:'PRO DOTA 2',pro_cs2:'PRO CS 2',premium:'PREMIUM'};var planCls=plan==='premium'?'premium':plan==='free'?'free':'pro';document.getElementById('statPlan').innerHTML='<span class="account-plan-badge '+planCls+'">'+planLabels[plan]+'</span>';renderAchievements(total,dota,cs);renderHistoryList(allAnalyses,'historyList',null);await renderLimitsBlock();await renderProgressChart(currentChartMetric);}
+async function renderLimitsBlock(){var u=getCurrentUser();if(!u)return;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];var usage=await getUsage();var el=document.getElementById('limitsContent');if(!el)return;if(plan==='premium'){el.innerHTML='<div class="analysis-item positive">✅ PREMIUM: безлимитное количество анализов</div>';return;}var dotaPct=Math.min(100,Math.round((usage.dota_today||0)/limits.dota*100));var csPct=Math.min(100,Math.round((usage.cs_today||0)/limits.cs*100));el.innerHTML='<div class="limit-bar-wrap"><div class="limit-bar-label"><span>⚔️ Dota 2: '+usage.dota_today+' / '+limits.dota+'</span><span>'+dotaPct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(dotaPct>=80?' danger':'')+'" style="width:'+dotaPct+'%"></div></div></div><div class="limit-bar-wrap" style="margin-top:12px;"><div class="limit-bar-label"><span>🔫 CS 2: '+usage.cs_today+' / '+limits.cs+'</span><span>'+csPct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(csPct>=80?' danger':'')+'" style="width:'+csPct+'%"></div></div></div><div class="limit-reset-time" style="margin-top:10px;">🕐 Обновление лимитов в 00:00 · осталось '+getTimeUntilMidnight()+'</div>';}
 
 // ============================================================
 // PRO PLAYERS DATABASE 2026
 // ============================================================
-const PRO_PLAYERS_2026 = [
-    { nick:'ZywOo', name:'Mathieu Herbaut', flag:'🇫🇷', team:'Vitality', tier:1, role:'awp', roleLabel:'AWPer', rating:1.31, adr:82.4, kd:1.38, hs:44, entryRate:0.12, utilDmg:18, traits:['Пассивный AWP','Чтение позиций','Высокий рейтинг','Клатч-мастер'], description:'Лучший AWPer мира по версии HLTV 2024-2025. Терпеливое удержание углов, минимум рисков, максимальный ADR.' },
-    { nick:'sh1ro', name:'Dmitry Sorokin', flag:'🇷🇺', team:'Cloud9', tier:1, role:'awp', roleLabel:'AWPer', rating:1.28, adr:79.1, kd:1.32, hs:38, entryRate:0.10, utilDmg:14, traits:['Тихий AWP','Минимум смертей','Переигровка позиций','Читает катку'], description:'Феноменально низкая смертность — один из лучших KD на про-сцене.' },
-    { nick:'NiKo', name:'Nikola Kovač', flag:'🇧🇦', team:'G2', tier:1, role:'rifler', roleLabel:'Rifler', rating:1.24, adr:81.2, kd:1.29, hs:58, entryRate:0.18, utilDmg:22, traits:['Агрессивный рифлер','Высокий HS%','Дуэли в открытую','Clutch'], description:'Один из лучших рифлеров в истории CS. Агрессивный стиль, высокий HS%.' },
-    { nick:'donk', name:'Danil Kryshkovets', flag:'🇷🇺', team:'Spirit', tier:1, role:'rifler', roleLabel:'Star Rifler', rating:1.35, adr:88.3, kd:1.42, hs:62, entryRate:0.22, utilDmg:19, traits:['Взрывной старт','Высокий HS%','Агрессивные пики','#1 рейтинг 2024'], description:'#1 игрок мира 2024. Феноменальная скорость реакции.' },
-    { nick:'jL', name:'Jere Salo', flag:'🇫🇮', team:'NAVI', tier:1, role:'rifler', roleLabel:'Rifler', rating:1.18, adr:76.8, kd:1.22, hs:55, entryRate:0.16, utilDmg:28, traits:['Утилити-мастер','Позиционная игра','Поддержка','Стабильность'], description:'Ключевой игрок NAVI. Высокий утилити дамаг, стабильная позиционная игра.' },
-    { nick:'broky', name:'Helvijs Saukants', flag:'🇱🇻', team:'G2', tier:1, role:'awp', roleLabel:'AWPer', rating:1.19, adr:74.5, kd:1.21, hs:41, entryRate:0.13, utilDmg:16, traits:['Мобильный AWP','Агрессивные пики','Читает ротации','Клатч'], description:'AWPer G2, играет агрессивнее большинства AWPerов.' },
-    { nick:'Jimpphat', name:'Jimi Lipisti', flag:'🇫🇮', team:'ENCE', tier:1, role:'entry', roleLabel:'Entry Fragger', rating:1.22, adr:83.1, kd:1.26, hs:64, entryRate:0.31, utilDmg:15, traits:['Главный входящий','Высокий Entry%','Жертвенный стиль','Открывает раунды'], description:'Один из лучших entry fraggers в Tier-1.' },
-    { nick:'electroNic', name:'Denis Sharipov', flag:'🇷🇺', team:'Spirit', tier:2, role:'entry', roleLabel:'Entry/Support', rating:1.08, adr:71.2, kd:1.10, hs:52, entryRate:0.24, utilDmg:31, traits:['Entry+Support гибрид','Утилити при входе','Командная игра','Ротации'], description:'Универсальный игрок Spirit. Совмещает entry и support роли.' },
-    { nick:'Perfecto', name:'Ilya Zalutsky', flag:'🇷🇺', team:'NAVI', tier:2, role:'support', roleLabel:'Support', rating:1.02, adr:64.1, kd:1.03, hs:47, entryRate:0.11, utilDmg:45, traits:['Высокий утилити дамаг','Флэши для команды','Саппорт-роль','Клатч'], description:'Классический support. Рекордно высокий утилити дамаг.' },
-    { nick:'YEKINDAR', name:'Mareks Gaļinskis', flag:'🇱🇻', team:'Liquid', tier:2, role:'entry', roleLabel:'Aggressive Entry', rating:1.06, adr:74.8, kd:1.08, hs:59, entryRate:0.35, utilDmg:22, traits:['Самый агрессивный entry','Высокий риск','Открывает раунды','Хаотичный стиль'], description:'Самый агрессивный entry fragger в мире. Высокий риск — высокая награда.' }
-];
+const PRO_PLAYERS_2026=[{nick:'ZywOo',name:'Mathieu Herbaut',flag:'🇫🇷',team:'Vitality',tier:1,role:'awp',roleLabel:'AWPer',rating:1.31,adr:82.4,kd:1.38,hs:44,entryRate:0.12,utilDmg:18,traits:['Пассивный AWP','Чтение позиций','Высокий рейтинг','Клатч-мастер'],description:'Лучший AWPer мира по версии HLTV 2024-2025. Терпеливое удержание углов, минимум рисков, максимальный ADR.'},{nick:'sh1ro',name:'Dmitry Sorokin',flag:'🇷🇺',team:'Cloud9',tier:1,role:'awp',roleLabel:'AWPer',rating:1.28,adr:79.1,kd:1.32,hs:38,entryRate:0.10,utilDmg:14,traits:['Тихий AWP','Минимум смертей','Переигровка позиций','Читает катку'],description:'Феноменально низкая смертность — один из лучших KD на про-сцене.'},{nick:'NiKo',name:'Nikola Kovač',flag:'🇧🇦',team:'G2',tier:1,role:'rifler',roleLabel:'Rifler',rating:1.24,adr:81.2,kd:1.29,hs:58,entryRate:0.18,utilDmg:22,traits:['Агрессивный рифлер','Высокий HS%','Дуэли в открытую','Clutch'],description:'Один из лучших рифлеров в истории CS. Агрессивный стиль, высокий HS%.'},{nick:'donk',name:'Danil Kryshkovets',flag:'🇷🇺',team:'Spirit',tier:1,role:'rifler',roleLabel:'Star Rifler',rating:1.35,adr:88.3,kd:1.42,hs:62,entryRate:0.22,utilDmg:19,traits:['Взрывной старт','Высокий HS%','Агрессивные пики','#1 рейтинг 2024'],description:'#1 игрок мира 2024. Феноменальная скорость реакции.'},{nick:'jL',name:'Jere Salo',flag:'🇫🇮',team:'NAVI',tier:1,role:'rifler',roleLabel:'Rifler',rating:1.18,adr:76.8,kd:1.22,hs:55,entryRate:0.16,utilDmg:28,traits:['Утилити-мастер','Позиционная игра','Поддержка','Стабильность'],description:'Ключевой игрок NAVI. Высокий утилити дамаг, стабильная позиционная игра.'},{nick:'broky',name:'Helvijs Saukants',flag:'🇱🇻',team:'G2',tier:1,role:'awp',roleLabel:'AWPer',rating:1.19,adr:74.5,kd:1.21,hs:41,entryRate:0.13,utilDmg:16,traits:['Мобильный AWP','Агрессивные пики','Читает ротации','Клатч'],description:'AWPer G2, играет агрессивнее большинства AWPerов.'},{nick:'Jimpphat',name:'Jimi Lipisti',flag:'🇫🇮',team:'ENCE',tier:1,role:'entry',roleLabel:'Entry Fragger',rating:1.22,adr:83.1,kd:1.26,hs:64,entryRate:0.31,utilDmg:15,traits:['Главный входящий','Высокий Entry%','Жертвенный стиль','Открывает раунды'],description:'Один из лучших entry fraggers в Tier-1.'},{nick:'electroNic',name:'Denis Sharipov',flag:'🇷🇺',team:'Spirit',tier:2,role:'entry',roleLabel:'Entry/Support',rating:1.08,adr:71.2,kd:1.10,hs:52,entryRate:0.24,utilDmg:31,traits:['Entry+Support гибрид','Утилити при входе','Командная игра','Ротации'],description:'Универсальный игрок Spirit. Совмещает entry и support роли.'},{nick:'Perfecto',name:'Ilya Zalutsky',flag:'🇷🇺',team:'NAVI',tier:2,role:'support',roleLabel:'Support',rating:1.02,adr:64.1,kd:1.03,hs:47,entryRate:0.11,utilDmg:45,traits:['Высокий утилити дамаг','Флэши для команды','Саппорт-роль','Клатч'],description:'Классический support. Рекордно высокий утилити дамаг.'},{nick:'YEKINDAR',name:'Mareks Gaļinskis',flag:'🇱🇻',team:'Liquid',tier:2,role:'entry',roleLabel:'Aggressive Entry',rating:1.06,adr:74.8,kd:1.08,hs:59,entryRate:0.35,utilDmg:22,traits:['Самый агрессивный entry','Высокий риск','Открывает раунды','Хаотичный стиль'],description:'Самый агрессивный entry fragger в мире. Высокий риск — высокая награда.'}];
 
-function detectPlayStyle(stats) {
-    var er=(stats.entryKills||0)/(stats.kills||1);
-    if (stats.awpKillRate&&stats.awpKillRate>0.35) return 'awp';
-    if (er>0.28) return 'entry';
-    if ((stats.utilDmg||0)>35&&(stats.adr||0)<72) return 'support';
-    if (stats.assistsPerRound&&stats.assistsPerRound>0.6) return 'igl';
-    if (er<0.12&&(stats.kd||0)>1.0) return 'lurk';
-    return 'rifler';
-}
-function findSimilarPro(style, stats) {
-    var cands=PRO_PLAYERS_2026.filter(function(p){return p.role===style;});
-    if (!cands.length) cands=PRO_PLAYERS_2026;
-    cands=cands.map(function(p){var s=100-Math.abs((stats.adr||70)-p.adr)*0.5-Math.abs((stats.hs||50)-p.hs)*0.3-Math.abs((stats.kd||1)-p.kd)*20;return{pro:p,score:Math.max(0,s)};});
-    cands.sort(function(a,b){return b.score-a.score;});
-    var best=cands[0], pct=Math.min(95,Math.max(25,Math.round(best.score)));
-    return{pro:best.pro,matchPct:pct,level:pct>=70?'high':pct>=45?'medium':'low'};
-}
+function detectPlayStyle(stats){var er=(stats.entryKills||0)/(stats.kills||1);if(stats.awpKillRate&&stats.awpKillRate>0.35)return'awp';if(er>0.28)return'entry';if((stats.utilDmg||0)>35&&(stats.adr||0)<72)return'support';if(stats.assistsPerRound&&stats.assistsPerRound>0.6)return'igl';if(er<0.12&&(stats.kd||0)>1.0)return'lurk';return'rifler';}
+function findSimilarPro(style,stats){var cands=PRO_PLAYERS_2026.filter(function(p){return p.role===style;});if(!cands.length)cands=PRO_PLAYERS_2026;cands=cands.map(function(p){var s=100-Math.abs((stats.adr||70)-p.adr)*0.5-Math.abs((stats.hs||50)-p.hs)*0.3-Math.abs((stats.kd||1)-p.kd)*20;return{pro:p,score:Math.max(0,s)};});cands.sort(function(a,b){return b.score-a.score;});var best=cands[0],pct=Math.min(95,Math.max(25,Math.round(best.score)));return{pro:best.pro,matchPct:pct,level:pct>=70?'high':pct>=45?'medium':'low'};}
 
-function buildDeepAnalysis(playerStats, matchData) {
-    var nick=playerStats.nickname||'Игрок', kills=parseInt(playerStats.kills)||0, deaths=parseInt(playerStats.deaths)||0, assists=parseInt(playerStats.assists)||0;
-    var hs=parseFloat(playerStats.headshots_percentage)||0, adr=parseFloat(playerStats.adr)||0, kd=deaths>0?(kills/deaths):kills;
-    var mvp=parseInt(playerStats.mvps)||0, entryKills=parseInt(playerStats.entry_count)||0, entryWins=parseInt(playerStats.entry_wins)||0;
-    var utilDmg=parseInt(playerStats.utility_damage)||0, flashAssists=parseInt(playerStats.flash_assists)||0, rounds=matchData.rounds||24;
+function buildDeepAnalysis(playerStats,matchData){
+    var nick=playerStats.nickname||'Игрок',kills=parseInt(playerStats.kills)||0,deaths=parseInt(playerStats.deaths)||0,assists=parseInt(playerStats.assists)||0;
+    var hs=parseFloat(playerStats.headshots_percentage)||0,adr=parseFloat(playerStats.adr)||0,kd=deaths>0?(kills/deaths):kills;
+    var mvp=parseInt(playerStats.mvps)||0,entryKills=parseInt(playerStats.entry_count)||0,entryWins=parseInt(playerStats.entry_wins)||0;
+    var utilDmg=parseInt(playerStats.utility_damage)||0,flashAssists=parseInt(playerStats.flash_assists)||0,rounds=matchData.rounds||24;
     var sty=detectPlayStyle({hs,adr,kd,kills,entryKills,utilDmg,assistsPerRound:assists/rounds});
-    var pm=findSimilarPro(sty,{hs,adr,kd,kills,entryKills,utilDmg}), pro=pm.pro;
+    var pm=findSimilarPro(sty,{hs,adr,kd,kills,entryKills,utilDmg}),pro=pm.pro;
     var styleLabels={awp:'AWPer',entry:'Entry Fragger',support:'Support',igl:'IGL',lurk:'Lurker',rifler:'Rifler'};
     var html='';
     html+='<div class="result-header"><div class="result-header-info"><h2>'+nick+' — '+(styleLabels[sty]||'Rifler')+'</h2><div class="result-header-meta">Карта: '+(matchData.map||'?')+' · Счёт: '+(matchData.score||'—')+' · '+rounds+' раундов</div></div><div class="result-badge '+(matchData.won?'win':'lose')+'">'+(matchData.won?'Победа':'Поражение')+'</div></div>';
-    if (matchData.playerOptions) html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" id="faceitPlayerSelect" onchange="switchFaceitPlayer()">'+matchData.playerOptions+'</select></div>';
+    if(matchData.playerOptions)html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" id="faceitPlayerSelect" onchange="switchFaceitPlayer()">'+matchData.playerOptions+'</select></div>';
     html+='<div class="result-block"><div class="result-block-title">📊 Основные показатели</div><div class="metrics-grid">';
     html+='<div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">'+kd.toFixed(2)+'</div><div class="metric-sub '+(kd>=1?'good':'bad')+'">Про: '+pro.kd+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">'+Math.round(adr)+'</div><div class="metric-sub '+(adr>=pro.adr*0.85?'good':'bad')+'">Про: '+Math.round(pro.adr)+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">'+Math.round(hs)+'%</div><div class="metric-sub '+(hs>=pro.hs*0.8?'good':'bad')+'">Про: '+pro.hs+'%</div></div>';
     html+='<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+kills+'/'+deaths+'/'+assists+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">MVP</div><div class="metric-value">'+mvp+'</div></div>';
-    if (utilDmg>0) html+='<div class="metric-card"><div class="metric-label">Утилити дмг</div><div class="metric-value">'+utilDmg+'</div><div class="metric-sub '+(utilDmg>=30?'good':'bad')+'">Про: '+pro.utilDmg+'</div></div>';
-    if (entryKills>0){var ew=Math.round(entryWins/entryKills*100);html+='<div class="metric-card"><div class="metric-label">Entry убийства</div><div class="metric-value">'+entryKills+'</div><div class="metric-sub '+(ew>=55?'good':'bad')+'">WR: '+ew+'%</div></div>';}
+    if(utilDmg>0)html+='<div class="metric-card"><div class="metric-label">Утилити дмг</div><div class="metric-value">'+utilDmg+'</div><div class="metric-sub '+(utilDmg>=30?'good':'bad')+'">Про: '+pro.utilDmg+'</div></div>';
+    if(entryKills>0){var ew=Math.round(entryWins/entryKills*100);html+='<div class="metric-card"><div class="metric-label">Entry убийства</div><div class="metric-value">'+entryKills+'</div><div class="metric-sub '+(ew>=55?'good':'bad')+'">WR: '+ew+'%</div></div>';}
     html+='</div></div>';
     html+='<div class="result-block"><div class="result-block-title">🏆 Похожий про-игрок</div><div class="pro-style-card"><div class="pro-style-header"><div class="pro-style-avatar">'+pro.flag+'</div><div class="pro-style-info"><h3>'+pro.flag+' '+pro.nick+' ('+pro.name+')</h3><p>'+pro.team+' · '+pro.roleLabel+'</p><p style="color:#888;font-size:0.85rem;margin-top:4px;">Rating: '+pro.rating+' · ADR: '+pro.adr+' · KD: '+pro.kd+'</p>';
     var tc=pro.tier===1?'t1':pro.tier===2?'t2':'t3',tl=pro.tier===1?'Tier-1':pro.tier===2?'Tier-2':'Tier-3';
     html+='<span class="tier-badge '+tc+'">'+tl+'</span><span class="pro-style-match '+pm.level+'" style="margin-left:8px;">Схожесть: '+pm.matchPct+'%</span></div></div><p style="color:#aaa;font-size:0.9rem;line-height:1.6;margin-bottom:12px;">'+pro.description+'</p><div class="pro-style-traits">'+pro.traits.map(function(t){return'<span class="pro-trait">'+t+'</span>';}).join('')+'</div></div></div>';
-    html+='<div class="result-block"><div class="result-block-title">🔍 Глубокий анализ</div>';
+    // Блок для Groq AI анализа
+    html+='<div id="groqAnalysisBlock_faceit"></div>';
+    html+='<div class="result-block"><div class="result-block-title">🔍 Базовый анализ</div>';
     html+='<div class="analysis-section"><div class="analysis-section-title">🎯 Прицеливание и хедшоты</div>';
-    if(hs>=65)html+='<div class="analysis-item positive"><strong>Отличный HS% ('+Math.round(hs)+'%)</strong> — прицел стабильно в голову. Уровень близок к NiKo/donk.</div>';
-    else if(hs>=45)html+='<div class="analysis-item neutral"><strong>Средний HS% ('+Math.round(hs)+'%)</strong> — держи crosshair на уровне головы в точках появления врага.</div>';
-    else html+='<div class="analysis-item negative"><strong>Низкий HS% ('+Math.round(hs)+'%)</strong> — упражнение: aim_botz 20 мин/день с режимом "только хедшоты".</div>';
-    html+='</div><div class="analysis-section"><div class="analysis-section-title">💥 Урон и агрессивность</div>';
+    if(hs>=65)html+='<div class="analysis-item positive"><strong>Отличный HS% ('+Math.round(hs)+'%)</strong> — прицел стабильно в голову.</div>';
+    else if(hs>=45)html+='<div class="analysis-item neutral"><strong>Средний HS% ('+Math.round(hs)+'%)</strong> — держи crosshair на уровне головы.</div>';
+    else html+='<div class="analysis-item negative"><strong>Низкий HS% ('+Math.round(hs)+'%)</strong> — тренируй aim_botz 20 мин/день.</div>';
+    html+='</div><div class="analysis-section"><div class="analysis-section-title">💥 Урон</div>';
     if(adr>=85)html+='<div class="analysis-item positive"><strong>Высокий ADR ('+Math.round(adr)+')</strong> — серьёзный урон каждый раунд.</div>';
-    else if(adr>=65)html+='<div class="analysis-item neutral"><strong>Нормальный ADR ('+Math.round(adr)+')</strong> — есть резерв. Доноси больше дамага через утилити.</div>';
-    else html+='<div class="analysis-item negative"><strong>Низкий ADR ('+Math.round(adr)+')</strong> — входи в дуэль активнее, не жди идеального момента.</div>';
-    html+='</div><div class="analysis-section"><div class="analysis-section-title">💀 Выживаемость</div>';
-    var dpr=deaths/rounds;
-    if(dpr<=0.4)html+='<div class="analysis-item positive"><strong>Отличная выживаемость</strong> — умираешь редко ('+deaths+'/'+rounds+'). Стиль похож на sh1ro/ZywOo.</div>';
-    else if(dpr<=0.6)html+='<div class="analysis-item neutral"><strong>Нормальная выживаемость</strong> — '+deaths+' смертей за '+rounds+' раундов. Ищи паттерны в реплеях.</div>';
-    else html+='<div class="analysis-item negative"><strong>Много смертей ('+deaths+')</strong> — используй flash→peek вместо dry peek.</div>';
+    else if(adr>=65)html+='<div class="analysis-item neutral"><strong>Нормальный ADR ('+Math.round(adr)+')</strong> — есть резерв для улучшения.</div>';
+    else html+='<div class="analysis-item negative"><strong>Низкий ADR ('+Math.round(adr)+')</strong> — входи в дуэль активнее.</div>';
     html+='</div></div>';
-    html+='<div class="result-block"><div class="result-block-title">🎓 Рекомендации</div>';
-    var rn=1;
-    if(hs<45)html+='<div class="recommendation-item"><span class="marker">'+rn+++'.</span><div>aim_botz 20 мин/день — только хедшоты.<div class="rec-exercise"><strong>Цель:</strong> HS% > 50% за 2 недели.</div></div></div>';
-    if(adr<65)html+='<div class="recommendation-item"><span class="marker">'+rn+++'.</span><div>Каждый раунд — минимум 60 дамага.<div class="rec-exercise"><strong>Упражнение:</strong> ставь себе эту цель осознанно.</div></div></div>';
-    if(deaths>rounds*0.6)html+='<div class="recommendation-item"><span class="marker">'+rn+++'.</span><div>Пересмотри 5 своих смертей в реплее.<div class="rec-exercise"><strong>Найди</strong> общий паттерн — позиция, оружие врага.</div></div></div>';
-    if(rn===1)html+='<div class="analysis-item positive">Отличная игра! Показатели близки к про-уровню.</div>';
-    html+='</div>';
     html+='<button class="new-analysis-btn" onclick="resetFaceitAnalysis()">Новый анализ</button>';
+    // Запускаем Groq анализ асинхронно
+    setTimeout(function(){
+        runGroqAnalysis('cs2',{map:matchData.map||'Unknown',kills:kills,deaths:deaths,assists:assists,kd:kd.toFixed(2),adr:Math.round(adr),hs:Math.round(hs),utilDmg:utilDmg,flashAssists:flashAssists,entryKills:entryKills,entryWr:entryKills>0?Math.round(entryWins/entryKills*100):0,mvp:mvp,role:styleLabels[sty]||'Rifler',similarPro:pro.nick,similarTeam:pro.team,matchPct:pm.matchPct,won:matchData.won,rounds:rounds},'groqAnalysisBlock_faceit');
+    },100);
     return html;
 }
 
-async function runFaceitAnalysis() {
-    var u = getCurrentUser(); if (!u) return;
-    var canAnalyze = await checkLimit('cs');
-    if (!canAnalyze) { await showLimitWarning('faceitLimitWarning','cs'); return; }
+async function runFaceitAnalysis(){
+    var u=getCurrentUser();if(!u)return;
+    var canAnalyze=await checkLimit('cs');
+    if(!canAnalyze){await showLimitWarning('faceitLimitWarning','cs');return;}
     var link=document.getElementById('faceitLink').value.trim();
-    if (!link){alert('Вставьте ссылку на FACEIT матч');return;}
-    var matchId=link, rm=link.match(/room\/(1-[a-f0-9-]+)/i), dm=link.match(/(1-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i);
-    if(rm)matchId=rm[1]; else if(dm)matchId=dm[1];
+    if(!link){alert('Вставьте ссылку на FACEIT матч');return;}
+    var matchId=link,rm=link.match(/room\/(1-[a-f0-9-]+)/i),dm=link.match(/(1-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i);
+    if(rm)matchId=rm[1];else if(dm)matchId=dm[1];
     var prog=document.getElementById('faceitProgress'),fill=document.getElementById('faceitProgressFill'),txt=document.getElementById('faceitProgressText'),res=document.getElementById('faceitResults');
     res.classList.remove('visible');res.innerHTML='';prog.classList.add('visible');fill.style.width='0%';txt.textContent='Подключение к FACEIT API...';
-    try {
+    try{
         fill.style.width='20%';txt.textContent='Загрузка матча...';
         var mr=await fetch('/api/faceit?path=matches/'+matchId);
         if(!mr.ok){var ed=await mr.json();throw new Error(ed.error||'Матч не найден');}
@@ -1122,17 +862,16 @@ async function runFaceitAnalysis() {
         res.innerHTML=buildDeepAnalysis(ns,mi);res.classList.add('visible');
         res.scrollIntoView({behavior:'smooth',block:'start'});
         await incrementUsage('cs');
-        await saveAnalysis('cs2', matchId, nick+' KD:'+ns.kd.toFixed(2)+' ADR:'+Math.round(ns.adr), ns.kd, ns.adr, 0, 0);
+        var nick=ns.nickname||'Игрок';
+        await saveAnalysis('cs2',matchId,nick+' KD:'+ns.kd.toFixed(2)+' ADR:'+Math.round(ns.adr),ns.kd,ns.adr,0,0);
         await showLimitWarning('faceitLimitWarning','cs');
-    } catch(err) {
+    }catch(err){
         txt.textContent='Ошибка: '+err.message;fill.style.width='0%';
         setTimeout(function(){prog.classList.remove('visible');fill.style.width='0%';txt.textContent='Загрузка...';res.innerHTML='<div class="problem-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+err.message+'</div></div>';res.classList.add('visible');},3000);
     }
 }
 
-function normalizeStats(raw) {
-    return{nickname:raw.nickname||raw._nick||'Игрок',kills:parseInt(raw.Kills||raw.kills||0),deaths:parseInt(raw.Deaths||raw.deaths||0),assists:parseInt(raw.Assists||raw.assists||0),headshots:parseInt(raw.Headshots||raw.headshots||0),headshots_percentage:parseFloat(raw['Headshots %']||raw.headshots_percentage||0),adr:parseFloat(raw.ADR||raw.adr||raw['Average Damage per Round']||0),mvps:parseInt(raw.MVPs||raw.mvps||0),entry_count:parseInt(raw['Entry Count']||raw.entry_count||0),entry_wins:parseInt(raw['Entry Wins']||raw.entry_wins||0),utility_damage:parseInt(raw['Utility Damage']||raw.utility_damage||0),flash_assists:parseInt(raw['Flash Assists']||raw.flash_assists||0),awpKillRate:parseFloat(raw['Sniper Kill Rate']||raw.awpKillRate||0)};
-}
+function normalizeStats(raw){return{nickname:raw.nickname||raw._nick||'Игрок',kills:parseInt(raw.Kills||raw.kills||0),deaths:parseInt(raw.Deaths||raw.deaths||0),assists:parseInt(raw.Assists||raw.assists||0),headshots:parseInt(raw.Headshots||raw.headshots||0),headshots_percentage:parseFloat(raw['Headshots %']||raw.headshots_percentage||0),adr:parseFloat(raw.ADR||raw.adr||raw['Average Damage per Round']||0),mvps:parseInt(raw.MVPs||raw.mvps||0),entry_count:parseInt(raw['Entry Count']||raw.entry_count||0),entry_wins:parseInt(raw['Entry Wins']||raw.entry_wins||0),utility_damage:parseInt(raw['Utility Damage']||raw.utility_damage||0),flash_assists:parseInt(raw['Flash Assists']||raw.flash_assists||0),awpKillRate:parseFloat(raw['Sniper Kill Rate']||raw.awpKillRate||0)};}
 
 window.switchFaceitPlayer=function(){
     var sel=document.getElementById('faceitPlayerSelect');if(!sel||!window._faceitMatchData)return;
@@ -1144,11 +883,7 @@ window.switchFaceitPlayer=function(){
     res.scrollIntoView({behavior:'smooth',block:'start'});
 };
 
-window.resetFaceitAnalysis=function(){
-    document.getElementById('faceitResults').classList.remove('visible');document.getElementById('faceitResults').innerHTML='';
-    document.getElementById('faceitProgress').classList.remove('visible');document.getElementById('faceitProgressFill').style.width='0%';
-    document.getElementById('faceitLink').value='';window._faceitMatchData=null;
-};
+window.resetFaceitAnalysis=function(){document.getElementById('faceitResults').classList.remove('visible');document.getElementById('faceitResults').innerHTML='';document.getElementById('faceitProgress').classList.remove('visible');document.getElementById('faceitProgressFill').style.width='0%';document.getElementById('faceitLink').value='';window._faceitMatchData=null;};
 
 // ============================================================
 // AUTH
@@ -1196,19 +931,9 @@ document.getElementById('loginBtn').addEventListener('click',async function(){
 });
 
 function enterApp(){document.getElementById('authScreen').style.display='none';setTimeout(function(){document.getElementById('appWrapper').classList.add('active');updateUserInfo();updateSubscriptionUI();initLimitWarnings();},10);}
-
-async function initLimitWarnings(){
-    await showLimitWarning('dotaLimitWarning','dota');
-    await showLimitWarning('csLimitWarning','cs');
-    await showLimitWarning('faceitLimitWarning','cs');
-}
-
+async function initLimitWarnings(){await showLimitWarning('dotaLimitWarning','dota');await showLimitWarning('csLimitWarning','cs');await showLimitWarning('faceitLimitWarning','cs');}
 function updateUserInfo(){var u=getCurrentUser();if(!u)return;document.getElementById('userName').textContent=u.login;var pn={'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM'};document.getElementById('userPlan').textContent=pn[u.plan]||'Бесплатный';}
-function updateSubscriptionUI(){
-    var u=getCurrentUser();if(!u)return;
-    document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Выбрать тариф';bd.classList.remove('visible');});
-    if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}
-}
+function updateSubscriptionUI(){var u=getCurrentUser();if(!u)return;document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Выбрать тариф';bd.classList.remove('visible');});if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}}
 document.getElementById('logoutBtn').addEventListener('click',function(){clearCurrentUser();document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
 document.getElementById('btn-dota').addEventListener('click',function(){selectPlan('pro_dota2');});
 document.getElementById('btn-cs').addEventListener('click',function(){selectPlan('pro_cs2');});
@@ -1235,17 +960,8 @@ document.querySelectorAll('.sidebar-item').forEach(function(item){
         if(window.innerWidth<768)closeSidebar();
     });
 });
-
 function revealCards(){document.querySelectorAll('.subscription-card').forEach(function(c,i){c.classList.remove('visible');setTimeout(function(){c.classList.add('visible');},i*150);});}
-
-document.querySelectorAll('.back-home-btn').forEach(function(btn){
-    btn.addEventListener('click',function(){
-        document.querySelectorAll('.sidebar-item').forEach(function(i){i.classList.remove('active');});
-        document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-        document.getElementById('section-home').classList.add('active');
-        var hi=document.querySelector('.sidebar-item[data-section="home"]');if(hi)hi.classList.add('active');
-    });
-});
+document.querySelectorAll('.back-home-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.sidebar-item').forEach(function(i){i.classList.remove('active');});document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});document.getElementById('section-home').classList.add('active');var hi=document.querySelector('.sidebar-item[data-section="home"]');if(hi)hi.classList.add('active');});});
 
 document.querySelectorAll('.dota-subtab[data-subtab]').forEach(function(tab){
     tab.addEventListener('click',function(){
@@ -1269,15 +985,7 @@ document.querySelectorAll('.dota-subtab[data-cs2subtab]').forEach(function(tab){
     });
 });
 
-// Табы графика
-document.querySelectorAll('.chart-tab').forEach(function(tab){
-    tab.addEventListener('click',function(){
-        document.querySelectorAll('.chart-tab').forEach(function(t){t.classList.remove('active');});
-        tab.classList.add('active');
-        renderProgressChart(tab.getAttribute('data-chart'));
-    });
-});
-
+document.querySelectorAll('.chart-tab').forEach(function(tab){tab.addEventListener('click',function(){document.querySelectorAll('.chart-tab').forEach(function(t){t.classList.remove('active');});tab.classList.add('active');renderProgressChart(tab.getAttribute('data-chart'));});});
 async function loadDotaHistory(){var a=await loadAnalyses('dota2');renderHistoryList(a,'dotaHistoryList','dota2');}
 async function loadCsHistory(){var a=await loadAnalyses('cs2');renderHistoryList(a,'csHistoryList','cs2');}
 
@@ -1288,38 +996,11 @@ var RANKS=[{num:1,name:'Рекрут',color:'#6b6b6b'},{num:2,name:'Страж',
 var POSITIONS=[{id:'all',name:'Все',icon:'Все'},{id:1,name:'Carry',icon:'1'},{id:2,name:'Mid',icon:'2'},{id:3,name:'Offlane',icon:'3'},{id:4,name:'Support',icon:'4'},{id:5,name:'Hard Support',icon:'5'}];
 var tierlistData=null,laneRolesMap={},currentRank=7,currentPosition='all';
 
-async function loadTierlist(){
-    var c=document.getElementById('tierlistContent');c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';
-    try{
-        var sr=await fetch(DOTA_API+'heroStats'),lr=await fetch(DOTA_API+'scenarios/laneRoles');
-        if(!sr.ok)throw new Error('Недоступно');
-        tierlistData=await sr.json();
-        if(lr.ok){var ld=await lr.json();laneRolesMap={};var hlg={};ld.forEach(function(e){var h=parseInt(e.hero_id);if(!hlg[h])hlg[h]={};hlg[h][e.lane_role]=(hlg[h][e.lane_role]||0)+(parseInt(e.games)||0);});Object.keys(hlg).forEach(function(h){var best=0,bg=0;Object.keys(hlg[h]).forEach(function(l){if(hlg[h][l]>bg){bg=hlg[h][l];best=parseInt(l);}});laneRolesMap[h]=best;});}
-        renderPositionSelector();renderRankSelector();renderTierlist(currentRank);
-        var now=new Date();document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-    }catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}
-}
-
+async function loadTierlist(){var c=document.getElementById('tierlistContent');c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';try{var sr=await fetch(DOTA_API+'heroStats'),lr=await fetch(DOTA_API+'scenarios/laneRoles');if(!sr.ok)throw new Error('Недоступно');tierlistData=await sr.json();if(lr.ok){var ld=await lr.json();laneRolesMap={};var hlg={};ld.forEach(function(e){var h=parseInt(e.hero_id);if(!hlg[h])hlg[h]={};hlg[h][e.lane_role]=(hlg[h][e.lane_role]||0)+(parseInt(e.games)||0);});Object.keys(hlg).forEach(function(h){var best=0,bg=0;Object.keys(hlg[h]).forEach(function(l){if(hlg[h][l]>bg){bg=hlg[h][l];best=parseInt(l);}});laneRolesMap[h]=best;});}renderPositionSelector();renderRankSelector();renderTierlist(currentRank);var now=new Date();document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}}
 function renderPositionSelector(){var s=document.getElementById('positionSelector');s.innerHTML=POSITIONS.map(function(p){return'<div class="position-badge '+(p.id===currentPosition?'active':'')+'" data-pos="'+p.id+'"><div class="position-badge-icon"><span style="font-size:1.4rem;">'+p.icon+'</span></div><div class="position-badge-name">'+p.name+'</div></div>';}).join('');s.querySelectorAll('.position-badge').forEach(function(b){b.addEventListener('click',function(){currentPosition=b.dataset.pos;s.querySelectorAll('.position-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
 function renderRankSelector(){var s=document.getElementById('rankSelector');s.innerHTML=RANKS.map(function(r){return'<div class="rank-badge '+(r.num===currentRank?'active':'')+'" data-rank="'+r.num+'"><div class="rank-badge-icon" style="width:36px;height:36px;border-radius:50%;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;box-shadow:0 0 8px '+r.color+'99;">'+r.num+'</div><div class="rank-badge-name">'+r.name+'</div></div>';}).join('');s.querySelectorAll('.rank-badge').forEach(function(b){b.addEventListener('click',function(){currentRank=parseInt(b.dataset.rank);s.querySelectorAll('.rank-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
 function getHeroPosition(hid){var id=parseInt(hid),h=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===id;}):null;if(!h)return null;var r=h.roles||[],s=r.some(function(x){return x.indexOf('Support')!==-1;}),c=r.indexOf('Carry')!==-1,d=r.indexOf('Durable')!==-1,i=r.indexOf('Initiator')!==-1,e=r.indexOf('Escape')!==-1,n=r.indexOf('Nuker')!==-1;var l=laneRolesMap[id];if(l===2)return 2;if(l===3){if(s&&!c){if(e||i)return 4;return 5;}return 3;}if(l===4)return 4;if(s&&!c){if(e||i)return 4;return 5;}if(c&&s){if(e||i)return 4;return 5;}if(l===1)return 1;if(c&&!d&&!i)return 1;if(d||i)return 3;if(n)return 2;return 1;}
-function renderTierlist(rn){
-    if(!tierlistData)return;
-    var c=document.getElementById('tierlistContent');
-    var heroes=tierlistData.map(function(h){var picks,wins;if(rn===8){picks=h.pro_pick||0;wins=h.pro_win||0;}else{picks=h[rn+'_pick']||0;wins=h[rn+'_win']||0;}var wr=picks>0?(wins/picks*100):0;var ip=(h.img||'').replace(/^\//,'');return{id:h.id,name:h.localized_name,icon:'https://cdn.cloudflare.steamstatic.com/'+ip,fallback:DOTA_API+(h.icon||''),picks:picks,winRate:wr,position:getHeroPosition(h.id)};});
-    if(currentPosition!=='all'){var pi=parseInt(currentPosition);heroes=heroes.filter(function(h){return h.position===pi;});}
-    var th=50,hw=heroes.filter(function(h){return h.picks>=th;});
-    if(hw.length<10){th=20;hw=heroes.filter(function(h){return h.picks>=th;});}
-    if(hw.length<10){th=5;hw=heroes.filter(function(h){return h.picks>=th;});}
-    if(hw.length<5){hw=heroes;}
-    var nd=heroes.filter(function(h){return h.picks<th;});
-    hw.sort(function(a,b){return b.winRate-a.winRate;});
-    var tot=hw.length;if(tot===0){c.innerHTML='<div style="text-align:center;padding:40px;color:#888;">Нет данных</div>';return;}
-    var sC=Math.ceil(tot*0.15),aC=Math.ceil(tot*0.20),bC=Math.ceil(tot*0.25),cC=Math.ceil(tot*0.25);
-    var sH=hw.slice(0,sC),aH=hw.slice(sC,sC+aC),bH=hw.slice(sC+aC,sC+aC+bC),cH=hw.slice(sC+aC+bC,sC+aC+bC+cC),dH=hw.slice(sC+aC+bC+cC).concat(nd);
-    var tiers=[{label:'S',cls:'s',h:sH,desc:'META'},{label:'A',cls:'a',h:aH,desc:'STRONG'},{label:'B',cls:'b',h:bH,desc:'SITUATION'},{label:'C',cls:'c',h:cH,desc:'WEAK'},{label:'D',cls:'d',h:dH,desc:'AVOID'}];
-    c.innerHTML='<div class="tier-table">'+tiers.map(function(t){return'<div class="tier-row"><div class="tier-label '+t.cls+'">'+t.label+'<div class="tier-label-desc">'+t.desc+'</div></div><div class="tier-heroes">'+t.h.map(function(h){var wt=h.winRate>0?h.winRate.toFixed(1)+'%':'—';return'<div class="hero-card"><img src="'+h.icon+'" alt="'+h.name+'" loading="lazy" onerror="this.src=\''+h.fallback+'\'"><div class="hero-card-winrate">'+wt+'</div><div class="hero-card-tooltip">'+h.name+' · '+wt+' · '+h.picks+' игр</div></div>';}).join('')+'</div></div>';}).join('')+'</div>';
-}
+function renderTierlist(rn){if(!tierlistData)return;var c=document.getElementById('tierlistContent');var heroes=tierlistData.map(function(h){var picks,wins;if(rn===8){picks=h.pro_pick||0;wins=h.pro_win||0;}else{picks=h[rn+'_pick']||0;wins=h[rn+'_win']||0;}var wr=picks>0?(wins/picks*100):0;var ip=(h.img||'').replace(/^\//,'');return{id:h.id,name:h.localized_name,icon:'https://cdn.cloudflare.steamstatic.com/'+ip,fallback:DOTA_API+(h.icon||''),picks:picks,winRate:wr,position:getHeroPosition(h.id)};});if(currentPosition!=='all'){var pi=parseInt(currentPosition);heroes=heroes.filter(function(h){return h.position===pi;});}var th=50,hw=heroes.filter(function(h){return h.picks>=th;});if(hw.length<10){th=20;hw=heroes.filter(function(h){return h.picks>=th;});}if(hw.length<10){th=5;hw=heroes.filter(function(h){return h.picks>=th;});}if(hw.length<5){hw=heroes;}var nd=heroes.filter(function(h){return h.picks<th;});hw.sort(function(a,b){return b.winRate-a.winRate;});var tot=hw.length;if(tot===0){c.innerHTML='<div style="text-align:center;padding:40px;color:#888;">Нет данных</div>';return;}var sC=Math.ceil(tot*0.15),aC=Math.ceil(tot*0.20),bC=Math.ceil(tot*0.25),cC=Math.ceil(tot*0.25);var sH=hw.slice(0,sC),aH=hw.slice(sC,sC+aC),bH=hw.slice(sC+aC,sC+aC+bC),cH=hw.slice(sC+aC+bC,sC+aC+bC+cC),dH=hw.slice(sC+aC+bC+cC).concat(nd);var tiers=[{label:'S',cls:'s',h:sH,desc:'META'},{label:'A',cls:'a',h:aH,desc:'STRONG'},{label:'B',cls:'b',h:bH,desc:'SITUATION'},{label:'C',cls:'c',h:cH,desc:'WEAK'},{label:'D',cls:'d',h:dH,desc:'AVOID'}];c.innerHTML='<div class="tier-table">'+tiers.map(function(t){return'<div class="tier-row"><div class="tier-label '+t.cls+'">'+t.label+'<div class="tier-label-desc">'+t.desc+'</div></div><div class="tier-heroes">'+t.h.map(function(h){var wt=h.winRate>0?h.winRate.toFixed(1)+'%':'—';return'<div class="hero-card"><img src="'+h.icon+'" alt="'+h.name+'" loading="lazy" onerror="this.src=\''+h.fallback+'\'"><div class="hero-card-winrate">'+wt+'</div><div class="hero-card-tooltip">'+h.name+' · '+wt+' · '+h.picks+' игр</div></div>';}).join('')+'</div></div>';}).join('')+'</div>';}
 function getHeroName(hid){if(tierlistData){var h=tierlistData.find(function(x){return parseInt(x.id)===parseInt(hid);});if(h)return h.localized_name;}return'Hero #'+hid;}
 
 // ============================================================
@@ -1348,6 +1029,7 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     pl.forEach(function(p){if(KEY_ITEMS.indexOf(p.key)!==-1&&!sk[p.key]){sk[p.key]=1;var nm=ITEM_NAMES[p.key]||p.key;var m=Math.floor(p.time/60),s=p.time%60;kp2.push({name:nm,key:p.key,time:p.time,ts:m+':'+String(s).padStart(2,'0')});}});
     kp2.sort(function(a,b){return a.time-b.time;});
     var blink=kp2.find(function(p){return p.key==='blink';});
+    var groqId='groqDota_'+Date.now();
     var html='';
     if(!parsed)html+='<div class="problem-block" style="border-color:rgba(99,102,241,0.3);background-color:rgba(99,102,241,0.06);"><div class="problem-title" style="color:#818cf8;">Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota.</div></div>';
     html+='<div class="result-header"><div class="result-header-info"><h2>'+hName+' — '+posName+'</h2><div class="result-header-meta">Длительность: '+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
@@ -1376,27 +1058,20 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     html+='</div><div class="result-block"><div class="result-block-title">Слабые стороны</div>';
     if(gpm<bm.gpm*0.8)html+='<div class="weakness-item"><span class="marker">−</span> Низкий GPM ('+gpm+', норма: '+bm.gpm+').</div>';
     if(d>=8)html+='<div class="weakness-item"><span class="marker">−</span> Много смертей ('+d+').</div>';
-    html+='</div><div class="result-block"><div class="result-block-title">Рекомендации</div>';
-    if(gpm<bm.gpm*0.8)html+='<div class="recommendation-item"><span class="marker">1.</span><div>Улучшите фарм.<div class="rec-exercise"><strong>Упражнение:</strong> 20 мин в лобби.</div></div></div>';
-    if(d>=8)html+='<div class="recommendation-item"><span class="marker">2.</span><div>Работайте над отступлением.<div class="rec-exercise"><strong>Упражнение:</strong> Смотрите реплеи смертей.</div></div></div>';
-    html+='</div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+    html+='</div>';
+    // Groq AI блок для Dota 2
+    html+='<div id="'+groqId+'"></div>';
+    html+='<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+    // Запускаем Groq анализ
+    setTimeout(function(){
+        runGroqAnalysis('dota2',{hero:hName,position:posName,kills:k,deaths:d,assists:a,gpm:gpm,xpm:xpm,gpmBenchmark:bm.gpm,xpmBenchmark:bm.xpm,lh10:lh10||'н/д',lh20:lh20||'н/д',lh30:lh30||'н/д',benchLh10:bm.lh10,benchLh20:bm.lh20,benchLh30:bm.lh30,heroDamage:Math.round(hd/1000)+'K',towerDamage:Math.round(td/1000)+'K',apm:apm||'н/д',kp:kp,won:won,duration:durStr},groqId);
+    },100);
     return html;
 }
 
-function generateDotaResultsFromAPI(data){
-    var players=data.players||[],opts='';
-    players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});
-    var player=players[0];if(!player)return'<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';
-    return buildDotaAnalysis(data,player,0,opts);
-}
-
-window.switchDotaPlayer=async function(matchId){
-    var rd=document.getElementById('dotaResults'),dd=rd.querySelector('.player-select-dropdown'),pi=parseInt(dd.value);
-    try{var res=await fetch(DOTA_API+'matches/'+matchId),data=await res.json(),player=data.players[pi];if(!player)return;var opts='';data.players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===pi?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});rd.innerHTML=buildDotaAnalysis(data,player,pi,opts);}catch(err){console.error(err);}
-};
-
+function generateDotaResultsFromAPI(data){var players=data.players||[],opts='';players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});var player=players[0];if(!player)return'<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';return buildDotaAnalysis(data,player,0,opts);}
+window.switchDotaPlayer=async function(matchId){var rd=document.getElementById('dotaResults'),dd=rd.querySelector('.player-select-dropdown'),pi=parseInt(dd.value);try{var res=await fetch(DOTA_API+'matches/'+matchId),data=await res.json(),player=data.players[pi];if(!player)return;var opts='';data.players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===pi?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});rd.innerHTML=buildDotaAnalysis(data,player,pi,opts);}catch(err){console.error(err);}};
 window.resetAnalysis=function(game){var p=game==='dota'?'dota':'cs';document.getElementById(p+'Results').classList.remove('visible');document.getElementById(p+'Results').innerHTML='';document.getElementById(p+'Progress').classList.remove('visible');document.getElementById(p+'ProgressFill').style.width='0%';document.getElementById(p+'Link').value='';if(game==='cs'){var fi=document.getElementById('csFile');if(fi)fi.value='';}};
-
 function generateCsResults(){return'<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда</div></div><div class="result-badge lose">Поражение</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Норма: 45%+</div></div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Используйте FACEIT анализ для глубокого разбора.<div class="rec-exercise"><strong>Перейдите во вкладку FACEIT Анализ</strong></div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';}
 
 async function runAnalysis(game){
@@ -1426,7 +1101,7 @@ async function runAnalysis(game){
             var p0=data.players[0];
             var summ=getHeroName(p0.hero_id)+' GPM:'+p0.gold_per_min+' K/D:'+p0.kills+'/'+p0.deaths;
             await incrementUsage('dota');
-            await saveAnalysis('dota2', matchId, summ, 0, 0, p0.gold_per_min||0, 0);
+            await saveAnalysis('dota2',matchId,summ,0,0,p0.gold_per_min||0,0);
             await showLimitWarning('dotaLimitWarning','dota');
         }
         if(game==='cs'){
@@ -1437,7 +1112,7 @@ async function runAnalysis(game){
             w.classList.remove('visible');r.innerHTML=generateCsResults();r.classList.add('visible');
             r.scrollIntoView({behavior:'smooth',block:'start'});
             await incrementUsage('cs');
-            await saveAnalysis('cs2', matchId, 'CS2 анализ · ADR: 62', 0.85, 62, 0, 0);
+            await saveAnalysis('cs2',matchId,'CS2 анализ · ADR: 62',0.85,62,0,0);
             await showLimitWarning('csLimitWarning','cs');
         }
     }catch(err){t.textContent='Ошибка: '+err.message;setTimeout(function(){w.classList.remove('visible');f.style.width='0%';t.textContent='В очереди...';},3000);}
@@ -1449,61 +1124,7 @@ async function runAnalysis(game){
 var currentPeriod=7;
 document.querySelectorAll('.period-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.period-btn').forEach(function(b){b.classList.remove('active');});this.classList.add('active');currentPeriod=parseInt(this.dataset.period);});});
 document.getElementById('steamFetchBtn').addEventListener('click',fetchSteamStats);
-
-async function fetchSteamStats(){
-    var input=document.getElementById('steamInput').value.trim();if(!input){alert('Введите Steam ID');return;}
-    var accountId=input;
-    if(input.indexOf('/profiles/')!==-1){var m=input.match(/\/profiles\/(\d+)/);if(m)accountId=m[1];}
-    else if(input.indexOf('/id/')!==-1){var m2=input.match(/\/id\/([^\/\?]+)/);if(m2)accountId=m2[1];}
-    var prog=document.getElementById('steamProgress'),fill=document.getElementById('steamProgressFill'),txt=document.getElementById('steamProgressText'),res=document.getElementById('steamResults');
-    res.classList.remove('visible');res.innerHTML='';prog.classList.add('visible');fill.style.width='0%';txt.textContent='Получение данных...';
-    try{
-        fill.style.width='15%';
-        var pRes=await fetch(DOTA_API+'players/'+accountId);if(!pRes.ok)throw new Error('Игрок не найден');
-        var pData=await pRes.json();
-        fill.style.width='50%';txt.textContent='Загрузка матчей...';
-        var df=currentPeriod>0?'?date='+(Math.floor(Date.now()/1000)-currentPeriod*86400):'';
-        var mRes=await fetch(DOTA_API+'players/'+accountId+'/recentMatches'+df);
-        var matches=mRes.ok?await mRes.json():[];
-        fill.style.width='70%';txt.textContent='Анализ героев...';
-        var hRes=await fetch(DOTA_API+'players/'+accountId+'/heroes'+df);
-        var heroesData=hRes.ok?await hRes.json():[];
-        fill.style.width='90%';txt.textContent='Формирование...';
-        var total=matches.length,wins=0,losses=0,tK=0,tD=0,tA=0,tGPM=0,tXPM=0,tLH=0,tHD=0,tDur=0;
-        matches.forEach(function(m){if(m.radiant_win===(m.player_slot<128))wins++;else losses++;tK+=m.kills||0;tD+=m.deaths||0;tA+=m.assists||0;tGPM+=m.gold_per_min||0;tXPM+=m.xp_per_min||0;tLH+=m.last_hits||0;tHD+=m.hero_damage||0;tDur+=m.duration||0;});
-        var wr=total>0?Math.round(wins/total*100):0;
-        var aK=total>0?(tK/total).toFixed(1):'0',aD=total>0?(tD/total).toFixed(1):'0',aA=total>0?(tA/total).toFixed(1):'0';
-        var aGPM=total>0?Math.round(tGPM/total):0,aXPM=total>0?Math.round(tXPM/total):0,aLH=total>0?Math.round(tLH/total):0,aHD=total>0?Math.round(tHD/total/1000):0,aDur=total>0?Math.floor(tDur/total/60):0;
-        var topH=heroesData.filter(function(h){return h.games>0;}).sort(function(a,b){return b.games-a.games;}).slice(0,8);
-        if(!tierlistData){try{var sR=await fetch(DOTA_API+'heroStats');if(sR.ok)tierlistData=await sR.json();}catch(e){}}
-        fill.style.width='100%';txt.textContent='Готово!';
-        await new Promise(function(r){setTimeout(r,400);});
-        prog.classList.remove('visible');
-        var html='',prof=pData.profile||{},avatar=prof.avatarmedium||'',name=prof.personaname||'Неизвестный',medal='';
-        if(pData.rank_tier){var rn2=Math.floor(pData.rank_tier/10);var rns=['','Рекрут','Страж','Рыцарь','Герой','Легенда','Властелин','Божество','Титан'];medal=rn2>=1&&rn2<=8?rns[rn2]:'';}
-        html+='<div class="profile-header">';if(avatar)html+='<img class="profile-avatar" src="'+avatar+'" alt="'+name+'">';
-        html+='<div class="profile-info"><h2>'+name+'</h2><div class="profile-info-meta">Матчей: '+total+(medal?' · Ранг: '+medal:'')+'</div></div>';
-        html+='<div class="result-badge '+(wr>=50?'win':'lose')+'">'+wr+'% WR</div></div>';
-        if(total===0){html+='<div class="result-block"><div class="problem-text">За период матчей не найдено.</div></div>';}
-        else{
-            html+='<div class="result-block"><div class="result-block-title">Средние показатели</div><div class="metrics-grid">';
-            html+='<div class="metric-card"><div class="metric-label">Винрейт</div><div class="metric-value">'+wr+'%</div><div class="metric-sub '+(wr>=50?'good':'bad')+'">'+wins+'В / '+losses+'П</div></div>';
-            html+='<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+aK+'/'+aD+'/'+aA+'</div></div>';
-            html+='<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+aGPM+'</div></div>';
-            html+='<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">'+aXPM+'</div></div>';
-            html+='<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+aLH+'</div></div>';
-            html+='<div class="metric-card"><div class="metric-label">Урон/матч</div><div class="metric-value">'+aHD+'K</div></div>';
-            html+='<div class="metric-card"><div class="metric-label">Длительность</div><div class="metric-value">'+aDur+' мин</div></div>';
-            html+='</div></div>';
-            if(topH.length>0){
-                html+='<div class="result-block"><div class="result-block-title">Топ героев</div>';
-                topH.forEach(function(h){var hn=getHeroName(h.hero_id);var hh=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===parseInt(h.hero_id);}):null;var hi=hh?'https://cdn.cloudflare.steamstatic.com/'+(hh.img||'').replace(/^\//,''):'';var hw2=h.games>0?Math.round(h.win/h.games*100):0;html+='<div class="hero-stats-row">';if(hi)html+='<img class="hero-stats-img" src="'+hi+'" alt="'+hn+'">';html+='<div class="hero-stats-name">'+hn+'</div><div class="hero-stats-games">'+h.games+' игр · '+h.win+'В</div><div class="hero-stats-wr '+(hw2>=50?'good':'bad')+'">'+hw2+'%</div></div>';});
-                html+='</div>';
-            }
-        }
-        res.innerHTML=html;res.classList.add('visible');res.scrollIntoView({behavior:'smooth',block:'start'});
-    }catch(err){prog.classList.remove('visible');res.innerHTML='<div class="result-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+err.message+'</div></div>';res.classList.add('visible');}
-}
+async function fetchSteamStats(){var input=document.getElementById('steamInput').value.trim();if(!input){alert('Введите Steam ID');return;}var accountId=input;if(input.indexOf('/profiles/')!==-1){var m=input.match(/\/profiles\/(\d+)/);if(m)accountId=m[1];}else if(input.indexOf('/id/')!==-1){var m2=input.match(/\/id\/([^\/\?]+)/);if(m2)accountId=m2[1];}var prog=document.getElementById('steamProgress'),fill=document.getElementById('steamProgressFill'),txt=document.getElementById('steamProgressText'),res=document.getElementById('steamResults');res.classList.remove('visible');res.innerHTML='';prog.classList.add('visible');fill.style.width='0%';txt.textContent='Получение данных...';try{fill.style.width='15%';var pRes=await fetch(DOTA_API+'players/'+accountId);if(!pRes.ok)throw new Error('Игрок не найден');var pData=await pRes.json();fill.style.width='50%';txt.textContent='Загрузка матчей...';var df=currentPeriod>0?'?date='+(Math.floor(Date.now()/1000)-currentPeriod*86400):'';var mRes=await fetch(DOTA_API+'players/'+accountId+'/recentMatches'+df);var matches=mRes.ok?await mRes.json():[];fill.style.width='70%';txt.textContent='Анализ героев...';var hRes=await fetch(DOTA_API+'players/'+accountId+'/heroes'+df);var heroesData=hRes.ok?await hRes.json():[];fill.style.width='90%';txt.textContent='Формирование...';var total=matches.length,wins=0,losses=0,tK=0,tD=0,tA=0,tGPM=0,tXPM=0,tLH=0,tHD=0,tDur=0;matches.forEach(function(m){if(m.radiant_win===(m.player_slot<128))wins++;else losses++;tK+=m.kills||0;tD+=m.deaths||0;tA+=m.assists||0;tGPM+=m.gold_per_min||0;tXPM+=m.xp_per_min||0;tLH+=m.last_hits||0;tHD+=m.hero_damage||0;tDur+=m.duration||0;});var wr=total>0?Math.round(wins/total*100):0;var aK=total>0?(tK/total).toFixed(1):'0',aD=total>0?(tD/total).toFixed(1):'0',aA=total>0?(tA/total).toFixed(1):'0';var aGPM=total>0?Math.round(tGPM/total):0,aXPM=total>0?Math.round(tXPM/total):0,aLH=total>0?Math.round(tLH/total):0,aHD=total>0?Math.round(tHD/total/1000):0,aDur=total>0?Math.floor(tDur/total/60):0;var topH=heroesData.filter(function(h){return h.games>0;}).sort(function(a,b){return b.games-a.games;}).slice(0,8);if(!tierlistData){try{var sR=await fetch(DOTA_API+'heroStats');if(sR.ok)tierlistData=await sR.json();}catch(e){}}fill.style.width='100%';txt.textContent='Готово!';await new Promise(function(r){setTimeout(r,400);});prog.classList.remove('visible');var html='',prof=pData.profile||{},avatar=prof.avatarmedium||'',name=prof.personaname||'Неизвестный',medal='';if(pData.rank_tier){var rn2=Math.floor(pData.rank_tier/10);var rns=['','Рекрут','Страж','Рыцарь','Герой','Легенда','Властелин','Божество','Титан'];medal=rn2>=1&&rn2<=8?rns[rn2]:'';}html+='<div class="profile-header">';if(avatar)html+='<img class="profile-avatar" src="'+avatar+'" alt="'+name+'">';html+='<div class="profile-info"><h2>'+name+'</h2><div class="profile-info-meta">Матчей: '+total+(medal?' · Ранг: '+medal:'')+'</div></div>';html+='<div class="result-badge '+(wr>=50?'win':'lose')+'">'+wr+'% WR</div></div>';if(total===0){html+='<div class="result-block"><div class="problem-text">За период матчей не найдено.</div></div>';}else{html+='<div class="result-block"><div class="result-block-title">Средние показатели</div><div class="metrics-grid">';html+='<div class="metric-card"><div class="metric-label">Винрейт</div><div class="metric-value">'+wr+'%</div><div class="metric-sub '+(wr>=50?'good':'bad')+'">'+wins+'В / '+losses+'П</div></div>';html+='<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+aK+'/'+aD+'/'+aA+'</div></div>';html+='<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+aGPM+'</div></div>';html+='<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">'+aXPM+'</div></div>';html+='<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+aLH+'</div></div>';html+='<div class="metric-card"><div class="metric-label">Урон/матч</div><div class="metric-value">'+aHD+'K</div></div>';html+='<div class="metric-card"><div class="metric-label">Длительность</div><div class="metric-value">'+aDur+' мин</div></div>';html+='</div></div>';if(topH.length>0){html+='<div class="result-block"><div class="result-block-title">Топ героев</div>';topH.forEach(function(h){var hn=getHeroName(h.hero_id);var hh=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===parseInt(h.hero_id);}):null;var hi=hh?'https://cdn.cloudflare.steamstatic.com/'+(hh.img||'').replace(/^\//,''):'';var hw2=h.games>0?Math.round(h.win/h.games*100):0;html+='<div class="hero-stats-row">';if(hi)html+='<img class="hero-stats-img" src="'+hi+'" alt="'+hn+'">';html+='<div class="hero-stats-name">'+hn+'</div><div class="hero-stats-games">'+h.games+' игр · '+h.win+'В</div><div class="hero-stats-wr '+(hw2>=50?'good':'bad')+'">'+hw2+'%</div></div>';});html+='</div>';}}res.innerHTML=html;res.classList.add('visible');res.scrollIntoView({behavior:'smooth',block:'start'});}catch(err){prog.classList.remove('visible');res.innerHTML='<div class="result-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+err.message+'</div></div>';res.classList.add('visible');}}
 
 // ============================================================
 // EVENT LISTENERS
