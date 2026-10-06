@@ -6,6 +6,7 @@
     <title>GamerAnalyzer</title>
     <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M24 4 L42 12 L42 26 Q42 38 24 44 Q6 38 6 26 L6 12 Z" fill="%231e1e30" stroke="%236366f1" stroke-width="2"/><circle cx="24" cy="24" r="12" fill="none" stroke="%236366f1" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="%236366f1"/></svg>'/>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         :root {
@@ -16,25 +17,16 @@
             --bg: #0a0e14; --card-bg-2: #1a2030; --border: rgba(255,255,255,0.08);
             --text: #e8e8e8; --text-dim: #8b8b8b; --accent: #6366f1; --accent-2: #818cf8;
         }
-        html.light-theme {
-            --dark-bg: #f5f5f8; --card-bg: #fff;
-            --logo-primary: #4f46e5; --logo-secondary: #1a1a2a;
-            --bg: #f0f2f5; --card-bg-2: #f7f8fa; --border: rgba(0,0,0,0.08);
-            --text: #1a1a1a; --text-dim: #666;
-        }
+        html.light-theme { --dark-bg: #f5f5f8; --card-bg: #fff; --logo-primary: #4f46e5; --logo-secondary: #1a1a2a; --bg: #f0f2f5; --card-bg-2: #f7f8fa; --border: rgba(0,0,0,0.08); --text: #1a1a1a; --text-dim: #666; }
         body { background-color: var(--dark-bg); color: #fff; line-height: 1.6; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         html.light-theme body { color: #333; }
         html { scroll-behavior: smooth; }
-
-        /* ============ НОВЫЙ ЛОГОТИП ============ */
         .ga-logo { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; }
         .ga-logo-svg-wrap { width: 44px; height: 44px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(99,102,241,0.6)); transition: filter 0.3s ease; }
         .ga-logo:hover .ga-logo-svg-wrap { filter: drop-shadow(0 0 16px rgba(129,140,248,0.9)); }
-        .ga-logo-text { font-weight: 900; letter-spacing: 1px; font-size: 1.4rem; white-space: nowrap; background: linear-gradient(135deg, #6366f1, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transition: filter 0.3s ease; }
+        .ga-logo-text { font-weight: 900; letter-spacing: 1px; font-size: 1.4rem; white-space: nowrap; background: linear-gradient(135deg, #6366f1, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .ga-logo:hover .ga-logo-text { filter: brightness(1.2); }
         html.light-theme .ga-logo-text { background: linear-gradient(135deg, #4f46e5, #6366f1); -webkit-background-clip: text; background-clip: text; }
-
-        /* AUTH */
         #authScreen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at 50% 30%, rgba(99,102,241,0.15), transparent 60%), radial-gradient(circle at 80% 80%, rgba(129,140,248,0.08), transparent 50%), var(--bg); }
         .auth-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 40px; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
         .auth-logo { text-align: center; font-size: 1.8rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -45,8 +37,7 @@
         .input-group input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
         .input-group input::placeholder { color: #555; }
         .auth-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border-radius: 8px; font-size: 1rem; font-weight: 600; transition: transform 0.1s, opacity 0.2s; border: none; cursor: pointer; }
-        .auth-btn:hover { opacity: 0.9; }
-        .auth-btn:active { transform: scale(0.98); }
+        .auth-btn:hover { opacity: 0.9; } .auth-btn:active { transform: scale(0.98); }
         .auth-link { text-align: center; margin-top: 18px; color: var(--text-dim); font-size: 0.9rem; }
         .auth-link span { color: var(--accent); cursor: pointer; font-weight: 600; }
         .auth-link span:hover { text-decoration: underline; }
@@ -55,26 +46,18 @@
         .msg-box.visible { display: block; }
         .msg-error { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
         .msg-success { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
-
-        /* APP */
         .app-wrapper { display: none; min-height: 100vh; background: radial-gradient(circle at 80% 10%, rgba(99,102,241,0.10), transparent 45%), radial-gradient(circle at 10% 80%, rgba(129,140,248,0.07), transparent 45%), var(--dark-bg); }
         .app-wrapper.active { display: block; }
         html.light-theme .app-wrapper { background: radial-gradient(circle at 80% 10%, rgba(99,102,241,0.06), transparent 45%), radial-gradient(circle at 10% 80%, rgba(129,140,248,0.04), transparent 45%), var(--dark-bg); }
-
-        /* BURGER */
         .burger { position: fixed; top: 20px; left: 20px; z-index: 200; cursor: pointer; padding: 10px; background-color: var(--card-bg); border-radius: 8px; border: 1px solid rgba(99,102,241,0.2); transition: background-color 0.3s ease, border-color 0.3s ease; }
-        html.light-theme .burger { border-color: rgba(99,102,241,0.15); }
         .burger span { display: block; width: 26px; height: 3px; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 2px; margin: 5px 0; transition: all 0.3s ease; }
         .burger.open span:nth-child(1) { transform: rotate(45deg) translate(6px,6px); }
         .burger.open span:nth-child(2) { opacity: 0; }
         .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(6px,-6px); }
-
-        /* SIDEBAR */
-        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background-color: #12121e; border-right: 1px solid rgba(99,102,241,0.15); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.25,1,0.5,1), background-color 0.3s ease; z-index: 150; padding-top: 80px; overflow-y: auto; }
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-width); height: 100vh; background-color: #12121e; border-right: 1px solid rgba(99,102,241,0.15); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.25,1,0.5,1); z-index: 150; padding-top: 80px; overflow-y: auto; }
         html.light-theme .sidebar { background-color: #fff; border-color: rgba(99,102,241,0.1); }
         .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.5); }
         .sidebar-user { padding: 16px 24px; border-bottom: 1px solid rgba(99,102,241,0.15); margin-bottom: 8px; }
-        html.light-theme .sidebar-user { border-color: rgba(99,102,241,0.1); }
         .sidebar-user-label { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
         .sidebar-user-name { background: linear-gradient(135deg, #6366f1, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; font-size: 1.1rem; margin-top: 4px; }
         .sidebar-user-plan { color: #888; font-size: 0.9rem; margin-top: 4px; }
@@ -87,59 +70,93 @@
         .sidebar-divider { height: 1px; background: rgba(99,102,241,0.15); margin: 8px 20px; }
         html.light-theme .sidebar-divider { background: rgba(99,102,241,0.1); }
         .theme-toggle { padding: 14px 24px; cursor: pointer; color: #aaa; font-size: 1rem; transition: all 0.25s ease; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
-        html.light-theme .theme-toggle { color: #555; }
         .theme-toggle:hover { background-color: rgba(99,102,241,0.08); color: #a5b4fc; }
-        html.light-theme .theme-toggle:hover { background-color: rgba(99,102,241,0.05); color: #4f46e5; }
-
-        /* OVERLAY */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; z-index: 100; }
         .overlay.visible { opacity: 1; visibility: visible; }
-
-        /* NAVBAR */
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px 16px 80px; border-bottom: 1px solid rgba(99,102,241,0.15); background: rgba(20,20,31,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 90; transition: border-color 0.3s ease; }
-        html.light-theme .navbar { background: rgba(245,245,248,0.90); border-color: rgba(99,102,241,0.1); }
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px 16px 80px; border-bottom: 1px solid rgba(99,102,241,0.15); background: rgba(20,20,31,0.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 90; }
+        html.light-theme .navbar { background: rgba(245,245,248,0.90); }
         .navbar-right { display: flex; align-items: center; gap: 16px; }
         .logout-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 9px 18px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: opacity 0.2s, transform 0.1s; }
         .logout-btn:hover { opacity: 0.88; transform: translateY(-1px); }
-        .logout-btn:active { transform: scale(0.97); }
         .theme-btn-nav { background: none; border: 1px solid rgba(99,102,241,0.3); border-radius: 6px; padding: 8px 12px; cursor: pointer; font-size: 1.1rem; transition: border 0.3s; }
-        html.light-theme .theme-btn-nav { border-color: rgba(99,102,241,0.2); }
         .theme-btn-nav:hover { border-color: #6366f1; }
-
-        /* CONTENT */
         .content-area { padding: 40px 40px 40px 80px; max-width: 1200px; }
         .section { display: none; animation: fadeIn 0.5s ease; }
         .section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* HOME HERO */
         .home-hero { margin-bottom: 40px; }
-        .home-tagline { font-size: 0.85rem; color: #818cf8; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; opacity: 0.9; }
+        .home-tagline { font-size: 0.85rem; color: #818cf8; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
         .section-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 16px; }
         #section-home .section-title { background: linear-gradient(135deg, #6366f1, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        #section-account .section-title { background: linear-gradient(135deg, #6366f1, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .section-desc { color: #bbb; font-size: 1.05rem; margin-bottom: 30px; max-width: 700px; line-height: 1.8; }
         html.light-theme .section-desc { color: #666; }
-        .section-title:not(#section-home .section-title) { color: var(--dark-gold); }
-
-        /* Остальные section-title (не главная) */
-        #section-subscriptions .section-title,
-        #section-dota2 .section-title,
-        #section-cs2 .section-title,
-        .dota-subcontent .section-title { background: none; -webkit-text-fill-color: var(--dark-gold); color: var(--dark-gold); }
-
+        #section-subscriptions .section-title, #section-dota2 .section-title, #section-cs2 .section-title, .dota-subcontent .section-title { background: none; -webkit-text-fill-color: var(--dark-gold); color: var(--dark-gold); }
         .back-home-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem; transition: all 0.3s; margin-bottom: 24px; }
-        html.light-theme .back-home-btn { border-color: rgba(99,102,241,0.15); color: #555; }
         .back-home-btn:hover { border-color: #6366f1; color: #818cf8; }
-
-        /* FEATURES */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
         .feature-card { background: linear-gradient(145deg, var(--card-bg), rgba(99,102,241,0.04)); border-radius: 12px; padding: 24px; border: 1px solid rgba(99,102,241,0.15); transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; }
-        html.light-theme .feature-card { border-color: rgba(99,102,241,0.12); background: linear-gradient(145deg, #fff, rgba(99,102,241,0.02)); }
         .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(99,102,241,0.2); border-color: rgba(99,102,241,0.4); }
         .feature-icon { font-size: 2rem; margin-bottom: 12px; display: block; }
         .feature-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; background: linear-gradient(135deg, #6366f1, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .feature-text { color: #999; font-size: 0.95rem; line-height: 1.6; }
         html.light-theme .feature-text { color: #777; }
+
+        /* ===== ЛИЧНЫЙ КАБИНЕТ ===== */
+        .account-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .account-card { background: linear-gradient(145deg, var(--card-bg), rgba(99,102,241,0.04)); border-radius: 12px; padding: 24px; border: 1px solid rgba(99,102,241,0.15); }
+        .account-card-title { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .account-card-value { font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, #6366f1, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .account-card-sub { color: #888; font-size: 0.85rem; margin-top: 4px; }
+        .account-plan-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-top: 8px; }
+        .account-plan-badge.free { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
+        .account-plan-badge.pro { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+        .account-plan-badge.premium { background: rgba(197,160,40,0.15); color: var(--dark-gold); border: 1px solid rgba(197,160,40,0.3); }
+
+        /* Лимит анализов */
+        .limit-bar-wrap { margin-top: 10px; }
+        .limit-bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: #888; margin-bottom: 6px; }
+        .limit-bar { height: 6px; background: rgba(99,102,241,0.15); border-radius: 3px; overflow: hidden; }
+        .limit-bar-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 3px; transition: width 0.5s ease; }
+        .limit-bar-fill.danger { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        .limit-reset-time { font-size: 0.78rem; color: #666; margin-top: 6px; }
+
+        /* Достижения */
+        .achievements-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 32px; }
+        .achievement { display: flex; align-items: center; gap: 10px; background: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 10px; padding: 12px 16px; }
+        .achievement-icon { font-size: 1.6rem; }
+        .achievement-info { }
+        .achievement-name { font-weight: 700; font-size: 0.9rem; color: #a5b4fc; }
+        .achievement-desc { font-size: 0.78rem; color: #888; }
+
+        /* График */
+        .chart-block { background: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+        .chart-block-title { font-size: 1.1rem; font-weight: 700; color: var(--dark-gold); margin-bottom: 8px; }
+        .chart-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .chart-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.2); background: transparent; color: #aaa; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+        .chart-tab.active { background: rgba(99,102,241,0.12); border-color: #6366f1; color: #818cf8; }
+        .chart-empty { text-align: center; padding: 40px; color: #666; font-size: 0.95rem; }
+
+        /* История анализов */
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item { display: flex; align-items: center; gap: 14px; background: var(--card-bg); border: 1px solid rgba(99,102,241,0.12); border-radius: 10px; padding: 14px 18px; transition: border-color 0.2s; }
+        .history-item:hover { border-color: rgba(99,102,241,0.3); }
+        .history-game-icon { font-size: 1.4rem; width: 36px; text-align: center; flex-shrink: 0; }
+        .history-info { flex: 1; }
+        .history-match-id { font-size: 0.82rem; color: #888; }
+        .history-summary { font-size: 0.95rem; color: #ccc; font-weight: 600; }
+        html.light-theme .history-summary { color: #333; }
+        .history-time { font-size: 0.78rem; color: #666; white-space: nowrap; }
+        .history-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; }
+        .history-badge.dota { background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.2); }
+        .history-badge.cs { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid rgba(52,152,219,0.2); }
+        .history-empty { text-align: center; padding: 40px; color: #666; }
+
+        /* Лимит-блок внутри анализа */
+        .limit-warning { background: rgba(231,76,60,0.08); border: 1px solid rgba(231,76,60,0.3); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; text-align: center; }
+        .limit-warning-title { color: var(--red); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+        .limit-warning-text { color: #ccc; font-size: 0.95rem; }
+        .limit-warning-time { color: #888; font-size: 0.85rem; margin-top: 8px; }
 
         /* SUBSCRIPTIONS */
         .subscription-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
@@ -151,38 +168,32 @@
         .premium-badge { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #6366f1, #818cf8, #a5b4fc); border-radius: 10px 10px 0 0; }
         .subscription-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 0; color: var(--dark-gold); text-align: center; padding-bottom: 16px; border-bottom: 1px solid rgba(197,160,40,0.2); }
         .subscription-price { font-size: 2.4rem; font-weight: 800; color: var(--dark-gold); text-align: center; margin: 16px 0; letter-spacing: -1px; }
-        .subscription-price::after { content: '/мес'; font-size: 1rem; font-weight: 400; color: #888; margin-left: 4px; letter-spacing: 0; }
+        .subscription-price::after { content: '/мес'; font-size: 1rem; font-weight: 400; color: #888; margin-left: 4px; }
         .benefits-list { list-style: none; padding-left: 0; }
         .benefit { margin-bottom: 10px; padding-left: 22px; position: relative; color: #999; }
         html.light-theme .benefit { color: #666; }
         .benefit::before { content: "\2022"; color: var(--dark-gold); font-weight: bold; position: absolute; left: 0; top: 2px; }
         .card-btn { display: block; width: 100%; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; margin-top: 20px; transition: all 0.3s ease; }
-        .card-btn:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(99,102,241,0.4); transform: translateY(-1px); }
+        .card-btn:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(99,102,241,0.4); }
         .card-btn.current { background: linear-gradient(135deg, #4f46e5, #6366f1); cursor: default; }
         .current-badge { display: none; text-align: center; color: #818cf8; font-size: 0.85rem; font-weight: 600; margin-top: 8px; }
         .current-badge.visible { display: block; }
-
-        /* DOTA/CS2 SUBTABS */
         .dota-subtabs { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
         .dota-subtab { display: flex; align-items: center; gap: 10px; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 14px 24px; cursor: pointer; transition: all 0.3s ease; }
-        html.light-theme .dota-subtab { border-color: rgba(99,102,241,0.15); }
         .dota-subtab:hover { border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
         .dota-subtab.active { border-color: #6366f1; box-shadow: 0 0 14px rgba(99,102,241,0.25); background-color: rgba(99,102,241,0.08); }
         .dota-subtab-icon { font-size: 1.4rem; }
         .dota-subtab-text { color: #aaa; font-weight: 600; font-size: 1rem; }
-        html.light-theme .dota-subtab-text { color: #555; }
         .dota-subtab.active .dota-subtab-text { color: #818cf8; }
         .dota-subcontent { display: none; }
         .dota-subcontent.active { display: block; animation: fadeIn 0.4s ease; }
-
-        /* FORMS */
         .link-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
         .link-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
         html.light-theme .link-input { background-color: #f9f9f9; color: #333; border-color: #ccc; }
         .link-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
         .link-input::placeholder { color: #666; }
         .file-input { width: 100%; padding: 12px; border: 1px dashed rgba(99,102,241,0.3); border-radius: 8px; background-color: #222; color: #999; font-size: 0.9rem; cursor: pointer; }
-        html.light-theme .file-input { background-color: #f9f9f9; color: #777; border-color: rgba(99,102,241,0.2); }
+        html.light-theme .file-input { background-color: #f9f9f9; color: #777; }
         .file-hint { color: #666; font-size: 0.85rem; margin-top: -8px; }
         .analyze-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 16px; font-size: 1.05rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
         .analyze-btn:hover { opacity: 0.9; box-shadow: 0 0 18px rgba(99,102,241,0.4); transform: translateY(-1px); }
@@ -192,13 +203,9 @@
         html.light-theme .progress-bar { background-color: #ddd; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 4px; transition: width 0.5s ease; }
         .progress-text { margin-top: 10px; color: #aaa; font-size: 0.95rem; }
-        html.light-theme .progress-text { color: #666; }
         .results-wrapper { display: none; margin-top: 30px; }
         .results-wrapper.visible { display: block; animation: fadeIn 0.6s ease; }
-
-        /* RESULTS */
         .result-header { background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.2); border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-        html.light-theme .result-header { border-color: rgba(99,102,241,0.15); }
         .result-header-info { flex: 1; min-width: 200px; }
         .result-header h2 { color: var(--dark-gold); font-size: 1.4rem; margin-bottom: 6px; }
         .result-header-meta { color: #888; font-size: 0.95rem; }
@@ -211,18 +218,14 @@
         html.light-theme .problem-text { color: #555; }
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .metric-card { background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 10px; padding: 18px; text-align: center; transition: transform 0.3s, border 0.3s; }
-        html.light-theme .metric-card { border-color: rgba(99,102,241,0.1); }
         .metric-card:hover { transform: translateY(-3px); border-color: #6366f1; box-shadow: 0 4px 14px rgba(99,102,241,0.15); }
         .metric-label { color: #888; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .metric-value { color: var(--dark-gold); font-size: 1.8rem; font-weight: 700; }
         .metric-sub { color: #666; font-size: 0.8rem; margin-top: 4px; }
-        .metric-sub.good { color: var(--green); }
-        .metric-sub.bad { color: var(--red); }
+        .metric-sub.good { color: var(--green); } .metric-sub.bad { color: var(--red); }
         .result-block { background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.12); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
-        html.light-theme .result-block { border-color: rgba(99,102,241,0.08); }
         .result-block-title { color: var(--dark-gold); font-weight: 600; font-size: 1.15rem; margin-bottom: 14px; }
         .strength-item, .weakness-item, .recommendation-item { padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
-        html.light-theme .strength-item, html.light-theme .weakness-item, html.light-theme .recommendation-item { border-color: #eee; }
         .strength-item:last-child, .weakness-item:last-child, .recommendation-item:last-child { border-bottom: none; }
         .strength-item { display: flex; align-items: start; gap: 10px; }
         .strength-item .marker { color: var(--green); font-weight: bold; }
@@ -233,18 +236,13 @@
         html.light-theme .rec-exercise { color: #555; }
         .rec-exercise strong { color: #818cf8; }
         .new-analysis-btn { display: inline-block; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 14px 28px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; margin-bottom: 30px; transition: all 0.3s ease; }
-        .new-analysis-btn:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(99,102,241,0.4); transform: translateY(-1px); }
-
-        /* CS2 FACEIT */
+        .new-analysis-btn:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(99,102,241,0.4); }
         .game-block { max-width: 700px; margin: 0 auto; }
         .game-icon { font-size: 3rem; margin-bottom: 16px; text-align: center; }
         .player-select { margin: 20px 0; }
         .player-select-label { color: #888; font-size: 0.9rem; margin-bottom: 8px; }
         .player-select-dropdown { width: 100%; max-width: 500px; padding: 12px; border: 1px solid rgba(99,102,241,0.25); border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; cursor: pointer; }
-        html.light-theme .player-select-dropdown { background-color: #f9f9f9; color: #333; border-color: rgba(99,102,241,0.2); }
-        .player-select-dropdown:focus { border-color: #6366f1; }
-
-        /* PRO STYLE */
+        html.light-theme .player-select-dropdown { background-color: #f9f9f9; color: #333; }
         .pro-style-card { background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(129,140,248,0.05)); border: 1px solid rgba(99,102,241,0.25); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
         .pro-style-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
         .pro-style-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #6366f1; background: #333; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
@@ -256,35 +254,10 @@
         .pro-style-match.low { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
         .pro-style-traits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .pro-trait { padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); color: #a5b4fc; }
-        html.light-theme .pro-trait { color: #4f46e5; }
-
-        /* TIER BADGE */
         .tier-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
         .tier-badge.t1 { background: rgba(197,160,40,0.15); color: var(--dark-gold); border: 1px solid rgba(197,160,40,0.3); }
         .tier-badge.t2 { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
         .tier-badge.t3 { background: rgba(120,113,108,0.15); color: #78716c; border: 1px solid rgba(120,113,108,0.3); }
-
-        /* PLAYERS TABLE */
-        .players-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        .players-table th { text-align: left; padding: 12px; color: #888; font-size: 0.82rem; border-bottom: 1px solid rgba(99,102,241,0.15); text-transform: uppercase; letter-spacing: 0.5px; }
-        html.light-theme .players-table th { border-color: rgba(99,102,241,0.1); }
-        .players-table td { padding: 12px; border-bottom: 1px solid #2a2a3a; font-size: 0.92rem; }
-        html.light-theme .players-table td { border-color: #eee; }
-        .players-table tr:last-child td { border-bottom: none; }
-        .player-nick { color: var(--dark-gold); font-weight: 600; }
-        .stat-good { color: var(--green); font-weight: 600; }
-        .stat-bad { color: var(--red); font-weight: 600; }
-
-        /* ROLE BADGE */
-        .role-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 700; }
-        .role-entry { background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
-        .role-awp { background: rgba(52,152,219,0.15); color: #3498db; border: 1px solid rgba(52,152,219,0.3); }
-        .role-support { background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3); }
-        .role-igl { background: rgba(155,89,182,0.15); color: #9b59b6; border: 1px solid rgba(155,89,182,0.3); }
-        .role-lurk { background: rgba(230,126,34,0.15); color: #e67e22; border: 1px solid rgba(230,126,34,0.3); }
-        .role-rifler { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
-
-        /* ANALYSIS DEEP */
         .analysis-section { margin-bottom: 20px; }
         .analysis-section-title { font-size: 1rem; font-weight: 700; color: var(--dark-gold); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
         .analysis-item { padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; font-size: 0.92rem; line-height: 1.6; }
@@ -294,57 +267,40 @@
         html.light-theme .analysis-item { color: #555; }
         .analysis-item strong { color: #fff; }
         html.light-theme .analysis-item strong { color: #222; }
-
-        /* DOTA SPECIFIC */
         .farm-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-        .farm-table th { text-align: left; padding: 10px; color: #888; font-size: 0.85rem; border-bottom: 1px solid rgba(99,102,241,0.15); text-transform: uppercase; letter-spacing: 0.5px; }
-        html.light-theme .farm-table th { border-color: rgba(99,102,241,0.1); }
+        .farm-table th { text-align: left; padding: 10px; color: #888; font-size: 0.85rem; border-bottom: 1px solid rgba(99,102,241,0.15); text-transform: uppercase; }
         .farm-table td { padding: 10px; border-bottom: 1px solid #2a2a3a; }
-        html.light-theme .farm-table td { border-color: #eee; }
         .farm-table .gold-val { color: var(--dark-gold); font-weight: 700; text-align: center; }
         .farm-table .pro-val { color: #888; text-align: center; }
         .farm-table .diff-good { color: var(--green); text-align: center; font-size: 0.85rem; }
         .farm-table .diff-bad { color: var(--red); text-align: center; font-size: 0.85rem; }
         .item-timeline { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
         .item-chip { background: rgba(99,102,241,0.06); padding: 8px 14px; border-radius: 6px; border: 1px solid rgba(99,102,241,0.15); font-size: 0.9rem; }
-        html.light-theme .item-chip { background: #f5f5f5; border-color: rgba(99,102,241,0.1); }
         .item-chip .item-time { color: #818cf8; font-weight: 700; }
         .analysis-text { color: #ccc; font-size: 0.95rem; line-height: 1.8; margin-top: 12px; }
-        html.light-theme .analysis-text { color: #555; }
-        .comp-item { margin-bottom: 12px; padding-left: 16px; border-left: 2px solid #6366f1; line-height: 1.7; }
-
-        /* TIERLIST */
         .rank-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
         .rank-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.15); transition: all 0.3s ease; min-width: 80px; }
-        html.light-theme .rank-badge { border-color: rgba(99,102,241,0.1); }
         .rank-badge:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.35); }
         .rank-badge.active { border-color: #6366f1; box-shadow: 0 0 12px rgba(99,102,241,0.3); }
-        .rank-badge-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
         .rank-badge-name { font-size: 0.78rem; color: #aaa; text-align: center; }
-        html.light-theme .rank-badge-name { color: #666; }
         .rank-badge.active .rank-badge-name { color: #818cf8; }
         .position-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
         .position-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 14px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.15); transition: all 0.3s ease; min-width: 70px; }
-        html.light-theme .position-badge { border-color: rgba(99,102,241,0.1); }
         .position-badge:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.35); }
         .position-badge.active { border-color: #6366f1; box-shadow: 0 0 12px rgba(99,102,241,0.3); }
-        .position-badge-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
         .position-badge-name { font-size: 0.72rem; color: #aaa; text-align: center; }
-        html.light-theme .position-badge-name { color: #666; }
         .position-badge.active .position-badge-name { color: #818cf8; }
         .tier-table { display: flex; flex-direction: column; gap: 12px; }
         .tier-row { display: flex; gap: 12px; align-items: stretch; background-color: var(--card-bg); border-radius: 10px; padding: 16px; border: 1px solid rgba(99,102,241,0.12); min-height: 80px; }
-        html.light-theme .tier-row { border-color: rgba(99,102,241,0.08); }
         .tier-label { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 70px; border-radius: 8px; font-weight: 800; font-size: 1.6rem; padding: 8px; flex-shrink: 0; }
         .tier-label.s { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
         .tier-label.a { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
         .tier-label.b { background: linear-gradient(135deg, #f1c40f, #d4ac0d); color: #333; }
         .tier-label.c { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: #fff; }
         .tier-label.d { background: linear-gradient(135deg, #7f8c8d, #636e72); color: #ccc; }
-        .tier-label-desc { font-size: 0.6rem; font-weight: 500; margin-top: 2px; text-align: center; line-height: 1.2; }
+        .tier-label-desc { font-size: 0.6rem; font-weight: 500; margin-top: 2px; text-align: center; }
         .tier-heroes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1; }
         .hero-card { position: relative; width: 84px; height: 48px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 2px solid rgba(99,102,241,0.2); transition: all 0.25s ease; }
-        html.light-theme .hero-card { border-color: rgba(99,102,241,0.15); }
         .hero-card:hover { border-color: #6366f1; transform: translateY(-3px) scale(1.08); z-index: 10; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
         .hero-card img { width: 100%; height: 100%; object-fit: cover; }
         .hero-card-tooltip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background-color: #111; border: 1px solid #6366f1; border-radius: 6px; padding: 6px 10px; white-space: nowrap; font-size: 0.78rem; color: #fff; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 20; }
@@ -356,18 +312,10 @@
         .tierlist-error { text-align: center; padding: 40px; color: var(--error-color); }
         .tierlist-updated { font-size: 0.85rem; color: #666; margin-bottom: 16px; }
         .tier-info-block { background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
-        html.light-theme .tier-info-block { border-color: rgba(99,102,241,0.1); }
         .tier-info-title { color: var(--dark-gold); font-weight: 600; font-size: 1.05rem; margin-bottom: 12px; }
         .tier-info-item { display: flex; align-items: start; gap: 8px; margin-bottom: 6px; font-size: 0.9rem; color: #aaa; }
-        html.light-theme .tier-info-item { color: #666; }
         .tier-info-letter { font-weight: 800; min-width: 20px; }
-        .tier-info-letter.s { color: #e74c3c; }
-        .tier-info-letter.a { color: #e67e22; }
-        .tier-info-letter.b { color: #f1c40f; }
-        .tier-info-letter.c { color: #95a5a6; }
-        .tier-info-letter.d { color: #636e72; }
-
-        /* STEAM STATS */
+        .tier-info-letter.s { color: #e74c3c; } .tier-info-letter.a { color: #e67e22; } .tier-info-letter.b { color: #f1c40f; } .tier-info-letter.c { color: #95a5a6; } .tier-info-letter.d { color: #636e72; }
         .steam-block { max-width: 700px; margin: 0 auto; }
         .steam-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
         .steam-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
@@ -375,10 +323,9 @@
         .steam-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
         .steam-input::placeholder { color: #666; }
         .steam-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 16px; font-size: 1.05rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
-        .steam-btn:hover { opacity: 0.9; box-shadow: 0 0 18px rgba(99,102,241,0.4); transform: translateY(-1px); }
+        .steam-btn:hover { opacity: 0.9; box-shadow: 0 0 18px rgba(99,102,241,0.4); }
         .period-selector { display: flex; gap: 8px; flex-wrap: wrap; }
         .period-btn { padding: 10px 20px; border-radius: 8px; border: 2px solid rgba(99,102,241,0.2); background-color: var(--card-bg); color: #aaa; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; }
-        html.light-theme .period-btn { border-color: rgba(99,102,241,0.15); color: #555; }
         .period-btn:hover { border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
         .period-btn.active { border-color: #6366f1; color: #818cf8; box-shadow: 0 0 12px rgba(99,102,241,0.25); background-color: rgba(99,102,241,0.08); }
         .steam-progress { display: none; margin-top: 24px; }
@@ -386,22 +333,17 @@
         .steam-results { display: none; margin-top: 30px; }
         .steam-results.visible { display: block; animation: fadeIn 0.6s ease; }
         .profile-header { background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 24px; margin-bottom: 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-        html.light-theme .profile-header { border-color: rgba(99,102,241,0.1); }
         .profile-avatar { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #6366f1; object-fit: cover; }
-        .profile-info { flex: 1; min-width: 200px; }
         .profile-info h2 { color: var(--dark-gold); font-size: 1.4rem; margin-bottom: 6px; }
         .profile-info-meta { color: #888; font-size: 0.95rem; }
         .hero-stats-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2a2a3a; }
-        html.light-theme .hero-stats-row { border-color: #eee; }
         .hero-stats-row:last-child { border-bottom: none; }
         .hero-stats-img { width: 48px; height: 28px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
         .hero-stats-name { flex: 1; font-size: 0.95rem; }
         .hero-stats-games { color: #888; font-size: 0.85rem; }
         .hero-stats-wr { font-weight: 700; font-size: 0.95rem; min-width: 60px; text-align: right; }
-        .hero-stats-wr.good { color: var(--green); }
-        .hero-stats-wr.bad { color: var(--red); }
+        .hero-stats-wr.good { color: var(--green); } .hero-stats-wr.bad { color: var(--red); }
         .steam-hint { color: #666; font-size: 0.85rem; }
-
         @media (max-width: 768px) {
             .content-area { padding: 30px 20px; }
             .navbar { padding: 14px 16px 14px 70px; }
@@ -414,271 +356,332 @@
             .farm-table th, .farm-table td { padding: 6px; font-size: 0.85rem; }
             .ga-logo-text { font-size: 1.1rem; }
             .profile-header { flex-direction: column; text-align: center; }
-            .players-table { font-size: 0.8rem; }
-            .players-table th, .players-table td { padding: 8px 6px; }
+            .account-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- AUTH -->
-    <div id="authScreen">
-        <div class="auth-card">
-            <div class="auth-logo">GAMERANALYZER</div>
-            <div class="auth-subtitle">Анализ матчей Dota 2 и CS 2</div>
-            <div id="loginForm">
-                <div class="input-group"><label>Логин</label><input type="text" id="loginInput" placeholder="Введите логин"></div>
-                <div class="input-group"><label>Пароль</label><input type="password" id="passwordInput" placeholder="Введите пароль"></div>
-                <button class="auth-btn" id="loginBtn">Войти</button>
-                <div id="loginError" class="msg-box msg-error"></div>
-                <div class="auth-link">Нет аккаунта? <span id="goToRegister">Зарегистрироваться</span></div>
+<!-- AUTH -->
+<div id="authScreen">
+    <div class="auth-card">
+        <div class="auth-logo">GAMERANALYZER</div>
+        <div class="auth-subtitle">Анализ матчей Dota 2 и CS 2</div>
+        <div id="loginForm">
+            <div class="input-group"><label>Логин</label><input type="text" id="loginInput" placeholder="Введите логин"></div>
+            <div class="input-group"><label>Пароль</label><input type="password" id="passwordInput" placeholder="Введите пароль"></div>
+            <button class="auth-btn" id="loginBtn">Войти</button>
+            <div id="loginError" class="msg-box msg-error"></div>
+            <div class="auth-link">Нет аккаунта? <span id="goToRegister">Зарегистрироваться</span></div>
+        </div>
+        <div id="registerForm" style="display:none;">
+            <div class="input-group"><label>Придумайте логин</label><input type="text" id="regLoginInput" placeholder="Минимум 3 символа"></div>
+            <div class="input-group"><label>Придумайте пароль</label><input type="password" id="regPasswordInput" placeholder="Минимум 4 символа"></div>
+            <div class="input-group"><label>Подтвердите пароль</label><input type="password" id="regPasswordConfirm" placeholder="Повторите пароль"></div>
+            <button class="auth-btn" id="registerBtn">Зарегистрироваться</button>
+            <div id="regError" class="msg-box msg-error"></div>
+            <div id="regSuccess" class="msg-box msg-success"></div>
+            <div class="auth-link">Уже есть аккаунт? <span id="goToLogin">Войти</span></div>
+        </div>
+        <div class="auth-note">Данные хранятся в защищённой облачной базе</div>
+    </div>
+</div>
+
+<!-- APP -->
+<div class="app-wrapper" id="appWrapper">
+    <div class="burger" id="burger"><span></span><span></span><span></span></div>
+    <div class="overlay" id="overlay"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+            <div class="sidebar-user-label">Аккаунт</div>
+            <div class="sidebar-user-name" id="userName">—</div>
+            <div class="sidebar-user-plan" id="userPlan">Бесплатный</div>
+        </div>
+        <div class="sidebar-item active" data-section="home"><span class="icon">🏠</span> Главная</div>
+        <div class="sidebar-item" data-section="account"><span class="icon">👤</span> Личный кабинет</div>
+        <div class="sidebar-item" data-section="subscriptions"><span class="icon">⭐</span> Подписки</div>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
+        <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
+        <div class="sidebar-divider"></div>
+        <div class="theme-toggle" id="themeToggle"><span class="icon">🌓</span> Сменить тему</div>
+    </div>
+    <div class="navbar">
+        <div class="ga-logo">
+            <div class="ga-logo-svg-wrap">
+                <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
+                    <defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6366f1"/><stop offset="50%" style="stop-color:#818cf8"/><stop offset="100%" style="stop-color:#a5b4fc"/></linearGradient></defs>
+                    <path d="M22 3 L37 11.5 L37 30.5 L22 39 L7 30.5 L7 11.5 Z" stroke="url(#logoGrad)" stroke-width="1.8" fill="rgba(99,102,241,0.06)" stroke-linejoin="round"/>
+                    <path d="M29 5.5 L37 11.5" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                    <line x1="16" y1="13" x2="27" y2="29" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="28" y1="13" x2="17" y2="29" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="13" y1="16" x2="19" y2="10" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
+                    <line x1="31" y1="16" x2="25" y2="10" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
+                    <line x1="12" y1="18" x2="20" y2="18" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
+                    <line x1="24" y1="18" x2="32" y2="18" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
             </div>
-            <div id="registerForm" style="display:none;">
-                <div class="input-group"><label>Придумайте логин</label><input type="text" id="regLoginInput" placeholder="Минимум 3 символа"></div>
-                <div class="input-group"><label>Придумайте пароль</label><input type="password" id="regPasswordInput" placeholder="Минимум 4 символа"></div>
-                <div class="input-group"><label>Подтвердите пароль</label><input type="password" id="regPasswordConfirm" placeholder="Повторите пароль"></div>
-                <button class="auth-btn" id="registerBtn">Зарегистрироваться</button>
-                <div id="regError" class="msg-box msg-error"></div>
-                <div id="regSuccess" class="msg-box msg-success"></div>
-                <div class="auth-link">Уже есть аккаунт? <span id="goToLogin">Войти</span></div>
-            </div>
-            <div class="auth-note">Данные хранятся в защищённой облачной базе</div>
+            <span class="ga-logo-text">GAMERANALYZER</span>
+        </div>
+        <div class="navbar-right">
+            <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему">🌓</button>
+            <button class="logout-btn" id="logoutBtn">Выйти</button>
         </div>
     </div>
 
-    <!-- APP -->
-    <div class="app-wrapper" id="appWrapper">
-        <div class="burger" id="burger"><span></span><span></span><span></span></div>
-        <div class="overlay" id="overlay"></div>
+    <div class="content-area">
 
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-user">
-                <div class="sidebar-user-label">Аккаунт</div>
-                <div class="sidebar-user-name" id="userName">—</div>
-                <div class="sidebar-user-plan" id="userPlan">Бесплатный</div>
+        <!-- HOME -->
+        <div class="section active" id="section-home">
+            <div class="home-hero">
+                <div class="home-tagline">⚡ AI-powered game analysis</div>
+                <div class="section-title">Функционал сервиса</div>
+                <p class="section-desc">GamerAnalyzer — ИИ-сервис для анализа матчей в Dota 2 и CS 2. Персональный разбор, сравнение с актуальными про-игроками 2026 года и конкретные тренерские рекомендации.</p>
             </div>
-            <div class="sidebar-item active" data-section="home"><span class="icon">🏠</span> Главная</div>
-            <div class="sidebar-item" data-section="subscriptions"><span class="icon">⭐</span> Подписки</div>
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
-            <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
-            <div class="sidebar-divider"></div>
-            <div class="theme-toggle" id="themeToggle"><span class="icon">🌓</span> Сменить тему</div>
-        </div>
-
-        <div class="navbar">
-            <!-- НОВЫЙ ЛОГОТИП с шестиугольником и мечами -->
-            <div class="ga-logo">
-                <div class="ga-logo-svg-wrap">
-                    <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
-                        <defs>
-                            <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#6366f1"/>
-                                <stop offset="50%" style="stop-color:#818cf8"/>
-                                <stop offset="100%" style="stop-color:#a5b4fc"/>
-                            </linearGradient>
-                        </defs>
-                        <!-- Шестиугольник -->
-                        <path d="M22 3 L37 11.5 L37 30.5 L22 39 L7 30.5 L7 11.5 Z" stroke="url(#logoGrad)" stroke-width="1.8" fill="rgba(99,102,241,0.06)" stroke-linejoin="round"/>
-                        <!-- Разрыв сверху-справа как на логотипе -->
-                        <path d="M29 5.5 L37 11.5" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round"/>
-                        <!-- Меч 1 (↙) -->
-                        <line x1="16" y1="13" x2="27" y2="29" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
-                        <!-- Меч 2 (↘) -->
-                        <line x1="28" y1="13" x2="17" y2="29" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
-                        <!-- Рукоятка 1 -->
-                        <line x1="13" y1="16" x2="19" y2="10" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                        <!-- Рукоятка 2 -->
-                        <line x1="31" y1="16" x2="25" y2="10" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                        <!-- Гарда 1 -->
-                        <line x1="12" y1="18" x2="20" y2="18" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                        <!-- Гарда 2 -->
-                        <line x1="24" y1="18" x2="32" y2="18" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <span class="ga-logo-text">GAMERANALYZER</span>
-            </div>
-            <div class="navbar-right">
-                <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему">🌓</button>
-                <button class="logout-btn" id="logoutBtn">Выйти</button>
+            <div class="features-grid">
+                <div class="feature-card"><span class="feature-icon">📊</span><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
+                <div class="feature-card"><span class="feature-icon">🎯</span><div class="feature-title">Сравнение с про-сценой</div><div class="feature-text">Ваши показатели сравниваются с актуальными данными профессиональных игроков 2026 года.</div></div>
+                <div class="feature-card"><span class="feature-icon">💡</span><div class="feature-title">Рекомендации тренера</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
+                <div class="feature-card"><span class="feature-icon">👤</span><div class="feature-title">Личный кабинет</div><div class="feature-text">История анализов, график прогресса и статистика достижений.</div></div>
+                <div class="feature-card"><span class="feature-icon">📈</span><div class="feature-title">График прогресса</div><div class="feature-text">Отслеживай рост KD, ADR и GPM на основе реальных матчей.</div></div>
+                <div class="feature-card"><span class="feature-icon">🔫</span><div class="feature-title">FACEIT анализ CS2</div><div class="feature-text">Анализ матчей по ссылке FACEIT с глубоким разбором стиля игры.</div></div>
             </div>
         </div>
 
-        <div class="content-area">
+        <!-- ЛИЧНЫЙ КАБИНЕТ -->
+        <div class="section" id="section-account">
+            <div class="section-title">👤 Личный кабинет</div>
+            <p class="section-desc">Ваша статистика, прогресс и история анализов.</p>
 
-            <!-- HOME -->
-            <div class="section active" id="section-home">
-                <div class="home-hero">
-                    <div class="home-tagline">⚡ AI-powered game analysis</div>
-                    <div class="section-title">Функционал сервиса</div>
-                    <p class="section-desc">GamerAnalyzer — ИИ-сервис для анализа матчей в Dota 2 и CS 2. Персональный разбор, сравнение с актуальными про-игроками 2026 года и конкретные тренерские рекомендации.</p>
+            <!-- Статы -->
+            <div class="account-grid" id="accountStats">
+                <div class="account-card">
+                    <div class="account-card-title">Всего анализов</div>
+                    <div class="account-card-value" id="statTotalAnalyses">0</div>
+                    <div class="account-card-sub">за всё время</div>
                 </div>
-                <div class="features-grid">
-                    <div class="feature-card"><span class="feature-icon">📊</span><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
-                    <div class="feature-card"><span class="feature-icon">🎯</span><div class="feature-title">Сравнение с про-сценой</div><div class="feature-text">Ваши показатели сравниваются с актуальными данными профессиональных игроков 2026 года.</div></div>
-                    <div class="feature-card"><span class="feature-icon">💡</span><div class="feature-title">Рекомендации тренера</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
-                    <div class="feature-card"><span class="feature-icon">🏆</span><div class="feature-title">Определение роли</div><div class="feature-text">ИИ определяет вашу идеальную роль на основе 20+ параметров поведения в матче.</div></div>
-                    <div class="feature-card"><span class="feature-icon">📈</span><div class="feature-title">Отслеживание прогресса</div><div class="feature-text">История разборов и графики роста по неделям — следите за улучшениями.</div></div>
-                    <div class="feature-card"><span class="feature-icon">🔫</span><div class="feature-title">FACEIT анализ CS2</div><div class="feature-text">Анализ матчей по ссылке FACEIT с глубоким разбором стиля игры и сравнением с про-игроками.</div></div>
+                <div class="account-card">
+                    <div class="account-card-title">Dota 2 анализов</div>
+                    <div class="account-card-value" id="statDotaAnalyses">0</div>
+                    <div class="account-card-sub">матчей разобрано</div>
+                </div>
+                <div class="account-card">
+                    <div class="account-card-title">CS 2 анализов</div>
+                    <div class="account-card-value" id="statCsAnalyses">0</div>
+                    <div class="account-card-sub">матчей разобрано</div>
+                </div>
+                <div class="account-card">
+                    <div class="account-card-title">Тариф</div>
+                    <div id="statPlan"><span class="account-plan-badge free">Бесплатный</span></div>
+                    <div class="account-card-sub" style="margin-top:8px;" id="statLimitInfo"></div>
                 </div>
             </div>
 
-            <!-- SUBSCRIPTIONS -->
-            <div class="section" id="section-subscriptions">
-                <button class="back-home-btn" data-back="home">← На главную страницу</button>
-                <div class="section-title">Тарифы и подписки</div>
-                <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
-                <div class="subscription-cards">
-                    <div class="subscription-card" id="card-dota" data-plan="pro_dota2">
-                        <div class="subscription-title">PRO DOTA 2</div>
-                        <div class="subscription-price">250 ₽</div>
-                        <ul class="benefits-list">
-                            <li class="benefit">10 анализов матчей ежедневно</li>
-                            <li class="benefit">Лучшие паттерны фарма</li>
-                            <li class="benefit">Идеальный вардинг</li>
-                            <li class="benefit">Тайминги всех действий, предметов</li>
-                        </ul>
-                        <button class="card-btn" id="btn-dota">Выбрать тариф</button>
-                        <div class="current-badge" id="badge-dota">✓ Ваша текущая подписка</div>
-                    </div>
-                    <div class="subscription-card" id="card-cs" data-plan="pro_cs2">
-                        <div class="subscription-title">PRO CS 2</div>
-                        <div class="subscription-price">250 ₽</div>
-                        <ul class="benefits-list">
-                            <li class="benefit">10 анализов матчей ежедневно</li>
-                            <li class="benefit">Лайнапы гранат на всех картах</li>
-                            <li class="benefit">Тайминги действий на карте</li>
-                            <li class="benefit">FACEIT анализ с про-сравнением</li>
-                        </ul>
-                        <button class="card-btn" id="btn-cs">Выбрать тариф</button>
-                        <div class="current-badge" id="badge-cs">✓ Ваша текущая подписка</div>
-                    </div>
-                    <div class="subscription-card" id="card-premium" data-plan="premium">
-                        <div class="premium-badge"></div>
-                        <div class="subscription-title">⭐ PREMIUM</div>
-                        <div class="subscription-price" style="font-size:2.6rem;">499 ₽</div>
-                        <ul class="benefits-list">
-                            <li class="benefit">Всё из PRO DOTA 2 и PRO CS 2</li>
-                            <li class="benefit">Безлимитное количество анализов</li>
-                            <li class="benefit">Сравнение с профессиональными игроками</li>
-                            <li class="benefit">Более глубокий анализ игровых ситуаций</li>
-                        </ul>
-                        <button class="card-btn" id="btn-premium">Выбрать тариф</button>
-                        <div class="current-badge" id="badge-premium">✓ Ваша текущая подписка</div>
-                    </div>
-                </div>
+            <!-- Лимиты -->
+            <div class="chart-block" id="limitsBlock">
+                <div class="chart-block-title">📊 Лимиты анализов сегодня</div>
+                <div id="limitsContent"></div>
             </div>
 
-            <!-- DOTA 2 -->
-            <div class="section" id="section-dota2">
-                <button class="back-home-btn" data-back="home">← На главную страницу</button>
-                <div class="dota-subtabs">
-                    <div class="dota-subtab active" data-subtab="analysis"><span class="dota-subtab-icon">⚔️</span><span class="dota-subtab-text">Анализ матча</span></div>
-                    <div class="dota-subtab" data-subtab="tierlist"><span class="dota-subtab-icon">📋</span><span class="dota-subtab-text">Тир-лист героев</span></div>
-                    <div class="dota-subtab" data-subtab="stats"><span class="dota-subtab-icon">👤</span><span class="dota-subtab-text">Моя статистика</span></div>
-                </div>
-                <div class="dota-subcontent active" id="dotaSub-analysis">
-                    <div class="game-block">
-                        <div class="game-icon">⚔️</div>
-                        <div class="section-title">Анализ матча Dota 2</div>
-                        <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор.</div>
-                        <div class="link-form">
-                            <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink"/>
-                            <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
-                        </div>
-                        <div class="progress-wrapper" id="dotaProgress">
-                            <div class="progress-bar"><div class="progress-fill" id="dotaProgressFill"></div></div>
-                            <div class="progress-text" id="dotaProgressText">В очереди...</div>
-                        </div>
-                        <div class="results-wrapper" id="dotaResults"></div>
-                    </div>
-                </div>
-                <div class="dota-subcontent" id="dotaSub-tierlist">
-                    <div class="section-title">Тир-лист героев Dota 2</div>
-                    <div class="section-desc">Актуальный тир-лист героев по рангам и позициям. Данные обновляются автоматически.</div>
-                    <div class="tier-info-block">
-                        <div class="tier-info-title">Расшифровка тиров</div>
-                        <div class="tier-info-item"><span class="tier-info-letter s">S</span> Очень метовые и сильные — лучший выбор в текущей мете</div>
-                        <div class="tier-info-item"><span class="tier-info-letter a">A</span> Сильные, чуть уступают S-тиру, но всё ещё отличный выбор</div>
-                        <div class="tier-info-item"><span class="tier-info-letter b">B</span> Ситуативные — нужны под конкретный пик</div>
-                        <div class="tier-info-item"><span class="tier-info-letter c">C</span> Объективно слабые — пикайте, только если вы задрот на этом герое</div>
-                        <div class="tier-info-item"><span class="tier-info-letter d">D</span> Мусор — не стоит брать в нынешней мете</div>
-                    </div>
-                    <div class="position-selector" id="positionSelector"></div>
-                    <div class="rank-selector" id="rankSelector"></div>
-                    <div class="tierlist-updated" id="tierlistUpdated"></div>
-                    <div id="tierlistContent"><div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div></div>
-                </div>
-                <div class="dota-subcontent" id="dotaSub-stats">
-                    <div class="steam-block">
-                        <div class="game-icon">👤</div>
-                        <div class="section-title">Моя статистика</div>
-                        <div class="section-desc">Введите ваш Steam ID — сервис выгрузит статистику за выбранный период.</div>
-                        <div class="steam-form">
-                            <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль / friend code" id="steamInput"/>
-                            <div class="period-selector">
-                                <div class="period-btn active" data-period="7">7 дней</div>
-                                <div class="period-btn" data-period="30">30 дней</div>
-                                <div class="period-btn" data-period="90">90 дней</div>
-                                <div class="period-btn" data-period="0">Всё время</div>
-                            </div>
-                            <button class="steam-btn" id="steamFetchBtn">Получить статистику</button>
-                        </div>
-                        <div class="steam-hint">Steam ID можно найти на сайте steamid.xyz</div>
-                        <div class="steam-progress" id="steamProgress">
-                            <div class="progress-bar"><div class="progress-fill" id="steamProgressFill"></div></div>
-                            <div class="progress-text" id="steamProgressText">Загрузка...</div>
-                        </div>
-                        <div class="steam-results" id="steamResults"></div>
-                    </div>
-                </div>
+            <!-- Достижения -->
+            <div class="chart-block">
+                <div class="chart-block-title">🏆 Достижения</div>
+                <div class="achievements-row" id="achievementsList"></div>
             </div>
 
-            <!-- CS 2 -->
-            <div class="section" id="section-cs2">
-                <button class="back-home-btn" data-back="home">← На главную страницу</button>
-                <div class="dota-subtabs" id="cs2Subtabs">
-                    <div class="dota-subtab active" data-cs2subtab="analysis"><span class="dota-subtab-icon">🔫</span><span class="dota-subtab-text">Анализ матча</span></div>
-                    <div class="dota-subtab" data-cs2subtab="faceit"><span class="dota-subtab-icon">🎯</span><span class="dota-subtab-text">FACEIT Анализ</span></div>
+            <!-- График прогресса -->
+            <div class="chart-block">
+                <div class="chart-block-title">📈 График прогресса</div>
+                <div class="chart-tabs">
+                    <button class="chart-tab active" data-chart="kd">K/D (CS2)</button>
+                    <button class="chart-tab" data-chart="adr">ADR (CS2)</button>
+                    <button class="chart-tab" data-chart="gpm">GPM (Dota2)</button>
+                    <button class="chart-tab" data-chart="wr">Винрейт (Dota2)</button>
                 </div>
-                <div class="dota-subcontent active" id="cs2Sub-analysis">
-                    <div class="game-block">
-                        <div class="game-icon">🔫</div>
-                        <div class="section-title">Анализ матча CS 2</div>
-                        <div class="section-desc">Вставьте ссылку на матч или загрузите .dem файл — сервис проанализирует демку и выдаст разбор по гранатам, спотам и роли.</div>
-                        <div class="link-form">
-                            <input type="text" class="link-input" placeholder="Вставьте ссылку на матч" id="csLink"/>
-                            <input type="file" class="file-input" id="csFile" accept=".dem"/>
-                            <div class="file-hint">Скачайте .dem с HLTV, FACEIT или CS2Stats и загрузите сюда</div>
-                            <button class="analyze-btn" id="csAnalyzeBtn">Анализировать</button>
-                        </div>
-                        <div class="progress-wrapper" id="csProgress">
-                            <div class="progress-bar"><div class="progress-fill" id="csProgressFill"></div></div>
-                            <div class="progress-text" id="csProgressText">В очереди...</div>
-                        </div>
-                        <div class="results-wrapper" id="csResults"></div>
-                    </div>
+                <div style="position:relative;height:260px;">
+                    <canvas id="progressChart"></canvas>
                 </div>
-                <div class="dota-subcontent" id="cs2Sub-faceit">
-                    <div class="game-block" style="max-width:900px;">
-                        <div class="game-icon">🎯</div>
-                        <div class="section-title">FACEIT Анализ матча</div>
-                        <div class="section-desc">Вставьте ссылку на матч FACEIT — получите глубокий разбор с анализом стиля игры и сравнением с актуальными про-игроками 2026 года.</div>
-                        <div class="link-form">
-                            <input type="text" class="link-input" placeholder="https://www.faceit.com/en/cs2/room/1-xxxxxxxx-..." id="faceitLink"/>
-                            <button class="analyze-btn" id="faceitAnalyzeBtn">Анализировать</button>
-                        </div>
-                        <div class="progress-wrapper" id="faceitProgress">
-                            <div class="progress-bar"><div class="progress-fill" id="faceitProgressFill"></div></div>
-                            <div class="progress-text" id="faceitProgressText">Загрузка данных матча...</div>
-                        </div>
-                        <div class="results-wrapper" id="faceitResults"></div>
-                    </div>
-                </div>
+                <div class="chart-empty" id="chartEmpty" style="display:none;">Недостаточно данных. Проведите минимум 2 анализа для отображения графика.</div>
             </div>
 
+            <!-- История анализов -->
+            <div class="chart-block">
+                <div class="chart-block-title">🕐 История анализов</div>
+                <div id="historyList" class="history-list">
+                    <div class="history-empty">История пуста. Проведите первый анализ!</div>
+                </div>
+            </div>
         </div>
+
+        <!-- SUBSCRIPTIONS -->
+        <div class="section" id="section-subscriptions">
+            <button class="back-home-btn" data-back="home">← На главную страницу</button>
+            <div class="section-title">Тарифы и подписки</div>
+            <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
+            <div class="subscription-cards">
+                <div class="subscription-card" id="card-dota" data-plan="pro_dota2">
+                    <div class="subscription-title">PRO DOTA 2</div>
+                    <div class="subscription-price">250 ₽</div>
+                    <ul class="benefits-list">
+                        <li class="benefit">10 анализов матчей ежедневно</li>
+                        <li class="benefit">Лучшие паттерны фарма</li>
+                        <li class="benefit">Идеальный вардинг</li>
+                        <li class="benefit">Тайминги всех действий, предметов</li>
+                    </ul>
+                    <button class="card-btn" id="btn-dota">Выбрать тариф</button>
+                    <div class="current-badge" id="badge-dota">✓ Ваша текущая подписка</div>
+                </div>
+                <div class="subscription-card" id="card-cs" data-plan="pro_cs2">
+                    <div class="subscription-title">PRO CS 2</div>
+                    <div class="subscription-price">250 ₽</div>
+                    <ul class="benefits-list">
+                        <li class="benefit">10 анализов матчей ежедневно</li>
+                        <li class="benefit">Лайнапы гранат на всех картах</li>
+                        <li class="benefit">Тайминги действий на карте</li>
+                        <li class="benefit">FACEIT анализ с про-сравнением</li>
+                    </ul>
+                    <button class="card-btn" id="btn-cs">Выбрать тариф</button>
+                    <div class="current-badge" id="badge-cs">✓ Ваша текущая подписка</div>
+                </div>
+                <div class="subscription-card" id="card-premium" data-plan="premium">
+                    <div class="premium-badge"></div>
+                    <div class="subscription-title">⭐ PREMIUM</div>
+                    <div class="subscription-price" style="font-size:2.6rem;">499 ₽</div>
+                    <ul class="benefits-list">
+                        <li class="benefit">Всё из PRO DOTA 2 и PRO CS 2</li>
+                        <li class="benefit">Безлимитное количество анализов</li>
+                        <li class="benefit">Сравнение с профессиональными игроками</li>
+                        <li class="benefit">Более глубокий анализ игровых ситуаций</li>
+                    </ul>
+                    <button class="card-btn" id="btn-premium">Выбрать тариф</button>
+                    <div class="current-badge" id="badge-premium">✓ Ваша текущая подписка</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOTA 2 -->
+        <div class="section" id="section-dota2">
+            <button class="back-home-btn" data-back="home">← На главную страницу</button>
+            <div class="dota-subtabs">
+                <div class="dota-subtab active" data-subtab="analysis"><span class="dota-subtab-icon">⚔️</span><span class="dota-subtab-text">Анализ матча</span></div>
+                <div class="dota-subtab" data-subtab="history"><span class="dota-subtab-icon">🕐</span><span class="dota-subtab-text">История</span></div>
+                <div class="dota-subtab" data-subtab="tierlist"><span class="dota-subtab-icon">📋</span><span class="dota-subtab-text">Тир-лист героев</span></div>
+                <div class="dota-subtab" data-subtab="stats"><span class="dota-subtab-icon">👤</span><span class="dota-subtab-text">Моя статистика</span></div>
+            </div>
+            <div class="dota-subcontent active" id="dotaSub-analysis">
+                <div class="game-block">
+                    <div class="game-icon">⚔️</div>
+                    <div class="section-title">Анализ матча Dota 2</div>
+                    <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор.</div>
+                    <div id="dotaLimitWarning"></div>
+                    <div class="link-form">
+                        <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink"/>
+                        <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
+                    </div>
+                    <div class="progress-wrapper" id="dotaProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="dotaProgressFill"></div></div>
+                        <div class="progress-text" id="dotaProgressText">В очереди...</div>
+                    </div>
+                    <div class="results-wrapper" id="dotaResults"></div>
+                </div>
+            </div>
+            <div class="dota-subcontent" id="dotaSub-history">
+                <div class="section-title">История анализов Dota 2</div>
+                <div id="dotaHistoryList" class="history-list"><div class="history-empty">История пуста.</div></div>
+            </div>
+            <div class="dota-subcontent" id="dotaSub-tierlist">
+                <div class="section-title">Тир-лист героев Dota 2</div>
+                <div class="section-desc">Актуальный тир-лист героев по рангам и позициям.</div>
+                <div class="tier-info-block">
+                    <div class="tier-info-title">Расшифровка тиров</div>
+                    <div class="tier-info-item"><span class="tier-info-letter s">S</span> Очень метовые — лучший выбор в текущей мете</div>
+                    <div class="tier-info-item"><span class="tier-info-letter a">A</span> Сильные, чуть уступают S-тиру</div>
+                    <div class="tier-info-item"><span class="tier-info-letter b">B</span> Ситуативные — нужны под конкретный пик</div>
+                    <div class="tier-info-item"><span class="tier-info-letter c">C</span> Объективно слабые</div>
+                    <div class="tier-info-item"><span class="tier-info-letter d">D</span> Мусор — не стоит брать в нынешней мете</div>
+                </div>
+                <div class="position-selector" id="positionSelector"></div>
+                <div class="rank-selector" id="rankSelector"></div>
+                <div class="tierlist-updated" id="tierlistUpdated"></div>
+                <div id="tierlistContent"><div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка данных...</div></div></div>
+            </div>
+            <div class="dota-subcontent" id="dotaSub-stats">
+                <div class="steam-block">
+                    <div class="game-icon">👤</div>
+                    <div class="section-title">Моя статистика</div>
+                    <div class="section-desc">Введите ваш Steam ID — сервис выгрузит статистику за выбранный период.</div>
+                    <div class="steam-form">
+                        <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль / friend code" id="steamInput"/>
+                        <div class="period-selector">
+                            <div class="period-btn active" data-period="7">7 дней</div>
+                            <div class="period-btn" data-period="30">30 дней</div>
+                            <div class="period-btn" data-period="90">90 дней</div>
+                            <div class="period-btn" data-period="0">Всё время</div>
+                        </div>
+                        <button class="steam-btn" id="steamFetchBtn">Получить статистику</button>
+                    </div>
+                    <div class="steam-hint">Steam ID можно найти на сайте steamid.xyz</div>
+                    <div class="steam-progress" id="steamProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="steamProgressFill"></div></div>
+                        <div class="progress-text" id="steamProgressText">Загрузка...</div>
+                    </div>
+                    <div class="steam-results" id="steamResults"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CS 2 -->
+        <div class="section" id="section-cs2">
+            <button class="back-home-btn" data-back="home">← На главную страницу</button>
+            <div class="dota-subtabs" id="cs2Subtabs">
+                <div class="dota-subtab active" data-cs2subtab="analysis"><span class="dota-subtab-icon">🔫</span><span class="dota-subtab-text">Анализ матча</span></div>
+                <div class="dota-subtab" data-cs2subtab="history"><span class="dota-subtab-icon">🕐</span><span class="dota-subtab-text">История</span></div>
+                <div class="dota-subtab" data-cs2subtab="faceit"><span class="dota-subtab-icon">🎯</span><span class="dota-subtab-text">FACEIT Анализ</span></div>
+            </div>
+            <div class="dota-subcontent active" id="cs2Sub-analysis">
+                <div class="game-block">
+                    <div class="game-icon">🔫</div>
+                    <div class="section-title">Анализ матча CS 2</div>
+                    <div class="section-desc">Вставьте ссылку на матч или загрузите .dem файл.</div>
+                    <div id="csLimitWarning"></div>
+                    <div class="link-form">
+                        <input type="text" class="link-input" placeholder="Вставьте ссылку на матч" id="csLink"/>
+                        <input type="file" class="file-input" id="csFile" accept=".dem"/>
+                        <div class="file-hint">Скачайте .dem с HLTV, FACEIT или CS2Stats и загрузите сюда</div>
+                        <button class="analyze-btn" id="csAnalyzeBtn">Анализировать</button>
+                    </div>
+                    <div class="progress-wrapper" id="csProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="csProgressFill"></div></div>
+                        <div class="progress-text" id="csProgressText">В очереди...</div>
+                    </div>
+                    <div class="results-wrapper" id="csResults"></div>
+                </div>
+            </div>
+            <div class="dota-subcontent" id="cs2Sub-history">
+                <div class="section-title">История анализов CS 2</div>
+                <div id="csHistoryList" class="history-list"><div class="history-empty">История пуста.</div></div>
+            </div>
+            <div class="dota-subcontent" id="cs2Sub-faceit">
+                <div class="game-block" style="max-width:900px;">
+                    <div class="game-icon">🎯</div>
+                    <div class="section-title">FACEIT Анализ матча</div>
+                    <div class="section-desc">Вставьте ссылку на матч FACEIT — получите глубокий разбор с анализом стиля игры и сравнением с актуальными про-игроками 2026 года.</div>
+                    <div id="faceitLimitWarning"></div>
+                    <div class="link-form">
+                        <input type="text" class="link-input" placeholder="https://www.faceit.com/en/cs2/room/1-xxxxxxxx-..." id="faceitLink"/>
+                        <button class="analyze-btn" id="faceitAnalyzeBtn">Анализировать</button>
+                    </div>
+                    <div class="progress-wrapper" id="faceitProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="faceitProgressFill"></div></div>
+                        <div class="progress-text" id="faceitProgressText">Загрузка данных матча...</div>
+                    </div>
+                    <div class="results-wrapper" id="faceitResults"></div>
+                </div>
+            </div>
+        </div>
+
     </div>
+</div>
 
 <script>
 // ============================================================
@@ -688,355 +691,618 @@ const SUPABASE_URL = 'https://nkzxnjixxcuxyziprbdg.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5renhuaml4eGN1eHl6aXByYmRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4OTc4NTksImV4cCI6MjEwNDQ3Mzg1OX0.eBSjZR7huEnQMRqhpu2vuBIpLK5yOm1tmpVzg6NhHB8';
 let supabaseClient = null;
 try {
-    if (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('https://') && SUPABASE_KEY.length > 20) {
-        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    }
-} catch(e) { console.error('Supabase error:', e.message); }
+    if (typeof supabase !== 'undefined') supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch(e) { console.error('Supabase:', e.message); }
 
-function isRLSError(err) {
-    var msg = (err && err.message) ? err.message.toLowerCase() : '';
-    return msg.indexOf('app.current_login') !== -1 || msg.indexOf('row-level security') !== -1 || msg.indexOf('permission') !== -1 || msg.indexOf('policy') !== -1;
-}
+function isRLSError(err) { var msg=(err&&err.message)?err.message.toLowerCase():''; return msg.indexOf('row-level security')!==-1||msg.indexOf('permission')!==-1||msg.indexOf('policy')!==-1; }
 
 const DOTA_API = '/api/dota/';
-const FACEIT_API = '/api/faceit/';
+
+// ============================================================
+// ЛИМИТЫ ПОДПИСОК
+// ============================================================
+const PLAN_LIMITS = {
+    'free':     { dota: 3,  cs: 3,  label: 'Бесплатный' },
+    'pro_dota2':{ dota: 10, cs: 3,  label: 'PRO DOTA 2' },
+    'pro_cs2':  { dota: 3,  cs: 10, label: 'PRO CS 2' },
+    'premium':  { dota: 999,cs: 999,label: 'PREMIUM' }
+};
+
+function getTimeUntilMidnight() {
+    var now = new Date();
+    var midnight = new Date(now); midnight.setHours(24,0,0,0);
+    var diff = midnight - now;
+    var h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000);
+    return h + 'ч ' + m + 'мин';
+}
+
+async function getUsage() {
+    var u = getCurrentUser(); if (!u) return { dota_today: 0, cs_today: 0 };
+    var today = new Date().toISOString().split('T')[0];
+    if (supabaseClient) {
+        try {
+            var r = await supabaseClient.from('usage_limits').select('*').eq('user_login', u.login).maybeSingle();
+            if (r.data) {
+                if (r.data.last_reset !== today) {
+                    await supabaseClient.from('usage_limits').update({ dota_today: 0, cs_today: 0, last_reset: today }).eq('user_login', u.login);
+                    return { dota_today: 0, cs_today: 0 };
+                }
+                return { dota_today: r.data.dota_today || 0, cs_today: r.data.cs_today || 0 };
+            } else {
+                await supabaseClient.from('usage_limits').insert({ user_login: u.login, dota_today: 0, cs_today: 0, last_reset: today });
+                return { dota_today: 0, cs_today: 0 };
+            }
+        } catch(e) { return getLocalUsage(); }
+    }
+    return getLocalUsage();
+}
+
+function getLocalUsage() {
+    var today = new Date().toISOString().split('T')[0];
+    try { var d = JSON.parse(localStorage.getItem('ga_usage')||'{}'); if (d.date !== today) return { dota_today: 0, cs_today: 0 }; return { dota_today: d.dota||0, cs_today: d.cs||0 }; } catch(e) { return { dota_today: 0, cs_today: 0 }; }
+}
+
+async function incrementUsage(game) {
+    var u = getCurrentUser(); if (!u) return;
+    var today = new Date().toISOString().split('T')[0];
+    if (supabaseClient) {
+        try {
+            var cur = await getUsage();
+            var upd = game === 'dota' ? { dota_today: (cur.dota_today||0)+1, last_reset: today } : { cs_today: (cur.cs_today||0)+1, last_reset: today };
+            await supabaseClient.from('usage_limits').upsert({ user_login: u.login, ...upd });
+        } catch(e) { incrementLocalUsage(game); }
+    } else { incrementLocalUsage(game); }
+}
+
+function incrementLocalUsage(game) {
+    var today = new Date().toISOString().split('T')[0];
+    try { var d = JSON.parse(localStorage.getItem('ga_usage')||'{}'); if (d.date !== today) d = { date: today, dota: 0, cs: 0 }; if (game==='dota') d.dota++; else d.cs++; localStorage.setItem('ga_usage', JSON.stringify(d)); } catch(e) {}
+}
+
+async function checkLimit(game) {
+    var u = getCurrentUser(); if (!u) return true;
+    var plan = u.plan || 'free';
+    var limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free'];
+    if (plan === 'premium') return true;
+    var usage = await getUsage();
+    var used = game === 'dota' ? usage.dota_today : usage.cs_today;
+    var max = game === 'dota' ? limits.dota : limits.cs;
+    return used < max;
+}
+
+async function showLimitWarning(containerId, game) {
+    var u = getCurrentUser(); if (!u) return;
+    var plan = u.plan || 'free';
+    var limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free'];
+    var usage = await getUsage();
+    var used = game === 'dota' ? usage.dota_today : usage.cs_today;
+    var max = game === 'dota' ? limits.dota : limits.cs;
+    var el = document.getElementById(containerId); if (!el) return;
+    if (plan === 'premium') { el.innerHTML = ''; return; }
+    var pct = Math.min(100, Math.round(used/max*100));
+    var isFull = used >= max;
+    el.innerHTML = isFull
+        ? '<div class="limit-warning"><div class="limit-warning-title">🚫 Лимит исчерпан</div><div class="limit-warning-text">Вы использовали все ' + max + ' анализов на сегодня (' + limits.label + ').</div><div class="limit-warning-time">Обновление через: ' + getTimeUntilMidnight() + ' (в 00:00)</div></div>'
+        : '<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#888;margin-bottom:6px;"><span>Анализов сегодня: ' + used + ' / ' + max + '</span><span>' + pct + '%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(pct>=80?' danger':'')+'" style="width:'+pct+'%"></div></div><div class="limit-reset-time">Обновление в 00:00 · осталось ' + getTimeUntilMidnight() + '</div></div>';
+}
+
+// ============================================================
+// ИСТОРИЯ АНАЛИЗОВ
+// ============================================================
+async function saveAnalysis(game, matchId, summary, kd, adr, gpm, wr) {
+    var u = getCurrentUser(); if (!u) return;
+    var rec = { user_login: u.login, game: game, match_id: matchId || '', result_summary: summary || '', kd: kd||0, adr: adr||0, gpm: gpm||0, wr: wr||0 };
+    if (supabaseClient) {
+        try { await supabaseClient.from('analyses').insert(rec); } catch(e) { saveLocalAnalysis(rec); }
+    } else { saveLocalAnalysis(rec); }
+}
+
+function saveLocalAnalysis(rec) {
+    try { var list = JSON.parse(localStorage.getItem('ga_analyses')||'[]'); list.unshift({ ...rec, created_at: new Date().toISOString() }); if (list.length > 100) list = list.slice(0,100); localStorage.setItem('ga_analyses', JSON.stringify(list)); } catch(e) {}
+}
+
+async function loadAnalyses(game) {
+    var u = getCurrentUser(); if (!u) return [];
+    if (supabaseClient) {
+        try {
+            var q = supabaseClient.from('analyses').select('*').eq('user_login', u.login).order('created_at', { ascending: false }).limit(50);
+            if (game) q = q.eq('game', game);
+            var r = await q; if (r.data) return r.data;
+        } catch(e) {}
+    }
+    var list = JSON.parse(localStorage.getItem('ga_analyses')||'[]');
+    return game ? list.filter(function(a){return a.game===game;}) : list;
+}
+
+function timeAgo(dateStr) {
+    var d = new Date(dateStr), now = new Date(), diff = Math.floor((now-d)/1000);
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return Math.floor(diff/60) + ' мин назад';
+    if (diff < 86400) return Math.floor(diff/3600) + ' ч назад';
+    return Math.floor(diff/86400) + ' дн назад';
+}
+
+function renderHistoryList(analyses, containerId, game) {
+    var el = document.getElementById(containerId); if (!el) return;
+    if (!analyses || analyses.length === 0) { el.innerHTML = '<div class="history-empty">История пуста. Проведите первый анализ!</div>'; return; }
+    var html = analyses.map(function(a) {
+        var icon = a.game==='dota2' ? '⚔️' : '🔫';
+        var badge = a.game==='dota2' ? '<span class="history-badge dota">Dota 2</span>' : '<span class="history-badge cs">CS 2</span>';
+        var summary = a.result_summary || (a.game==='dota2' ? 'GPM: '+a.gpm : 'KD: '+a.kd.toFixed(2));
+        var mid = a.match_id ? 'Match: ' + a.match_id.substring(0,12)+'...' : '';
+        return '<div class="history-item">'+
+            '<div class="history-game-icon">'+icon+'</div>'+
+            '<div class="history-info">'+
+                '<div class="history-summary">'+summary+'</div>'+
+                '<div class="history-match-id">'+mid+'</div>'+
+            '</div>'+
+            badge+
+            '<div class="history-time">'+timeAgo(a.created_at)+'</div>'+
+        '</div>';
+    }).join('');
+    el.innerHTML = html;
+}
+
+// ============================================================
+// ГРАФИК ПРОГРЕССА
+// ============================================================
+var progressChartInstance = null;
+var currentChartMetric = 'kd';
+
+async function renderProgressChart(metric) {
+    currentChartMetric = metric;
+    var analyses = await loadAnalyses(null);
+    var canvas = document.getElementById('progressChart');
+    var emptyEl = document.getElementById('chartEmpty');
+    if (!canvas) return;
+
+    var filtered = analyses.filter(function(a) {
+        if (metric==='kd'||metric==='adr') return a.game==='cs2'||a.game==='cs';
+        return a.game==='dota2'||a.game==='dota';
+    }).reverse().slice(-20);
+
+    if (filtered.length < 2) {
+        canvas.style.display = 'none';
+        emptyEl.style.display = 'block';
+        return;
+    }
+    canvas.style.display = 'block';
+    emptyEl.style.display = 'none';
+
+    var labels = filtered.map(function(a,i) { return '#'+(i+1); });
+    var values = filtered.map(function(a) {
+        if (metric==='kd') return parseFloat(a.kd)||0;
+        if (metric==='adr') return parseFloat(a.adr)||0;
+        if (metric==='gpm') return parseInt(a.gpm)||0;
+        if (metric==='wr') return parseInt(a.wr)||0;
+        return 0;
+    });
+
+    var metricLabels = { kd:'K/D', adr:'ADR', gpm:'GPM', wr:'Винрейт %' };
+    var isDark = !document.documentElement.classList.contains('light-theme');
+    var gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+    var textColor = isDark ? '#888' : '#666';
+
+    if (progressChartInstance) { progressChartInstance.destroy(); progressChartInstance = null; }
+
+    progressChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: metricLabels[metric],
+                data: values,
+                borderColor: '#6366f1',
+                backgroundColor: 'rgba(99,102,241,0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#818cf8',
+                pointBorderColor: '#6366f1',
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e1e30',
+                    titleColor: '#818cf8',
+                    bodyColor: '#ccc',
+                    borderColor: '#6366f1',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                y: { grid: { color: gridColor }, ticks: { color: textColor }, beginAtZero: metric!=='kd' }
+            }
+        }
+    });
+}
+
+// ============================================================
+// ДОСТИЖЕНИЯ
+// ============================================================
+function renderAchievements(total, dota, cs) {
+    var el = document.getElementById('achievementsList'); if (!el) return;
+    var achievements = [
+        { icon:'🎮', name:'Первый анализ', desc:'Проведён 1 анализ', earned: total >= 1 },
+        { icon:'📊', name:'Аналитик', desc:'5 анализов проведено', earned: total >= 5 },
+        { icon:'🏆', name:'Про-игрок', desc:'20 анализов проведено', earned: total >= 20 },
+        { icon:'⚔️', name:'Dota 2 мастер', desc:'10 анализов Dota 2', earned: dota >= 10 },
+        { icon:'🔫', name:'CS 2 снайпер', desc:'10 анализов CS 2', earned: cs >= 10 },
+        { icon:'💯', name:'Сотня', desc:'100 анализов проведено', earned: total >= 100 }
+    ];
+    el.innerHTML = achievements.map(function(a) {
+        return '<div class="achievement" style="opacity:'+(a.earned?1:0.35)+'">' +
+            '<div class="achievement-icon">'+a.icon+'</div>' +
+            '<div class="achievement-info"><div class="achievement-name">'+a.name+'</div><div class="achievement-desc">'+a.desc+'</div></div>' +
+            '</div>';
+    }).join('');
+}
+
+// ============================================================
+// ЗАГРУЗКА ДАННЫХ ЛИЧНОГО КАБИНЕТА
+// ============================================================
+async function loadAccountData() {
+    var u = getCurrentUser(); if (!u) return;
+    var allAnalyses = await loadAnalyses(null);
+    var dotaAnalyses = allAnalyses.filter(function(a){return a.game==='dota2'||a.game==='dota';});
+    var csAnalyses = allAnalyses.filter(function(a){return a.game==='cs2'||a.game==='cs';});
+    var total = allAnalyses.length, dota = dotaAnalyses.length, cs = csAnalyses.length;
+
+    document.getElementById('statTotalAnalyses').textContent = total;
+    document.getElementById('statDotaAnalyses').textContent = dota;
+    document.getElementById('statCsAnalyses').textContent = cs;
+
+    var plan = u.plan || 'free';
+    var planLabels = { free:'Бесплатный', pro_dota2:'PRO DOTA 2', pro_cs2:'PRO CS 2', premium:'PREMIUM' };
+    var planCls = plan==='premium'?'premium':plan==='free'?'free':'pro';
+    document.getElementById('statPlan').innerHTML = '<span class="account-plan-badge '+planCls+'">'+planLabels[plan]+'</span>';
+
+    renderAchievements(total, dota, cs);
+    renderHistoryList(allAnalyses, 'historyList', null);
+    await renderLimitsBlock();
+    await renderProgressChart(currentChartMetric);
+}
+
+async function renderLimitsBlock() {
+    var u = getCurrentUser(); if (!u) return;
+    var plan = u.plan || 'free';
+    var limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free'];
+    var usage = await getUsage();
+    var el = document.getElementById('limitsContent'); if (!el) return;
+
+    if (plan === 'premium') {
+        el.innerHTML = '<div class="analysis-item positive">✅ PREMIUM: безлимитное количество анализов</div>';
+        return;
+    }
+
+    var dotaPct = Math.min(100, Math.round((usage.dota_today||0)/limits.dota*100));
+    var csPct = Math.min(100, Math.round((usage.cs_today||0)/limits.cs*100));
+
+    el.innerHTML =
+        '<div class="limit-bar-wrap">'+
+            '<div class="limit-bar-label"><span>⚔️ Dota 2: '+usage.dota_today+' / '+limits.dota+'</span><span>'+dotaPct+'%</span></div>'+
+            '<div class="limit-bar"><div class="limit-bar-fill'+(dotaPct>=80?' danger':'')+'" style="width:'+dotaPct+'%"></div></div>'+
+        '</div>'+
+        '<div class="limit-bar-wrap" style="margin-top:12px;">'+
+            '<div class="limit-bar-label"><span>🔫 CS 2: '+usage.cs_today+' / '+limits.cs+'</span><span>'+csPct+'%</span></div>'+
+            '<div class="limit-bar"><div class="limit-bar-fill'+(csPct>=80?' danger':'')+'" style="width:'+csPct+'%"></div></div>'+
+        '</div>'+
+        '<div class="limit-reset-time" style="margin-top:10px;">🕐 Обновление лимитов в 00:00 · осталось '+getTimeUntilMidnight()+'</div>';
+}
 
 // ============================================================
 // PRO PLAYERS DATABASE 2026
 // ============================================================
 const PRO_PLAYERS_2026 = [
-    { nick: 'ZywOo', name: 'Mathieu Herbaut', flag: '🇫🇷', team: 'Vitality', tier: 1, role: 'awp', roleLabel: 'AWPer', rating: 1.31, adr: 82.4, kd: 1.38, hs: 44, entryRate: 0.12, utilDmg: 18, traits: ['Пассивный AWP', 'Чтение позиций', 'Высокий рейтинг', 'Клатч-мастер'], description: 'Лучший AWPer мира по версии HLTV 2024-2025. Стиль — терпеливое удержание углов, минимум рисков, максимальный ADR.' },
-    { nick: 'sh1ro', name: 'Dmitry Sorokin', flag: '🇷🇺', team: 'Cloud9', tier: 1, role: 'awp', roleLabel: 'AWPer', rating: 1.28, adr: 79.1, kd: 1.32, hs: 38, entryRate: 0.10, utilDmg: 14, traits: ['Тихий AWP', 'Минимум смертей', 'Переигровка позиций', 'Читает катку'], description: 'Феноменально низкая смертность — один из лучших показателей KD на про-сцене. Играет очень аккуратно.' },
-    { nick: 'NiKo', name: 'Nikola Kovač', flag: '🇧🇦', team: 'G2', tier: 1, role: 'rifler', roleLabel: 'Rifler', rating: 1.24, adr: 81.2, kd: 1.29, hs: 58, entryRate: 0.18, utilDmg: 22, traits: ['Агрессивный рифлер', 'Высокий HS%', 'Дуэли в открытую', 'Clutch ситуации'], description: 'Один из лучших рифлеров в истории CS. Агрессивный стиль, высокий HS%, отличные дуэльные способности.' },
-    { nick: 'donk', name: 'Danil Kryshkovets', flag: '🇷🇺', team: 'Spirit', tier: 1, role: 'rifler', roleLabel: 'Star Rifler', rating: 1.35, adr: 88.3, kd: 1.42, hs: 62, entryRate: 0.22, utilDmg: 19, traits: ['Взрывной старт раунда', 'Высокий HS%', 'Агрессивные пики', 'Лучший рейтинг 2024'], description: '#1 игрок мира 2024 по HLTV Rating 3.0. Феноменальная скорость реакции и агрессивный пиковый стиль.' },
-    { nick: 'jL', name: 'Jere Salo', flag: '🇫🇮', team: 'NAVI', tier: 1, role: 'rifler', roleLabel: 'Rifler', rating: 1.18, adr: 76.8, kd: 1.22, hs: 55, entryRate: 0.16, utilDmg: 28, traits: ['Утилити-мастер', 'Позиционная игра', 'Поддержка тиммейтов', 'Стабильность'], description: 'Ключевой игрок NAVI. Высокий утилити дамаг, стабильная позиционная игра.' },
-    { nick: 'broky', name: 'Helvijs Saukants', flag: '🇱🇻', team: 'G2', tier: 1, role: 'awp', roleLabel: 'AWPer', rating: 1.19, adr: 74.5, kd: 1.21, hs: 41, entryRate: 0.13, utilDmg: 16, traits: ['Мобильный AWP', 'Агрессивные пики с AWP', 'Читает ротации', 'Клатч'], description: 'AWPer G2, играет агрессивнее большинства AWPerов. Хорошо работает в паре с NiKo.' },
-    { nick: 'Jimpphat', name: 'Jimi Lipisti', flag: '🇫🇮', team: 'ENCE', tier: 1, role: 'entry', roleLabel: 'Entry Fragger', rating: 1.22, adr: 83.1, kd: 1.26, hs: 64, entryRate: 0.31, utilDmg: 15, traits: ['Главный входящий', 'Высокий Entry%', 'Жертвенный стиль', 'Открывает раунды'], description: 'Один из лучших entry fraggers в Tier-1. Высокий процент первых убийств.' },
-    { nick: 'electroNic', name: 'Denis Sharipov', flag: '🇷🇺', team: 'Spirit', tier: 2, role: 'entry', roleLabel: 'Entry/Support', rating: 1.08, adr: 71.2, kd: 1.10, hs: 52, entryRate: 0.24, utilDmg: 31, traits: ['Entry + Support гибрид', 'Утилити при входе', 'Командная игра', 'Читает ротации'], description: 'Универсальный игрок Spirit. Совмещает entry и support роли, высокий утилити дамаг.' },
-    { nick: 'Perfecto', name: 'Ilya Zalutsky', flag: '🇷🇺', team: 'NAVI', tier: 2, role: 'support', roleLabel: 'Support', rating: 1.02, adr: 64.1, kd: 1.03, hs: 47, entryRate: 0.11, utilDmg: 45, traits: ['Высокий утилити дамаг', 'Флэши для команды', 'Саппорт-роль', 'Клатч'], description: 'Классический support игрок. Рекордно высокий утилити дамаг — ключ его игры.' },
-    { nick: 'YEKINDAR', name: 'Mareks Gaļinskis', flag: '🇱🇻', team: 'Liquid', tier: 2, role: 'entry', roleLabel: 'Aggressive Entry', rating: 1.06, adr: 74.8, kd: 1.08, hs: 59, entryRate: 0.35, utilDmg: 22, traits: ['Самый агрессивный entry', 'Высокий риск', 'Открывает любые раунды', 'Хаотичный стиль'], description: 'Известен как самый агрессивный entry fragger в мире. Высокий риск — высокая награда.' }
+    { nick:'ZywOo', name:'Mathieu Herbaut', flag:'🇫🇷', team:'Vitality', tier:1, role:'awp', roleLabel:'AWPer', rating:1.31, adr:82.4, kd:1.38, hs:44, entryRate:0.12, utilDmg:18, traits:['Пассивный AWP','Чтение позиций','Высокий рейтинг','Клатч-мастер'], description:'Лучший AWPer мира по версии HLTV 2024-2025. Терпеливое удержание углов, минимум рисков, максимальный ADR.' },
+    { nick:'sh1ro', name:'Dmitry Sorokin', flag:'🇷🇺', team:'Cloud9', tier:1, role:'awp', roleLabel:'AWPer', rating:1.28, adr:79.1, kd:1.32, hs:38, entryRate:0.10, utilDmg:14, traits:['Тихий AWP','Минимум смертей','Переигровка позиций','Читает катку'], description:'Феноменально низкая смертность — один из лучших KD на про-сцене.' },
+    { nick:'NiKo', name:'Nikola Kovač', flag:'🇧🇦', team:'G2', tier:1, role:'rifler', roleLabel:'Rifler', rating:1.24, adr:81.2, kd:1.29, hs:58, entryRate:0.18, utilDmg:22, traits:['Агрессивный рифлер','Высокий HS%','Дуэли в открытую','Clutch'], description:'Один из лучших рифлеров в истории CS. Агрессивный стиль, высокий HS%.' },
+    { nick:'donk', name:'Danil Kryshkovets', flag:'🇷🇺', team:'Spirit', tier:1, role:'rifler', roleLabel:'Star Rifler', rating:1.35, adr:88.3, kd:1.42, hs:62, entryRate:0.22, utilDmg:19, traits:['Взрывной старт','Высокий HS%','Агрессивные пики','#1 рейтинг 2024'], description:'#1 игрок мира 2024. Феноменальная скорость реакции.' },
+    { nick:'jL', name:'Jere Salo', flag:'🇫🇮', team:'NAVI', tier:1, role:'rifler', roleLabel:'Rifler', rating:1.18, adr:76.8, kd:1.22, hs:55, entryRate:0.16, utilDmg:28, traits:['Утилити-мастер','Позиционная игра','Поддержка','Стабильность'], description:'Ключевой игрок NAVI. Высокий утилити дамаг, стабильная позиционная игра.' },
+    { nick:'broky', name:'Helvijs Saukants', flag:'🇱🇻', team:'G2', tier:1, role:'awp', roleLabel:'AWPer', rating:1.19, adr:74.5, kd:1.21, hs:41, entryRate:0.13, utilDmg:16, traits:['Мобильный AWP','Агрессивные пики','Читает ротации','Клатч'], description:'AWPer G2, играет агрессивнее большинства AWPerов.' },
+    { nick:'Jimpphat', name:'Jimi Lipisti', flag:'🇫🇮', team:'ENCE', tier:1, role:'entry', roleLabel:'Entry Fragger', rating:1.22, adr:83.1, kd:1.26, hs:64, entryRate:0.31, utilDmg:15, traits:['Главный входящий','Высокий Entry%','Жертвенный стиль','Открывает раунды'], description:'Один из лучших entry fraggers в Tier-1.' },
+    { nick:'electroNic', name:'Denis Sharipov', flag:'🇷🇺', team:'Spirit', tier:2, role:'entry', roleLabel:'Entry/Support', rating:1.08, adr:71.2, kd:1.10, hs:52, entryRate:0.24, utilDmg:31, traits:['Entry+Support гибрид','Утилити при входе','Командная игра','Ротации'], description:'Универсальный игрок Spirit. Совмещает entry и support роли.' },
+    { nick:'Perfecto', name:'Ilya Zalutsky', flag:'🇷🇺', team:'NAVI', tier:2, role:'support', roleLabel:'Support', rating:1.02, adr:64.1, kd:1.03, hs:47, entryRate:0.11, utilDmg:45, traits:['Высокий утилити дамаг','Флэши для команды','Саппорт-роль','Клатч'], description:'Классический support. Рекордно высокий утилити дамаг.' },
+    { nick:'YEKINDAR', name:'Mareks Gaļinskis', flag:'🇱🇻', team:'Liquid', tier:2, role:'entry', roleLabel:'Aggressive Entry', rating:1.06, adr:74.8, kd:1.08, hs:59, entryRate:0.35, utilDmg:22, traits:['Самый агрессивный entry','Высокий риск','Открывает раунды','Хаотичный стиль'], description:'Самый агрессивный entry fragger в мире. Высокий риск — высокая награда.' }
 ];
 
 function detectPlayStyle(stats) {
-    var entryRate = (stats.entryKills || 0) / (stats.kills || 1);
-    if (stats.awpKillRate && stats.awpKillRate > 0.35) return 'awp';
-    if (entryRate > 0.28) return 'entry';
-    if ((stats.utilDmg || 0) > 35 && (stats.adr || 0) < 72) return 'support';
-    if (stats.assistsPerRound && stats.assistsPerRound > 0.6) return 'igl';
-    if (entryRate < 0.12 && (stats.kd || 0) > 1.0) return 'lurk';
+    var er=(stats.entryKills||0)/(stats.kills||1);
+    if (stats.awpKillRate&&stats.awpKillRate>0.35) return 'awp';
+    if (er>0.28) return 'entry';
+    if ((stats.utilDmg||0)>35&&(stats.adr||0)<72) return 'support';
+    if (stats.assistsPerRound&&stats.assistsPerRound>0.6) return 'igl';
+    if (er<0.12&&(stats.kd||0)>1.0) return 'lurk';
     return 'rifler';
 }
-
-function findSimilarPro(detectedStyle, stats) {
-    var candidates = PRO_PLAYERS_2026.filter(function(p) { return p.role === detectedStyle; });
-    if (candidates.length === 0) candidates = PRO_PLAYERS_2026;
-    candidates = candidates.map(function(pro) {
-        var score = 100 - Math.abs((stats.adr||70) - pro.adr)*0.5 - Math.abs((stats.hs||50) - pro.hs)*0.3 - Math.abs((stats.kd||1.0) - pro.kd)*20;
-        return { pro: pro, score: Math.max(0, score) };
-    });
-    candidates.sort(function(a,b) { return b.score - a.score; });
-    var best = candidates[0];
-    var matchPct = Math.min(95, Math.max(25, Math.round(best.score)));
-    var level = matchPct >= 70 ? 'high' : matchPct >= 45 ? 'medium' : 'low';
-    return { pro: best.pro, matchPct: matchPct, level: level };
+function findSimilarPro(style, stats) {
+    var cands=PRO_PLAYERS_2026.filter(function(p){return p.role===style;});
+    if (!cands.length) cands=PRO_PLAYERS_2026;
+    cands=cands.map(function(p){var s=100-Math.abs((stats.adr||70)-p.adr)*0.5-Math.abs((stats.hs||50)-p.hs)*0.3-Math.abs((stats.kd||1)-p.kd)*20;return{pro:p,score:Math.max(0,s)};});
+    cands.sort(function(a,b){return b.score-a.score;});
+    var best=cands[0], pct=Math.min(95,Math.max(25,Math.round(best.score)));
+    return{pro:best.pro,matchPct:pct,level:pct>=70?'high':pct>=45?'medium':'low'};
 }
 
 function buildDeepAnalysis(playerStats, matchData) {
-    var nick = playerStats.nickname || 'Игрок';
-    var kills = parseInt(playerStats.kills) || 0;
-    var deaths = parseInt(playerStats.deaths) || 0;
-    var assists = parseInt(playerStats.assists) || 0;
-    var hs = parseFloat(playerStats.headshots_percentage) || 0;
-    var adr = parseFloat(playerStats.adr) || 0;
-    var kd = deaths > 0 ? (kills / deaths) : kills;
-    var mvp = parseInt(playerStats.mvps) || 0;
-    var entryKills = parseInt(playerStats.entry_count) || 0;
-    var entryWins = parseInt(playerStats.entry_wins) || 0;
-    var utilDmg = parseInt(playerStats.utility_damage) || 0;
-    var flashAssists = parseInt(playerStats.flash_assists) || 0;
-    var rounds = matchData.rounds || 24;
-    var statsForStyle = { hs: hs, adr: adr, kd: kd, kills: kills, entryKills: entryKills, utilDmg: utilDmg, assistsPerRound: assists / rounds };
-    var detectedStyle = detectPlayStyle(statsForStyle);
-    var proMatch = findSimilarPro(detectedStyle, statsForStyle);
-    var pro = proMatch.pro;
-    var styleLabels = { awp:'AWPer', entry:'Entry Fragger', support:'Support', igl:'IGL', lurk:'Lurker', rifler:'Rifler' };
-    var styleLabel = styleLabels[detectedStyle] || 'Rifler';
-    var won = matchData.won, map = matchData.map || 'Неизвестная карта', score = matchData.score || '—';
-    var html = '';
-    html += '<div class="result-header"><div class="result-header-info"><h2>' + nick + ' — ' + styleLabel + '</h2><div class="result-header-meta">Карта: ' + map + ' · Счёт: ' + score + ' · ' + rounds + ' раундов · FACEIT</div></div><div class="result-badge ' + (won?'win':'lose') + '">' + (won?'Победа':'Поражение') + '</div></div>';
-    if (matchData.playerOptions) { html += '<div class="player-select"><div class="player-select-label">Анализируемый игрок:</div><select class="player-select-dropdown" id="faceitPlayerSelect" onchange="switchFaceitPlayer()">' + matchData.playerOptions + '</select></div>'; }
-    html += '<div class="result-block"><div class="result-block-title">📊 Основные показатели</div><div class="metrics-grid">';
-    html += '<div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">' + kd.toFixed(2) + '</div><div class="metric-sub ' + (kd>=1.0?'good':'bad') + '">Про: ' + pro.kd.toFixed(2) + '</div></div>';
-    html += '<div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">' + Math.round(adr) + '</div><div class="metric-sub ' + (adr>=pro.adr*0.85?'good':'bad') + '">Про: ' + Math.round(pro.adr) + '</div></div>';
-    html += '<div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">' + Math.round(hs) + '%</div><div class="metric-sub ' + (hs>=pro.hs*0.8?'good':'bad') + '">Про: ' + pro.hs + '%</div></div>';
-    html += '<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">' + kills + '/' + deaths + '/' + assists + '</div></div>';
-    html += '<div class="metric-card"><div class="metric-label">MVP</div><div class="metric-value">' + mvp + '</div><div class="metric-sub ' + (mvp>=3?'good':'') + '">раундов</div></div>';
-    if (utilDmg > 0) html += '<div class="metric-card"><div class="metric-label">Утилити дмг</div><div class="metric-value">' + utilDmg + '</div><div class="metric-sub ' + (utilDmg>=30?'good':'bad') + '">Про: ' + pro.utilDmg + '</div></div>';
-    if (entryKills > 0) { var entryWr = Math.round(entryWins/entryKills*100); html += '<div class="metric-card"><div class="metric-label">Entry убийства</div><div class="metric-value">' + entryKills + '</div><div class="metric-sub ' + (entryWr>=55?'good':'bad') + '">WR: ' + entryWr + '%</div></div>'; }
-    if (flashAssists > 0) html += '<div class="metric-card"><div class="metric-label">Flash ассисты</div><div class="metric-value">' + flashAssists + '</div></div>';
-    html += '</div></div>';
-    html += '<div class="result-block"><div class="result-block-title">🏆 Сравнение с про-игроком</div><div class="pro-style-card"><div class="pro-style-header"><div class="pro-style-avatar">' + pro.flag + '</div><div class="pro-style-info"><h3>' + pro.flag + ' ' + pro.nick + ' (' + pro.name + ')</h3><p>' + pro.team + ' · ' + pro.roleLabel + '</p><p style="color:#888;font-size:0.85rem;margin-top:4px;">Rating: ' + pro.rating + ' · ADR: ' + pro.adr + ' · KD: ' + pro.kd + '</p>';
-    var tierCls = pro.tier===1?'t1':pro.tier===2?'t2':'t3', tierLabel = pro.tier===1?'Tier-1':pro.tier===2?'Tier-2':'Tier-3';
-    html += '<span class="tier-badge ' + tierCls + '">' + tierLabel + '</span><span class="pro-style-match ' + proMatch.level + '" style="margin-left:8px;">Схожесть стиля: ' + proMatch.matchPct + '%</span></div></div><p style="color:#aaa;font-size:0.9rem;line-height:1.6;margin-bottom:12px;">' + pro.description + '</p><div class="pro-style-traits">' + pro.traits.map(function(t){return '<span class="pro-trait">'+t+'</span>';}).join('') + '</div></div></div>';
-    html += '<div class="result-block"><div class="result-block-title">🔍 Глубокий анализ игровых действий</div>';
-    html += '<div class="analysis-section"><div class="analysis-section-title">🎯 Прицеливание и хедшоты</div>';
-    if (hs >= 65) html += '<div class="analysis-item positive"><strong>Отличный HS% (' + Math.round(hs) + '%)</strong> — прицел стабильно идёт в голову. Уровень приближается к стилю NiKo/donk.</div>';
-    else if (hs >= 45) html += '<div class="analysis-item neutral"><strong>Средний HS% (' + Math.round(hs) + '%)</strong> — прицел иногда опускается. Держи crosshair placement на уровне головы в точках появления врага.</div>';
-    else html += '<div class="analysis-item negative"><strong>Низкий HS% (' + Math.round(hs) + '%)</strong> — прицел систематически ниже головы. Упражнение: 20 минут aim_botz ежедневно с настройкой "только хедшоты".</div>';
-    html += '</div>';
-    html += '<div class="analysis-section"><div class="analysis-section-title">💥 Урон и агрессивность</div>';
-    if (adr >= 85) html += '<div class="analysis-item positive"><strong>Высокий ADR (' + Math.round(adr) + ')</strong> — серьёзный урон каждый раунд. Следи за тем, чтобы не переоценивать себя в дуэлях 1v2+.</div>';
-    else if (adr >= 65) html += '<div class="analysis-item neutral"><strong>Нормальный ADR (' + Math.round(adr) + ')</strong> — урон в норме, но есть резерв. Доноси больше дамага через утилити перед входом на сайт.</div>';
-    else html += '<div class="analysis-item negative"><strong>Низкий ADR (' + Math.round(adr) + ')</strong> — слишком мало урона. Причины: пассивная игра, неправильные позиции. Входи в дуэль активнее.</div>';
-    html += '</div>';
-    html += '<div class="analysis-section"><div class="analysis-section-title">💀 Выживаемость и позиционирование</div>';
-    var dpr = deaths / rounds;
-    if (dpr <= 0.4) html += '<div class="analysis-item positive"><strong>Отличная выживаемость</strong> — умираешь редко (' + deaths + '/' + rounds + '). Хорошее чтение карты. Похоже на стиль sh1ro/ZywOo.</div>';
-    else if (dpr <= 0.6) html += '<div class="analysis-item neutral"><strong>Нормальная выживаемость</strong> — ' + deaths + ' смертей за ' + rounds + ' раундов. Анализируй реплеи своих смертей — ищи паттерны.</div>';
-    else html += '<div class="analysis-item negative"><strong>Много смертей (' + deaths + ')</strong> — умираешь слишком часто. Проблемы: пиковка невыгодных углов, отсутствие флэшей. Смотри 5 своих смертей в реплее.</div>';
-    html += '</div>';
-    if (entryKills > 0) {
-        var ew2 = Math.round(entryWins/entryKills*100);
-        html += '<div class="analysis-section"><div class="analysis-section-title">🚪 Открытие раундов (Entry)</div>';
-        if (ew2 >= 60) html += '<div class="analysis-item positive"><strong>Эффективный entry (' + entryKills + ' убийств, ' + ew2 + '% WR)</strong> — хорошо открываешь раунды. Уровень близок к Jimpphat/YEKINDAR.</div>';
-        else if (ew2 >= 45) html += '<div class="analysis-item neutral"><strong>Средний entry WR (' + ew2 + '%)</strong> — результаты 50/50. Синхронизируй флэши с тиммейтами, меняй timing входа.</div>';
-        else html += '<div class="analysis-item negative"><strong>Слабый entry WR (' + ew2 + '%)</strong> — теряешь больше дуэлей. Используй flash → peek вместо dry peek.</div>';
-        html += '</div>';
-    }
-    if (utilDmg > 0 || flashAssists > 0) {
-        html += '<div class="analysis-section"><div class="analysis-section-title">💣 Использование утилити</div>';
-        if (utilDmg >= 40) html += '<div class="analysis-item positive"><strong>Высокий утилити дамаг (' + utilDmg + ')</strong> — отличное использование гранат. Стиль близок к Perfecto.</div>';
-        else if (utilDmg >= 15) html += '<div class="analysis-item neutral"><strong>Средний утилити дамаг (' + utilDmg + ')</strong> — изучи 2-3 ключевых молотова на каждой карте.</div>';
-        else html += '<div class="analysis-item negative"><strong>Мало утилити дамага (' + utilDmg + ')</strong> — гранаты почти не наносят урона. Изучи lineup\'ы на workshop картах.</div>';
-        if (flashAssists > 0) html += '<div class="analysis-item positive"><strong>' + flashAssists + ' флэш-ассистов</strong> — ты ослепляешь врагов для тиммейтов. Командная игра высокого уровня.</div>';
-        html += '</div>';
-    }
-    html += '</div>';
-    html += '<div class="result-block"><div class="result-block-title">📈 Сравнение с ' + pro.nick + ' (' + pro.team + ')</div><table class="farm-table"><tr><th>Метрика</th><th>Ты</th><th>' + pro.nick + '</th><th>Разница</th></tr>';
-    var metrics = [{name:'KD',you:kd.toFixed(2),pro:pro.kd.toFixed(2),diff:kd-pro.kd},{name:'ADR',you:Math.round(adr),pro:Math.round(pro.adr),diff:adr-pro.adr},{name:'HS%',you:Math.round(hs)+'%',pro:pro.hs+'%',diff:hs-pro.hs}];
-    if (utilDmg > 0) metrics.push({name:'Util DMG',you:utilDmg,pro:pro.utilDmg,diff:utilDmg-pro.utilDmg});
-    metrics.forEach(function(m) { var dv = parseFloat(m.diff.toFixed(2)); html += '<tr><td>'+m.name+'</td><td class="gold-val">'+m.you+'</td><td class="pro-val">'+m.pro+'</td><td class="'+(dv>=-5?'diff-good':'diff-bad')+'">'+(dv>=0?'+':'')+dv+'</td></tr>'; });
-    html += '</table></div>';
-    html += '<div class="result-block"><div class="result-block-title">🎓 Рекомендации тренера</div>';
-    var recNum = 1;
-    if (hs < 45) html += '<div class="recommendation-item"><span class="marker">' + recNum++ + '.</span><div>Ежедневно 15-20 минут aim_botz с режимом "только хедшоты". Цель через 2 недели: HS% выше 50%.<div class="rec-exercise"><strong>Упражнение:</strong> Aim_botz → только голова. Минимум 500 убийств в день.</div></div></div>';
-    if (adr < 65) html += '<div class="recommendation-item"><span class="marker">' + recNum++ + '.</span><div>Работай над активностью — каждый раунд минимум 60 дамага.<div class="rec-exercise"><strong>Упражнение:</strong> Ставь себе цель каждый раунд: "я должен нанести хотя бы 60 дамага".</div></div></div>';
-    if (deaths > rounds * 0.6) html += '<div class="recommendation-item"><span class="marker">' + recNum++ + '.</span><div>Пересмотри 5 своих смертей в реплее. Найди общий паттерн.<div class="rec-exercise"><strong>Упражнение:</strong> FACEIT → Матч → Реплей → Фильтр: мои смерти.</div></div></div>';
-    if (utilDmg < 15 && detectedStyle !== 'awp') html += '<div class="recommendation-item"><span class="marker">' + recNum++ + '.</span><div>Изучи 3 ключевых lineup на каждой карте.<div class="rec-exercise"><strong>Упражнение:</strong> YouTube: "[map] CS2 molotov lineups 2025".</div></div></div>';
-    if (recNum === 1) html += '<div class="analysis-item positive">Отличная игра! Показатели близки к про-уровню. Продолжай в том же духе.</div>';
-    html += '</div>';
-    html += '<button class="new-analysis-btn" onclick="resetFaceitAnalysis()">Новый анализ</button>';
+    var nick=playerStats.nickname||'Игрок', kills=parseInt(playerStats.kills)||0, deaths=parseInt(playerStats.deaths)||0, assists=parseInt(playerStats.assists)||0;
+    var hs=parseFloat(playerStats.headshots_percentage)||0, adr=parseFloat(playerStats.adr)||0, kd=deaths>0?(kills/deaths):kills;
+    var mvp=parseInt(playerStats.mvps)||0, entryKills=parseInt(playerStats.entry_count)||0, entryWins=parseInt(playerStats.entry_wins)||0;
+    var utilDmg=parseInt(playerStats.utility_damage)||0, flashAssists=parseInt(playerStats.flash_assists)||0, rounds=matchData.rounds||24;
+    var sty=detectPlayStyle({hs,adr,kd,kills,entryKills,utilDmg,assistsPerRound:assists/rounds});
+    var pm=findSimilarPro(sty,{hs,adr,kd,kills,entryKills,utilDmg}), pro=pm.pro;
+    var styleLabels={awp:'AWPer',entry:'Entry Fragger',support:'Support',igl:'IGL',lurk:'Lurker',rifler:'Rifler'};
+    var html='';
+    html+='<div class="result-header"><div class="result-header-info"><h2>'+nick+' — '+(styleLabels[sty]||'Rifler')+'</h2><div class="result-header-meta">Карта: '+(matchData.map||'?')+' · Счёт: '+(matchData.score||'—')+' · '+rounds+' раундов</div></div><div class="result-badge '+(matchData.won?'win':'lose')+'">'+(matchData.won?'Победа':'Поражение')+'</div></div>';
+    if (matchData.playerOptions) html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" id="faceitPlayerSelect" onchange="switchFaceitPlayer()">'+matchData.playerOptions+'</select></div>';
+    html+='<div class="result-block"><div class="result-block-title">📊 Основные показатели</div><div class="metrics-grid">';
+    html+='<div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">'+kd.toFixed(2)+'</div><div class="metric-sub '+(kd>=1?'good':'bad')+'">Про: '+pro.kd+'</div></div>';
+    html+='<div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">'+Math.round(adr)+'</div><div class="metric-sub '+(adr>=pro.adr*0.85?'good':'bad')+'">Про: '+Math.round(pro.adr)+'</div></div>';
+    html+='<div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">'+Math.round(hs)+'%</div><div class="metric-sub '+(hs>=pro.hs*0.8?'good':'bad')+'">Про: '+pro.hs+'%</div></div>';
+    html+='<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+kills+'/'+deaths+'/'+assists+'</div></div>';
+    html+='<div class="metric-card"><div class="metric-label">MVP</div><div class="metric-value">'+mvp+'</div></div>';
+    if (utilDmg>0) html+='<div class="metric-card"><div class="metric-label">Утилити дмг</div><div class="metric-value">'+utilDmg+'</div><div class="metric-sub '+(utilDmg>=30?'good':'bad')+'">Про: '+pro.utilDmg+'</div></div>';
+    if (entryKills>0){var ew=Math.round(entryWins/entryKills*100);html+='<div class="metric-card"><div class="metric-label">Entry убийства</div><div class="metric-value">'+entryKills+'</div><div class="metric-sub '+(ew>=55?'good':'bad')+'">WR: '+ew+'%</div></div>';}
+    html+='</div></div>';
+    html+='<div class="result-block"><div class="result-block-title">🏆 Похожий про-игрок</div><div class="pro-style-card"><div class="pro-style-header"><div class="pro-style-avatar">'+pro.flag+'</div><div class="pro-style-info"><h3>'+pro.flag+' '+pro.nick+' ('+pro.name+')</h3><p>'+pro.team+' · '+pro.roleLabel+'</p><p style="color:#888;font-size:0.85rem;margin-top:4px;">Rating: '+pro.rating+' · ADR: '+pro.adr+' · KD: '+pro.kd+'</p>';
+    var tc=pro.tier===1?'t1':pro.tier===2?'t2':'t3',tl=pro.tier===1?'Tier-1':pro.tier===2?'Tier-2':'Tier-3';
+    html+='<span class="tier-badge '+tc+'">'+tl+'</span><span class="pro-style-match '+pm.level+'" style="margin-left:8px;">Схожесть: '+pm.matchPct+'%</span></div></div><p style="color:#aaa;font-size:0.9rem;line-height:1.6;margin-bottom:12px;">'+pro.description+'</p><div class="pro-style-traits">'+pro.traits.map(function(t){return'<span class="pro-trait">'+t+'</span>';}).join('')+'</div></div></div>';
+    html+='<div class="result-block"><div class="result-block-title">🔍 Глубокий анализ</div>';
+    html+='<div class="analysis-section"><div class="analysis-section-title">🎯 Прицеливание и хедшоты</div>';
+    if(hs>=65)html+='<div class="analysis-item positive"><strong>Отличный HS% ('+Math.round(hs)+'%)</strong> — прицел стабильно в голову. Уровень близок к NiKo/donk.</div>';
+    else if(hs>=45)html+='<div class="analysis-item neutral"><strong>Средний HS% ('+Math.round(hs)+'%)</strong> — держи crosshair на уровне головы в точках появления врага.</div>';
+    else html+='<div class="analysis-item negative"><strong>Низкий HS% ('+Math.round(hs)+'%)</strong> — упражнение: aim_botz 20 мин/день с режимом "только хедшоты".</div>';
+    html+='</div><div class="analysis-section"><div class="analysis-section-title">💥 Урон и агрессивность</div>';
+    if(adr>=85)html+='<div class="analysis-item positive"><strong>Высокий ADR ('+Math.round(adr)+')</strong> — серьёзный урон каждый раунд.</div>';
+    else if(adr>=65)html+='<div class="analysis-item neutral"><strong>Нормальный ADR ('+Math.round(adr)+')</strong> — есть резерв. Доноси больше дамага через утилити.</div>';
+    else html+='<div class="analysis-item negative"><strong>Низкий ADR ('+Math.round(adr)+')</strong> — входи в дуэль активнее, не жди идеального момента.</div>';
+    html+='</div><div class="analysis-section"><div class="analysis-section-title">💀 Выживаемость</div>';
+    var dpr=deaths/rounds;
+    if(dpr<=0.4)html+='<div class="analysis-item positive"><strong>Отличная выживаемость</strong> — умираешь редко ('+deaths+'/'+rounds+'). Стиль похож на sh1ro/ZywOo.</div>';
+    else if(dpr<=0.6)html+='<div class="analysis-item neutral"><strong>Нормальная выживаемость</strong> — '+deaths+' смертей за '+rounds+' раундов. Ищи паттерны в реплеях.</div>';
+    else html+='<div class="analysis-item negative"><strong>Много смертей ('+deaths+')</strong> — используй flash→peek вместо dry peek.</div>';
+    html+='</div></div>';
+    html+='<div class="result-block"><div class="result-block-title">🎓 Рекомендации</div>';
+    var rn=1;
+    if(hs<45)html+='<div class="recommendation-item"><span class="marker">'+rn+++'.</span><div>aim_botz 20 мин/день — только хедшоты.<div class="rec-exercise"><strong>Цель:</strong> HS% > 50% за 2 недели.</div></div></div>';
+    if(adr<65)html+='<div class="recommendation-item"><span class="marker">'+rn+++'.</span><div>Каждый раунд — минимум 60 дамага.<div class="rec-exercise"><strong>Упражнение:</strong> ставь себе эту цель осознанно.</div></div></div>';
+    if(deaths>rounds*0.6)html+='<div class="recommendation-item"><span class="marker">'+rn+++'.</span><div>Пересмотри 5 своих смертей в реплее.<div class="rec-exercise"><strong>Найди</strong> общий паттерн — позиция, оружие врага.</div></div></div>';
+    if(rn===1)html+='<div class="analysis-item positive">Отличная игра! Показатели близки к про-уровню.</div>';
+    html+='</div>';
+    html+='<button class="new-analysis-btn" onclick="resetFaceitAnalysis()">Новый анализ</button>';
     return html;
 }
 
 async function runFaceitAnalysis() {
-    var link = document.getElementById('faceitLink').value.trim();
-    if (!link) { alert('Вставьте ссылку на FACEIT матч'); return; }
-    var matchId = link;
-    var roomMatch = link.match(/room\/(1-[a-f0-9-]+)/i);
-    var directMatch = link.match(/(1-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i);
-    if (roomMatch) matchId = roomMatch[1];
-    else if (directMatch) matchId = directMatch[1];
-    var prog = document.getElementById('faceitProgress'), fill = document.getElementById('faceitProgressFill'), txt = document.getElementById('faceitProgressText'), res = document.getElementById('faceitResults');
-    res.classList.remove('visible'); res.innerHTML = ''; prog.classList.add('visible'); fill.style.width = '0%'; txt.textContent = 'Подключение к FACEIT API...';
+    var u = getCurrentUser(); if (!u) return;
+    var canAnalyze = await checkLimit('cs');
+    if (!canAnalyze) { await showLimitWarning('faceitLimitWarning','cs'); return; }
+    var link=document.getElementById('faceitLink').value.trim();
+    if (!link){alert('Вставьте ссылку на FACEIT матч');return;}
+    var matchId=link, rm=link.match(/room\/(1-[a-f0-9-]+)/i), dm=link.match(/(1-[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})/i);
+    if(rm)matchId=rm[1]; else if(dm)matchId=dm[1];
+    var prog=document.getElementById('faceitProgress'),fill=document.getElementById('faceitProgressFill'),txt=document.getElementById('faceitProgressText'),res=document.getElementById('faceitResults');
+    res.classList.remove('visible');res.innerHTML='';prog.classList.add('visible');fill.style.width='0%';txt.textContent='Подключение к FACEIT API...';
     try {
-        fill.style.width = '20%'; txt.textContent = 'Загрузка данных матча...';
-        var matchRes = await fetch('/api/faceit?path=matches/' + matchId);
-        if (!matchRes.ok) { var errData = await matchRes.json(); throw new Error(errData.error || 'Матч не найден. Проверьте ссылку.'); }
-        var matchData = await matchRes.json();
-        fill.style.width = '50%'; txt.textContent = 'Загрузка статистики игроков...';
-        var statsRes = await fetch('/api/faceit?path=matches/' + matchId + '/stats');
-        var statsData = statsRes.ok ? await statsRes.json() : null;
-        fill.style.width = '80%'; txt.textContent = 'Формирование анализа...';
-        var teams = matchData.teams || {}, faction1 = teams.faction1 || {}, faction2 = teams.faction2 || {}, allPlayers = [];
-        (faction1.roster||[]).forEach(function(p) { p._team = faction1.name||'Team 1'; p._teamId = 'faction1'; allPlayers.push(p); });
-        (faction2.roster||[]).forEach(function(p) { p._team = faction2.name||'Team 2'; p._teamId = 'faction2'; allPlayers.push(p); });
-        var winner = matchData.results && matchData.results.winner;
-        var score1 = (matchData.results && matchData.results.score && matchData.results.score.faction1) || '?';
-        var score2 = (matchData.results && matchData.results.score && matchData.results.score.faction2) || '?';
-        var rounds = parseInt(score1) + parseInt(score2) || 24;
-        var map = (matchData.voting && matchData.voting.map && matchData.voting.map.pick && matchData.voting.map.pick[0]) || 'Unknown';
-        var playersStats = {};
-        if (statsData && statsData.rounds) { statsData.rounds.forEach(function(round) { round.teams.forEach(function(team) { team.players.forEach(function(p) { playersStats[p.player_id] = p.player_stats; playersStats[p.player_id]._nick = p.nickname; }); }); }); }
-        var playerOptions = '';
-        allPlayers.forEach(function(p, i) { var ps = playersStats[p.player_id]||{}; var k=ps.Kills||ps.kills||'?', d=ps.Deaths||ps.deaths||'?'; playerOptions += '<option value="'+i+'"'+(i===0?' selected':'')+'>'+p.nickname+' ('+p._team+') — '+k+'/'+d+'</option>'; });
-        var firstPlayer = allPlayers[0], firstStats = playersStats[firstPlayer&&firstPlayer.player_id]||{};
-        firstStats.nickname = firstPlayer&&firstPlayer.nickname||'Игрок';
-        var normalizedStats = normalizeStats(firstStats);
-        var matchInfo = { won: winner===(firstPlayer&&firstPlayer._teamId), map: map, score: score1+':'+score2, rounds: rounds, playerOptions: playerOptions, allPlayers: allPlayers, playersStats: playersStats, winner: winner };
-        window._faceitMatchData = matchInfo; window._faceitAllPlayers = allPlayers; window._faceitPlayersStats = playersStats;
-        fill.style.width = '100%'; txt.textContent = 'Готово!';
+        fill.style.width='20%';txt.textContent='Загрузка матча...';
+        var mr=await fetch('/api/faceit?path=matches/'+matchId);
+        if(!mr.ok){var ed=await mr.json();throw new Error(ed.error||'Матч не найден');}
+        var md=await mr.json();
+        fill.style.width='50%';txt.textContent='Загрузка статистики...';
+        var sr=await fetch('/api/faceit?path=matches/'+matchId+'/stats');
+        var sd=sr.ok?await sr.json():null;
+        fill.style.width='80%';txt.textContent='Анализ...';
+        var teams=md.teams||{},f1=teams.faction1||{},f2=teams.faction2||{},allP=[];
+        (f1.roster||[]).forEach(function(p){p._team=f1.name||'Team 1';p._teamId='faction1';allP.push(p);});
+        (f2.roster||[]).forEach(function(p){p._team=f2.name||'Team 2';p._teamId='faction2';allP.push(p);});
+        var winner=md.results&&md.results.winner;
+        var s1=(md.results&&md.results.score&&md.results.score.faction1)||'?';
+        var s2=(md.results&&md.results.score&&md.results.score.faction2)||'?';
+        var rounds=parseInt(s1)+parseInt(s2)||24;
+        var map=(md.voting&&md.voting.map&&md.voting.map.pick&&md.voting.map.pick[0])||'Unknown';
+        var ps={};
+        if(sd&&sd.rounds){sd.rounds.forEach(function(r){r.teams.forEach(function(t){t.players.forEach(function(p){ps[p.player_id]=p.player_stats;ps[p.player_id]._nick=p.nickname;});});});}
+        var opts='';
+        allP.forEach(function(p,i){var pst=ps[p.player_id]||{};var k=pst.Kills||pst.kills||'?',d=pst.Deaths||pst.deaths||'?';opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+p.nickname+' ('+p._team+') — '+k+'/'+d+'</option>';});
+        var fp=allP[0],fs=ps[fp&&fp.player_id]||{};
+        fs.nickname=fp&&fp.nickname||'Игрок';
+        var ns=normalizeStats(fs);
+        var mi={won:winner===(fp&&fp._teamId),map:map,score:s1+':'+s2,rounds:rounds,playerOptions:opts,allPlayers:allP,playersStats:ps,winner:winner};
+        window._faceitMatchData=mi;window._faceitAllPlayers=allP;window._faceitPlayersStats=ps;
+        fill.style.width='100%';txt.textContent='Готово!';
         await new Promise(function(r){setTimeout(r,400);});
-        prog.classList.remove('visible'); res.innerHTML = buildDeepAnalysis(normalizedStats, matchInfo); res.classList.add('visible');
+        prog.classList.remove('visible');
+        res.innerHTML=buildDeepAnalysis(ns,mi);res.classList.add('visible');
         res.scrollIntoView({behavior:'smooth',block:'start'});
+        await incrementUsage('cs');
+        await saveAnalysis('cs2', matchId, nick+' KD:'+ns.kd.toFixed(2)+' ADR:'+Math.round(ns.adr), ns.kd, ns.adr, 0, 0);
+        await showLimitWarning('faceitLimitWarning','cs');
     } catch(err) {
-        txt.textContent = 'Ошибка: ' + err.message; fill.style.width = '0%';
-        setTimeout(function() { prog.classList.remove('visible'); fill.style.width='0%'; txt.textContent='Загрузка данных матча...'; res.innerHTML='<div class="problem-block"><div class="problem-title">Ошибка загрузки</div><div class="problem-text">'+err.message+'<br><br>Убедитесь что:<br>• Ссылка ведёт на реальный FACEIT CS2 матч<br>• FACEIT_API_KEY настроен в Vercel<br>• Файл api/cs2-match.js загружен на Vercel</div></div>'; res.classList.add('visible'); }, 3000);
+        txt.textContent='Ошибка: '+err.message;fill.style.width='0%';
+        setTimeout(function(){prog.classList.remove('visible');fill.style.width='0%';txt.textContent='Загрузка...';res.innerHTML='<div class="problem-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+err.message+'</div></div>';res.classList.add('visible');},3000);
     }
 }
 
 function normalizeStats(raw) {
-    return { nickname: raw.nickname||raw._nick||'Игрок', kills: parseInt(raw.Kills||raw.kills||0), deaths: parseInt(raw.Deaths||raw.deaths||0), assists: parseInt(raw.Assists||raw.assists||0), headshots: parseInt(raw.Headshots||raw.headshots||0), headshots_percentage: parseFloat(raw['Headshots %']||raw.headshots_percentage||0), adr: parseFloat(raw.ADR||raw.adr||raw['Average Damage per Round']||0), mvps: parseInt(raw.MVPs||raw.mvps||0), entry_count: parseInt(raw['Entry Count']||raw.entry_count||0), entry_wins: parseInt(raw['Entry Wins']||raw.entry_wins||0), utility_damage: parseInt(raw['Utility Damage']||raw.utility_damage||0), flash_assists: parseInt(raw['Flash Assists']||raw.flash_assists||0), awpKillRate: parseFloat(raw['Sniper Kill Rate']||raw.awpKillRate||0) };
+    return{nickname:raw.nickname||raw._nick||'Игрок',kills:parseInt(raw.Kills||raw.kills||0),deaths:parseInt(raw.Deaths||raw.deaths||0),assists:parseInt(raw.Assists||raw.assists||0),headshots:parseInt(raw.Headshots||raw.headshots||0),headshots_percentage:parseFloat(raw['Headshots %']||raw.headshots_percentage||0),adr:parseFloat(raw.ADR||raw.adr||raw['Average Damage per Round']||0),mvps:parseInt(raw.MVPs||raw.mvps||0),entry_count:parseInt(raw['Entry Count']||raw.entry_count||0),entry_wins:parseInt(raw['Entry Wins']||raw.entry_wins||0),utility_damage:parseInt(raw['Utility Damage']||raw.utility_damage||0),flash_assists:parseInt(raw['Flash Assists']||raw.flash_assists||0),awpKillRate:parseFloat(raw['Sniper Kill Rate']||raw.awpKillRate||0)};
 }
 
-window.switchFaceitPlayer = function() {
-    var sel = document.getElementById('faceitPlayerSelect'); if (!sel||!window._faceitMatchData) return;
-    var idx = parseInt(sel.value), player = window._faceitAllPlayers[idx]; if (!player) return;
-    var rawStats = window._faceitPlayersStats[player.player_id]||{}; rawStats.nickname = player.nickname;
-    var matchInfo = window._faceitMatchData; matchInfo.won = matchInfo.winner === player._teamId;
-    var res = document.getElementById('faceitResults'); res.innerHTML = buildDeepAnalysis(normalizeStats(rawStats), matchInfo);
+window.switchFaceitPlayer=function(){
+    var sel=document.getElementById('faceitPlayerSelect');if(!sel||!window._faceitMatchData)return;
+    var idx=parseInt(sel.value),player=window._faceitAllPlayers[idx];if(!player)return;
+    var raw=window._faceitPlayersStats[player.player_id]||{};raw.nickname=player.nickname;
+    var mi=window._faceitMatchData;mi.won=mi.winner===player._teamId;
+    var res=document.getElementById('faceitResults');res.innerHTML=buildDeepAnalysis(normalizeStats(raw),mi);
+    var newSel=document.getElementById('faceitPlayerSelect');if(newSel)newSel.value=idx;
     res.scrollIntoView({behavior:'smooth',block:'start'});
 };
 
-window.resetFaceitAnalysis = function() {
-    document.getElementById('faceitResults').classList.remove('visible'); document.getElementById('faceitResults').innerHTML = '';
-    document.getElementById('faceitProgress').classList.remove('visible'); document.getElementById('faceitProgressFill').style.width = '0%';
-    document.getElementById('faceitLink').value = ''; window._faceitMatchData = null;
+window.resetFaceitAnalysis=function(){
+    document.getElementById('faceitResults').classList.remove('visible');document.getElementById('faceitResults').innerHTML='';
+    document.getElementById('faceitProgress').classList.remove('visible');document.getElementById('faceitProgressFill').style.width='0%';
+    document.getElementById('faceitLink').value='';window._faceitMatchData=null;
 };
 
 // ============================================================
 // AUTH
 // ============================================================
-async function hashPassword(password) {
-    var encoder = new TextEncoder(), data = encoder.encode(password + 'gameranalyzer_salt_2025');
-    var hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hashBuffer)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
-}
-function getLocalUsers() { try { return JSON.parse(localStorage.getItem('ga_users')||'{}'); } catch(e) { return {}; } }
-function saveLocalUsers(u) { localStorage.setItem('ga_users', JSON.stringify(u)); }
-function getCurrentUser() { try { return JSON.parse(localStorage.getItem('ga_current_user')||'null'); } catch(e) { return null; } }
-function setCurrentUser(u) { localStorage.setItem('ga_current_user', JSON.stringify(u)); }
-function clearCurrentUser() { localStorage.removeItem('ga_current_user'); }
-function toggleTheme() { document.documentElement.classList.toggle('light-theme'); localStorage.setItem('ga-theme', document.documentElement.classList.contains('light-theme')?'light':'dark'); }
-function initTheme() { if (localStorage.getItem('ga-theme')==='light') document.documentElement.classList.add('light-theme'); }
+async function hashPassword(pw){var e=new TextEncoder(),d=e.encode(pw+'gameranalyzer_salt_2025'),h=await crypto.subtle.digest('SHA-256',d);return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');}
+function getLocalUsers(){try{return JSON.parse(localStorage.getItem('ga_users')||'{}');}catch(e){return{};}}
+function saveLocalUsers(u){localStorage.setItem('ga_users',JSON.stringify(u));}
+function getCurrentUser(){try{return JSON.parse(localStorage.getItem('ga_current_user')||'null');}catch(e){return null;}}
+function setCurrentUser(u){localStorage.setItem('ga_current_user',JSON.stringify(u));}
+function clearCurrentUser(){localStorage.removeItem('ga_current_user');}
+function toggleTheme(){document.documentElement.classList.toggle('light-theme');localStorage.setItem('ga-theme',document.documentElement.classList.contains('light-theme')?'light':'dark');if(progressChartInstance){var m=currentChartMetric;progressChartInstance.destroy();progressChartInstance=null;renderProgressChart(m);}}
+function initTheme(){if(localStorage.getItem('ga-theme')==='light')document.documentElement.classList.add('light-theme');}
 initTheme();
 function showError(id,msg){var el=document.getElementById(id);el.textContent=msg;el.classList.add('visible');}
 function hideError(id){document.getElementById(id).classList.remove('visible');}
 function showSuccess(id,msg){var el=document.getElementById(id);el.textContent=msg;el.classList.add('visible');}
 function hideSuccess(id){document.getElementById(id).classList.remove('visible');}
 
-document.getElementById('goToRegister').addEventListener('click', function(){document.getElementById('loginForm').style.display='none';document.getElementById('registerForm').style.display='block';hideError('loginError');});
-document.getElementById('goToLogin').addEventListener('click', function(){document.getElementById('registerForm').style.display='none';document.getElementById('loginForm').style.display='block';hideError('regError');hideSuccess('regSuccess');});
-document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-document.getElementById('themeBtnNav').addEventListener('click', toggleTheme);
+document.getElementById('goToRegister').addEventListener('click',function(){document.getElementById('loginForm').style.display='none';document.getElementById('registerForm').style.display='block';hideError('loginError');});
+document.getElementById('goToLogin').addEventListener('click',function(){document.getElementById('registerForm').style.display='none';document.getElementById('loginForm').style.display='block';hideError('regError');hideSuccess('regSuccess');});
+document.getElementById('themeToggle').addEventListener('click',toggleTheme);
+document.getElementById('themeBtnNav').addEventListener('click',toggleTheme);
 
-document.getElementById('registerBtn').addEventListener('click', async function() {
-    var login=document.getElementById('regLoginInput').value.trim().toLowerCase(), password=document.getElementById('regPasswordInput').value, confirm=document.getElementById('regPasswordConfirm').value;
-    hideError('regError'); hideSuccess('regSuccess');
-    if (!login||login.length<3){showError('regError','Логин должен быть не короче 3 символов');return;}
-    if (!password||password.length<4){showError('regError','Пароль должен быть не короче 4 символов');return;}
-    if (password!==confirm){showError('regError','Пароли не совпадают');return;}
+document.getElementById('registerBtn').addEventListener('click',async function(){
+    var login=document.getElementById('regLoginInput').value.trim().toLowerCase(),password=document.getElementById('regPasswordInput').value,confirm=document.getElementById('regPasswordConfirm').value;
+    hideError('regError');hideSuccess('regSuccess');
+    if(!login||login.length<3){showError('regError','Логин не короче 3 символов');return;}
+    if(!password||password.length<4){showError('regError','Пароль не короче 4 символов');return;}
+    if(password!==confirm){showError('regError','Пароли не совпадают');return;}
     var useLocal=false;
-    if (supabaseClient) { try { var ex=await supabaseClient.from('users').select('login').eq('login',login).maybeSingle(); if(ex.error)throw ex.error; if(ex.data){showError('regError','Этот логин уже занят');return;} var hashed=await hashPassword(password); var ins=await supabaseClient.from('users').insert({login:login,password:hashed,plan:'free'}); if(ins.error)throw ins.error; } catch(err){if(isRLSError(err)){useLocal=true;}else{showError('regError','Ошибка: '+(err.message||err));return;}} } else { useLocal=true; }
-    if (useLocal) { var users=getLocalUsers(); if(users[login]){showError('regError','Этот логин уже занят');return;} users[login]={password:await hashPassword(password),plan:'free'}; saveLocalUsers(users); }
+    if(supabaseClient){try{var ex=await supabaseClient.from('users').select('login').eq('login',login).maybeSingle();if(ex.error)throw ex.error;if(ex.data){showError('regError','Логин занят');return;}var hashed=await hashPassword(password);var ins=await supabaseClient.from('users').insert({login:login,password:hashed,plan:'free'});if(ins.error)throw ins.error;}catch(err){if(isRLSError(err)){useLocal=true;}else{showError('regError','Ошибка: '+(err.message||err));return;}}}else{useLocal=true;}
+    if(useLocal){var users=getLocalUsers();if(users[login]){showError('regError','Логин занят');return;}users[login]={password:await hashPassword(password),plan:'free'};saveLocalUsers(users);}
     showSuccess('regSuccess','Аккаунт создан! Теперь войдите.');
-    document.getElementById('regLoginInput').value=''; document.getElementById('regPasswordInput').value=''; document.getElementById('regPasswordConfirm').value='';
+    document.getElementById('regLoginInput').value='';document.getElementById('regPasswordInput').value='';document.getElementById('regPasswordConfirm').value='';
     setTimeout(function(){document.getElementById('registerForm').style.display='none';document.getElementById('loginForm').style.display='block';hideSuccess('regSuccess');document.getElementById('loginInput').value=login;},1500);
 });
 
-document.getElementById('loginBtn').addEventListener('click', async function() {
-    var login=document.getElementById('loginInput').value.trim().toLowerCase(), password=document.getElementById('passwordInput').value;
+document.getElementById('loginBtn').addEventListener('click',async function(){
+    var login=document.getElementById('loginInput').value.trim().toLowerCase(),password=document.getElementById('passwordInput').value;
     hideError('loginError');
-    if (!login||!password){showError('loginError','Введите логин и пароль');return;}
+    if(!login||!password){showError('loginError','Введите логин и пароль');return;}
     var useLocal=false;
-    if (supabaseClient) { try { var hashed=await hashPassword(password); var res=await supabaseClient.from('users').select('*').eq('login',login).maybeSingle(); if(res.error)throw res.error; if(!res.data){showError('loginError','Логин не найден');return;} if(res.data.password!==hashed){showError('loginError','Пароль не совпадает');return;} setCurrentUser({login:res.data.login,plan:res.data.plan}); enterApp(); return; } catch(err){if(isRLSError(err)){useLocal=true;}else{showError('loginError','Ошибка входа: '+(err.message||err));return;}} } else { useLocal=true; }
-    if (useLocal) { var users=getLocalUsers(); if(!users[login]){showError('loginError','Логин не найден. Зарегистрируйтесь.');return;} var hashed2=await hashPassword(password); if(users[login].password!==hashed2){showError('loginError','Пароль не совпадает');return;} setCurrentUser({login:login,plan:users[login].plan||'free'}); enterApp(); }
+    if(supabaseClient){try{var hashed=await hashPassword(password);var res=await supabaseClient.from('users').select('*').eq('login',login).maybeSingle();if(res.error)throw res.error;if(!res.data){showError('loginError','Логин не найден');return;}if(res.data.password!==hashed){showError('loginError','Пароль не совпадает');return;}setCurrentUser({login:res.data.login,plan:res.data.plan});enterApp();return;}catch(err){if(isRLSError(err)){useLocal=true;}else{showError('loginError','Ошибка: '+(err.message||err));return;}}}else{useLocal=true;}
+    if(useLocal){var users=getLocalUsers();if(!users[login]){showError('loginError','Логин не найден');return;}var hashed2=await hashPassword(password);if(users[login].password!==hashed2){showError('loginError','Пароль не совпадает');return;}setCurrentUser({login:login,plan:users[login].plan||'free'});enterApp();}
 });
 
-function enterApp() { document.getElementById('authScreen').style.display='none'; setTimeout(function(){document.getElementById('appWrapper').classList.add('active');updateUserInfo();updateSubscriptionUI();},10); }
-function updateUserInfo() { var u=getCurrentUser(); if(!u)return; document.getElementById('userName').textContent=u.login; var pn={'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM'}; document.getElementById('userPlan').textContent=pn[u.plan]||'Бесплатный'; }
-function updateSubscriptionUI() {
-    var u=getCurrentUser(); if(!u)return;
+function enterApp(){document.getElementById('authScreen').style.display='none';setTimeout(function(){document.getElementById('appWrapper').classList.add('active');updateUserInfo();updateSubscriptionUI();initLimitWarnings();},10);}
+
+async function initLimitWarnings(){
+    await showLimitWarning('dotaLimitWarning','dota');
+    await showLimitWarning('csLimitWarning','cs');
+    await showLimitWarning('faceitLimitWarning','cs');
+}
+
+function updateUserInfo(){var u=getCurrentUser();if(!u)return;document.getElementById('userName').textContent=u.login;var pn={'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM'};document.getElementById('userPlan').textContent=pn[u.plan]||'Бесплатный';}
+function updateSubscriptionUI(){
+    var u=getCurrentUser();if(!u)return;
     document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Выбрать тариф';bd.classList.remove('visible');});
-    if (u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}
+    if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}
 }
-
-document.getElementById('logoutBtn').addEventListener('click', function(){clearCurrentUser();document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
-document.getElementById('btn-dota').addEventListener('click', function(){selectPlan('pro_dota2');});
-document.getElementById('btn-cs').addEventListener('click', function(){selectPlan('pro_cs2');});
-document.getElementById('btn-premium').addEventListener('click', function(){selectPlan('premium');});
-
-async function selectPlan(plan) {
-    var u=getCurrentUser(); if(!u)return; u.plan=plan; setCurrentUser(u);
-    if(supabaseClient){try{await supabaseClient.from('users').update({plan:plan}).eq('login',u.login);}catch(e){}} else{var us=getLocalUsers();if(us[u.login]){us[u.login].plan=plan;saveLocalUsers(us);}}
-    updateUserInfo(); updateSubscriptionUI(); revealCards();
-}
+document.getElementById('logoutBtn').addEventListener('click',function(){clearCurrentUser();document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
+document.getElementById('btn-dota').addEventListener('click',function(){selectPlan('pro_dota2');});
+document.getElementById('btn-cs').addEventListener('click',function(){selectPlan('pro_cs2');});
+document.getElementById('btn-premium').addEventListener('click',function(){selectPlan('premium');});
+async function selectPlan(plan){var u=getCurrentUser();if(!u)return;u.plan=plan;setCurrentUser(u);if(supabaseClient){try{await supabaseClient.from('users').update({plan:plan}).eq('login',u.login);}catch(e){}}else{var us=getLocalUsers();if(us[u.login]){us[u.login].plan=plan;saveLocalUsers(us);}}updateUserInfo();updateSubscriptionUI();revealCards();await initLimitWarnings();}
 
 // ============================================================
 // NAVIGATION
 // ============================================================
-var burger=document.getElementById('burger'), sidebar=document.getElementById('sidebar'), overlay=document.getElementById('overlay');
-burger.addEventListener('click', function(){toggleSidebar();});
-overlay.addEventListener('click', function(){closeSidebar();});
+var burger=document.getElementById('burger'),sidebar=document.getElementById('sidebar'),overlay=document.getElementById('overlay');
+burger.addEventListener('click',function(){toggleSidebar();});
+overlay.addEventListener('click',function(){closeSidebar();});
 function toggleSidebar(){sidebar.classList.toggle('open');overlay.classList.toggle('visible');burger.classList.toggle('open');}
 function closeSidebar(){sidebar.classList.remove('open');overlay.classList.remove('visible');burger.classList.remove('open');}
 
 document.querySelectorAll('.sidebar-item').forEach(function(item){
-    item.addEventListener('click', function(){
-        document.querySelectorAll('.sidebar-item').forEach(function(i){i.classList.remove('active');}); item.classList.add('active');
+    item.addEventListener('click',function(){
+        document.querySelectorAll('.sidebar-item').forEach(function(i){i.classList.remove('active');});item.classList.add('active');
         document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-        var t=item.getAttribute('data-section'), sec=document.getElementById('section-'+t);
-        if(sec) sec.classList.add('active');
-        if(t==='subscriptions') revealCards();
-        if(window.innerWidth<768) closeSidebar();
+        var t=item.getAttribute('data-section'),sec=document.getElementById('section-'+t);
+        if(sec)sec.classList.add('active');
+        if(t==='subscriptions')revealCards();
+        if(t==='account')loadAccountData();
+        if(window.innerWidth<768)closeSidebar();
     });
 });
 
 function revealCards(){document.querySelectorAll('.subscription-card').forEach(function(c,i){c.classList.remove('visible');setTimeout(function(){c.classList.add('visible');},i*150);});}
 
 document.querySelectorAll('.back-home-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
+    btn.addEventListener('click',function(){
         document.querySelectorAll('.sidebar-item').forEach(function(i){i.classList.remove('active');});
         document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
         document.getElementById('section-home').classList.add('active');
-        var hi=document.querySelector('.sidebar-item[data-section="home"]'); if(hi) hi.classList.add('active');
+        var hi=document.querySelector('.sidebar-item[data-section="home"]');if(hi)hi.classList.add('active');
     });
 });
 
 document.querySelectorAll('.dota-subtab[data-subtab]').forEach(function(tab){
-    tab.addEventListener('click', function(){
+    tab.addEventListener('click',function(){
         var parent=tab.closest('.section')||document.getElementById('section-dota2');
         parent.querySelectorAll('.dota-subtab[data-subtab]').forEach(function(t){t.classList.remove('active');});
         parent.querySelectorAll('.dota-subcontent').forEach(function(c){c.classList.remove('active');});
         tab.classList.add('active');
-        var t=tab.getAttribute('data-subtab'); document.getElementById('dotaSub-'+t).classList.add('active');
-        if(t==='tierlist'&&!tierlistData) loadTierlist();
+        var t=tab.getAttribute('data-subtab');document.getElementById('dotaSub-'+t).classList.add('active');
+        if(t==='tierlist'&&!tierlistData)loadTierlist();
+        if(t==='history')loadDotaHistory();
     });
 });
 
 document.querySelectorAll('.dota-subtab[data-cs2subtab]').forEach(function(tab){
-    tab.addEventListener('click', function(){
+    tab.addEventListener('click',function(){
         document.querySelectorAll('.dota-subtab[data-cs2subtab]').forEach(function(t){t.classList.remove('active');});
         document.querySelectorAll('#section-cs2 .dota-subcontent').forEach(function(c){c.classList.remove('active');});
         tab.classList.add('active');
-        var t=tab.getAttribute('data-cs2subtab'); document.getElementById('cs2Sub-'+t).classList.add('active');
+        var t=tab.getAttribute('data-cs2subtab');document.getElementById('cs2Sub-'+t).classList.add('active');
+        if(t==='history')loadCsHistory();
     });
 });
+
+// Табы графика
+document.querySelectorAll('.chart-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+        document.querySelectorAll('.chart-tab').forEach(function(t){t.classList.remove('active');});
+        tab.classList.add('active');
+        renderProgressChart(tab.getAttribute('data-chart'));
+    });
+});
+
+async function loadDotaHistory(){var a=await loadAnalyses('dota2');renderHistoryList(a,'dotaHistoryList','dota2');}
+async function loadCsHistory(){var a=await loadAnalyses('cs2');renderHistoryList(a,'csHistoryList','cs2');}
 
 // ============================================================
 // DOTA 2 TIERLIST
 // ============================================================
 var RANKS=[{num:1,name:'Рекрут',color:'#6b6b6b'},{num:2,name:'Страж',color:'#4a9d4a'},{num:3,name:'Рыцарь',color:'#b8860b'},{num:4,name:'Герой',color:'#b0b0b0'},{num:5,name:'Легенда',color:'#4a90d9'},{num:6,name:'Властелин',color:'#8b5cf6'},{num:7,name:'Божество',color:'#06b6d4'},{num:8,name:'Титан',color:'#ef4444'}];
 var POSITIONS=[{id:'all',name:'Все',icon:'Все'},{id:1,name:'Carry',icon:'1'},{id:2,name:'Mid',icon:'2'},{id:3,name:'Offlane',icon:'3'},{id:4,name:'Support',icon:'4'},{id:5,name:'Hard Support',icon:'5'}];
-var tierlistData=null, laneRolesMap={}, currentRank=7, currentPosition='all';
+var tierlistData=null,laneRolesMap={},currentRank=7,currentPosition='all';
 
-async function loadTierlist() {
-    var c=document.getElementById('tierlistContent'); c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';
-    try {
-        var sr=await fetch(DOTA_API+'heroStats'), lr=await fetch(DOTA_API+'scenarios/laneRoles');
-        if(!sr.ok) throw new Error('Недоступно');
+async function loadTierlist(){
+    var c=document.getElementById('tierlistContent');c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';
+    try{
+        var sr=await fetch(DOTA_API+'heroStats'),lr=await fetch(DOTA_API+'scenarios/laneRoles');
+        if(!sr.ok)throw new Error('Недоступно');
         tierlistData=await sr.json();
         if(lr.ok){var ld=await lr.json();laneRolesMap={};var hlg={};ld.forEach(function(e){var h=parseInt(e.hero_id);if(!hlg[h])hlg[h]={};hlg[h][e.lane_role]=(hlg[h][e.lane_role]||0)+(parseInt(e.games)||0);});Object.keys(hlg).forEach(function(h){var best=0,bg=0;Object.keys(hlg[h]).forEach(function(l){if(hlg[h][l]>bg){bg=hlg[h][l];best=parseInt(l);}});laneRolesMap[h]=best;});}
-        renderPositionSelector(); renderRankSelector(); renderTierlist(currentRank);
-        var now=new Date(); document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-    } catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}
+        renderPositionSelector();renderRankSelector();renderTierlist(currentRank);
+        var now=new Date();document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+    }catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}
 }
 
 function renderPositionSelector(){var s=document.getElementById('positionSelector');s.innerHTML=POSITIONS.map(function(p){return'<div class="position-badge '+(p.id===currentPosition?'active':'')+'" data-pos="'+p.id+'"><div class="position-badge-icon"><span style="font-size:1.4rem;">'+p.icon+'</span></div><div class="position-badge-name">'+p.name+'</div></div>';}).join('');s.querySelectorAll('.position-badge').forEach(function(b){b.addEventListener('click',function(){currentPosition=b.dataset.pos;s.querySelectorAll('.position-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
 function renderRankSelector(){var s=document.getElementById('rankSelector');s.innerHTML=RANKS.map(function(r){return'<div class="rank-badge '+(r.num===currentRank?'active':'')+'" data-rank="'+r.num+'"><div class="rank-badge-icon" style="width:36px;height:36px;border-radius:50%;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;box-shadow:0 0 8px '+r.color+'99;">'+r.num+'</div><div class="rank-badge-name">'+r.name+'</div></div>';}).join('');s.querySelectorAll('.rank-badge').forEach(function(b){b.addEventListener('click',function(){currentRank=parseInt(b.dataset.rank);s.querySelectorAll('.rank-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
-
 function getHeroPosition(hid){var id=parseInt(hid),h=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===id;}):null;if(!h)return null;var r=h.roles||[],s=r.some(function(x){return x.indexOf('Support')!==-1;}),c=r.indexOf('Carry')!==-1,d=r.indexOf('Durable')!==-1,i=r.indexOf('Initiator')!==-1,e=r.indexOf('Escape')!==-1,n=r.indexOf('Nuker')!==-1;var l=laneRolesMap[id];if(l===2)return 2;if(l===3){if(s&&!c){if(e||i)return 4;return 5;}return 3;}if(l===4)return 4;if(s&&!c){if(e||i)return 4;return 5;}if(c&&s){if(e||i)return 4;return 5;}if(l===1)return 1;if(c&&!d&&!i)return 1;if(d||i)return 3;if(n)return 2;return 1;}
-
 function renderTierlist(rn){
     if(!tierlistData)return;
     var c=document.getElementById('tierlistContent');
@@ -1048,14 +1314,12 @@ function renderTierlist(rn){
     if(hw.length<5){hw=heroes;}
     var nd=heroes.filter(function(h){return h.picks<th;});
     hw.sort(function(a,b){return b.winRate-a.winRate;});
-    var tot=hw.length;
-    if(tot===0){c.innerHTML='<div style="text-align:center;padding:40px;color:#888;">Нет данных</div>';return;}
+    var tot=hw.length;if(tot===0){c.innerHTML='<div style="text-align:center;padding:40px;color:#888;">Нет данных</div>';return;}
     var sC=Math.ceil(tot*0.15),aC=Math.ceil(tot*0.20),bC=Math.ceil(tot*0.25),cC=Math.ceil(tot*0.25);
     var sH=hw.slice(0,sC),aH=hw.slice(sC,sC+aC),bH=hw.slice(sC+aC,sC+aC+bC),cH=hw.slice(sC+aC+bC,sC+aC+bC+cC),dH=hw.slice(sC+aC+bC+cC).concat(nd);
     var tiers=[{label:'S',cls:'s',h:sH,desc:'META'},{label:'A',cls:'a',h:aH,desc:'STRONG'},{label:'B',cls:'b',h:bH,desc:'SITUATION'},{label:'C',cls:'c',h:cH,desc:'WEAK'},{label:'D',cls:'d',h:dH,desc:'AVOID'}];
-    c.innerHTML='<div class="tier-table">'+tiers.map(function(t){return'<div class="tier-row"><div class="tier-label '+t.cls+'">'+t.label+'<div class="tier-label-desc">'+t.desc+'</div></div><div class="tier-heroes">'+t.h.map(function(h){var wt=h.winRate>0?h.winRate.toFixed(1)+'%':'—';return'<div class="hero-card" title="'+h.name+'"><img src="'+h.icon+'" alt="'+h.name+'" loading="lazy" onerror="this.src=\''+h.fallback+'\'"><div class="hero-card-winrate">'+wt+'</div><div class="hero-card-tooltip">'+h.name+' · '+wt+' · '+h.picks+' игр</div></div>';}).join('')+'</div></div>';}).join('')+'</div>';
+    c.innerHTML='<div class="tier-table">'+tiers.map(function(t){return'<div class="tier-row"><div class="tier-label '+t.cls+'">'+t.label+'<div class="tier-label-desc">'+t.desc+'</div></div><div class="tier-heroes">'+t.h.map(function(h){var wt=h.winRate>0?h.winRate.toFixed(1)+'%':'—';return'<div class="hero-card"><img src="'+h.icon+'" alt="'+h.name+'" loading="lazy" onerror="this.src=\''+h.fallback+'\'"><div class="hero-card-winrate">'+wt+'</div><div class="hero-card-tooltip">'+h.name+' · '+wt+' · '+h.picks+' игр</div></div>';}).join('')+'</div></div>';}).join('')+'</div>';
 }
-
 function getHeroName(hid){if(tierlistData){var h=tierlistData.find(function(x){return parseInt(x.id)===parseInt(hid);});if(h)return h.localized_name;}return'Hero #'+hid;}
 
 // ============================================================
@@ -1074,7 +1338,7 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     var posNames=['—','Керри','Мид','Оффлейнер','Саппорт','Хард-саппорт'],posName=posNames[pos]||'Игрок';
     var bm=PRO_BENCH[pos]||PRO_BENCH[1];
     var k=player.kills||0,d=player.deaths||0,a=player.assists||0,gpm=player.gold_per_min||0,xpm=player.xp_per_min||0;
-    var lh=player.last_hits||0,dn=player.denies||0,hd=player.hero_damage||0,td=player.tower_damage||0;
+    var lh=player.last_hits||0,hd=player.hero_damage||0,td=player.tower_damage||0;
     var apm=player.actions_per_min||null,lhT=player.lh_t||[],goldT=player.gold_t||[];
     var lh10=lhT.length>10?lhT[10]:null,lh20=lhT.length>20?lhT[20]:null,lh30=lhT.length>30?lhT[30]:null;
     var rs=data.radiant_score||0,ds=data.dire_score||0,tk=isRad?rs:ds;
@@ -1085,14 +1349,14 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     kp2.sort(function(a,b){return a.time-b.time;});
     var blink=kp2.find(function(p){return p.key==='blink';});
     var html='';
-    if(!parsed) html+='<div class="problem-block" style="border-color:rgba(99,102,241,0.3);background-color:rgba(99,102,241,0.06);"><div class="problem-title" style="color:#818cf8;">Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota. Базовые показатели отображаются корректно.</div></div>';
+    if(!parsed)html+='<div class="problem-block" style="border-color:rgba(99,102,241,0.3);background-color:rgba(99,102,241,0.06);"><div class="problem-title" style="color:#818cf8;">Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota.</div></div>';
     html+='<div class="result-header"><div class="result-header-info"><h2>'+hName+' — '+posName+'</h2><div class="result-header-meta">Длительность: '+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
     html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\''+matchId+'\')">'+playerOptions+'</select></div>';
     html+='<div class="result-block"><div class="result-block-title">Базовые показатели</div><div class="metrics-grid">';
     html+='<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+gpm+'</div><div class="metric-sub '+(gpm>=bm.gpm?'good':'bad')+'">Про: '+bm.gpm+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">'+xpm+'</div><div class="metric-sub '+(xpm>=bm.xpm?'good':'bad')+'">Про: '+bm.xpm+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+k+'/'+d+'/'+a+'</div><div class="metric-sub">Участие: '+kp+'%</div></div>';
-    if(apm!=null) html+='<div class="metric-card"><div class="metric-label">APM</div><div class="metric-value">'+apm+'</div><div class="metric-sub '+(apm>=200?'good':'bad')+'">Про: 250+</div></div>';
+    if(apm!=null)html+='<div class="metric-card"><div class="metric-label">APM</div><div class="metric-value">'+apm+'</div><div class="metric-sub '+(apm>=200?'good':'bad')+'">Про: 250+</div></div>';
     html+='<div class="metric-card"><div class="metric-label">Урон</div><div class="metric-value">'+(hd/1000).toFixed(1)+'K</div></div>';
     html+='<div class="metric-card"><div class="metric-label">Башни</div><div class="metric-value">'+(td/1000).toFixed(1)+'K</div></div>';
     html+='<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+lh+'</div></div>';
@@ -1104,35 +1368,25 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
         if(lh10!=null&&lh20!=null&&lh30!=null){var d10=lh10-bm.lh10,d20=lh20-bm.lh20,d30=lh30-bm.lh30;html+='<tr><td>Разница</td><td class="'+(d10>=0?'diff-good':'diff-bad')+'">'+(d10>=0?'+':'')+d10+'</td><td class="'+(d20>=0?'diff-good':'diff-bad')+'">'+(d20>=0?'+':'')+d20+'</td><td class="'+(d30>=0?'diff-good':'diff-bad')+'">'+(d30>=0?'+':'')+d30+'</td></tr>';}
         html+='</table></div>';
     }
-    if(kp2.length>0){
-        html+='<div class="result-block"><div class="result-block-title">Ключевые предметы</div><div class="item-timeline">';
-        kp2.forEach(function(p){html+='<div class="item-chip">'+p.name+' — <span class="item-time">'+p.ts+'</span></div>';});
-        html+='</div>';
-        if(blink){var bm2=blink.time/60;if(bm2>bm.blink+3)html+='<div class="analysis-text"><strong style="color:var(--red);">Blink в '+blink.ts+'</strong> — поздновато.</div>';else if(bm2<=bm.blink+1)html+='<div class="analysis-text"><strong style="color:var(--green);">Blink в '+blink.ts+'</strong> — отлично.</div>';}
-        html+='</div>';
-    }
+    if(kp2.length>0){html+='<div class="result-block"><div class="result-block-title">Ключевые предметы</div><div class="item-timeline">';kp2.forEach(function(p){html+='<div class="item-chip">'+p.name+' — <span class="item-time">'+p.ts+'</span></div>';});html+='</div>';if(blink){var bm2=blink.time/60;if(bm2>bm.blink+3)html+='<div class="analysis-text"><strong style="color:var(--red);">Blink в '+blink.ts+'</strong> — поздновато.</div>';else if(bm2<=bm.blink+1)html+='<div class="analysis-text"><strong style="color:var(--green);">Blink в '+blink.ts+'</strong> — отлично.</div>';}html+='</div>';}
     html+='<div class="result-block"><div class="result-block-title">Сильные стороны</div>';
-    if(gpm>=bm.gpm) html+='<div class="strength-item"><span class="marker">+</span> GPM '+gpm+' — про-уровень.</div>';
-    if(kp>=65) html+='<div class="strength-item"><span class="marker">+</span> Участие в командных боях '+kp+'%.</div>';
-    if(d<=3) html+='<div class="strength-item"><span class="marker">+</span> Мало смертей ('+d+').</div>';
-    html+='</div>';
-    html+='<div class="result-block"><div class="result-block-title">Слабые стороны</div>';
-    if(gpm<bm.gpm*0.8) html+='<div class="weakness-item"><span class="marker">−</span> Низкий GPM ('+gpm+', норма: '+bm.gpm+').</div>';
-    if(d>=8) html+='<div class="weakness-item"><span class="marker">−</span> Много смертей ('+d+').</div>';
-    html+='</div>';
-    html+='<div class="result-block"><div class="result-block-title">Рекомендации</div>';
-    if(gpm<bm.gpm*0.8) html+='<div class="recommendation-item"><span class="marker">1.</span><div>Улучшите фарм.<div class="rec-exercise"><strong>Упражнение:</strong> 20 мин в лобби: крип → лес → крип.</div></div></div>';
-    if(d>=8) html+='<div class="recommendation-item"><span class="marker">2.</span><div>Работайте над отступлением.<div class="rec-exercise"><strong>Упражнение:</strong> Смотрите реплеи смертей.</div></div></div>';
-    html+='</div>';
-    html+='<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+    if(gpm>=bm.gpm)html+='<div class="strength-item"><span class="marker">+</span> GPM '+gpm+' — про-уровень.</div>';
+    if(kp>=65)html+='<div class="strength-item"><span class="marker">+</span> Участие '+kp+'%.</div>';
+    if(d<=3)html+='<div class="strength-item"><span class="marker">+</span> Мало смертей ('+d+').</div>';
+    html+='</div><div class="result-block"><div class="result-block-title">Слабые стороны</div>';
+    if(gpm<bm.gpm*0.8)html+='<div class="weakness-item"><span class="marker">−</span> Низкий GPM ('+gpm+', норма: '+bm.gpm+').</div>';
+    if(d>=8)html+='<div class="weakness-item"><span class="marker">−</span> Много смертей ('+d+').</div>';
+    html+='</div><div class="result-block"><div class="result-block-title">Рекомендации</div>';
+    if(gpm<bm.gpm*0.8)html+='<div class="recommendation-item"><span class="marker">1.</span><div>Улучшите фарм.<div class="rec-exercise"><strong>Упражнение:</strong> 20 мин в лобби.</div></div></div>';
+    if(d>=8)html+='<div class="recommendation-item"><span class="marker">2.</span><div>Работайте над отступлением.<div class="rec-exercise"><strong>Упражнение:</strong> Смотрите реплеи смертей.</div></div></div>';
+    html+='</div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
     return html;
 }
 
 function generateDotaResultsFromAPI(data){
     var players=data.players||[],opts='';
     players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});
-    var player=players[0];
-    if(!player) return '<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';
+    var player=players[0];if(!player)return'<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';
     return buildDotaAnalysis(data,player,0,opts);
 }
 
@@ -1143,15 +1397,15 @@ window.switchDotaPlayer=async function(matchId){
 
 window.resetAnalysis=function(game){var p=game==='dota'?'dota':'cs';document.getElementById(p+'Results').classList.remove('visible');document.getElementById(p+'Results').innerHTML='';document.getElementById(p+'Progress').classList.remove('visible');document.getElementById(p+'ProgressFill').style.width='0%';document.getElementById(p+'Link').value='';if(game==='cs'){var fi=document.getElementById('csFile');if(fi)fi.value='';}};
 
-// ============================================================
-// CS2 CLASSIC ANALYSIS
-// ============================================================
-function generateCsResults(){return'<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда (11:13)</div></div><div class="result-badge lose">Поражение</div></div><div class="problem-block"><div class="problem-title">Ключевая проблема</div><div class="problem-text">Выживаемость 25% — критически мало для entry роли.</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Норма: 45%+</div></div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Используйте FACEIT анализ для глубокого разбора.<div class="rec-exercise"><strong>Перейдите во вкладку FACEIT Анализ</strong> и вставьте ссылку на матч.</div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';}
+function generateCsResults(){return'<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда</div></div><div class="result-badge lose">Поражение</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Норма: 45%+</div></div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Используйте FACEIT анализ для глубокого разбора.<div class="rec-exercise"><strong>Перейдите во вкладку FACEIT Анализ</strong></div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';}
 
 async function runAnalysis(game){
-    var p=game==='dota'?'dota':'cs', link=document.getElementById(p+'Link').value.trim();
+    var u=getCurrentUser();if(!u)return;
+    var canAnalyze=await checkLimit(game);
+    if(!canAnalyze){await showLimitWarning(game==='dota'?'dotaLimitWarning':'csLimitWarning',game);return;}
+    var p=game==='dota'?'dota':'cs',link=document.getElementById(p+'Link').value.trim();
     if(!link){alert('Вставьте ссылку или match_id');return;}
-    var matchId=link; if(link.indexOf('/')!==-1){var parts=link.split('/');matchId=parts[parts.length-1];}
+    var matchId=link;if(link.indexOf('/')!==-1){var parts=link.split('/');matchId=parts[parts.length-1];}
     var w=document.getElementById(p+'Progress'),f=document.getElementById(p+'ProgressFill'),t=document.getElementById(p+'ProgressText'),r=document.getElementById(p+'Results');
     r.classList.remove('visible');r.innerHTML='';w.classList.add('visible');f.style.width='0%';t.textContent='Обработка...';
     try{
@@ -1167,14 +1421,24 @@ async function runAnalysis(game){
             await new Promise(function(r){setTimeout(r,400);});
             f.style.width='100%';t.textContent='Готово!';
             await new Promise(function(r){setTimeout(r,400);});
-            w.classList.remove('visible');r.innerHTML=generateDotaResultsFromAPI(data);r.classList.add('visible');r.scrollIntoView({behavior:'smooth',block:'start'});
+            w.classList.remove('visible');r.innerHTML=generateDotaResultsFromAPI(data);r.classList.add('visible');
+            r.scrollIntoView({behavior:'smooth',block:'start'});
+            var p0=data.players[0];
+            var summ=getHeroName(p0.hero_id)+' GPM:'+p0.gold_per_min+' K/D:'+p0.kills+'/'+p0.deaths;
+            await incrementUsage('dota');
+            await saveAnalysis('dota2', matchId, summ, 0, 0, p0.gold_per_min||0, 0);
+            await showLimitWarning('dotaLimitWarning','dota');
         }
         if(game==='cs'){
             f.style.width='50%';t.textContent='Разбор...';
             await new Promise(function(r){setTimeout(r,1000);});
             f.style.width='100%';t.textContent='Готово!';
             await new Promise(function(r){setTimeout(r,400);});
-            w.classList.remove('visible');r.innerHTML=generateCsResults();r.classList.add('visible');r.scrollIntoView({behavior:'smooth',block:'start'});
+            w.classList.remove('visible');r.innerHTML=generateCsResults();r.classList.add('visible');
+            r.scrollIntoView({behavior:'smooth',block:'start'});
+            await incrementUsage('cs');
+            await saveAnalysis('cs2', matchId, 'CS2 анализ · ADR: 62', 0.85, 62, 0, 0);
+            await showLimitWarning('csLimitWarning','cs');
         }
     }catch(err){t.textContent='Ошибка: '+err.message;setTimeout(function(){w.classList.remove('visible');f.style.width='0%';t.textContent='В очереди...';},3000);}
 }
@@ -1184,11 +1448,10 @@ async function runAnalysis(game){
 // ============================================================
 var currentPeriod=7;
 document.querySelectorAll('.period-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.period-btn').forEach(function(b){b.classList.remove('active');});this.classList.add('active');currentPeriod=parseInt(this.dataset.period);});});
-document.getElementById('steamFetchBtn').addEventListener('click', fetchSteamStats);
+document.getElementById('steamFetchBtn').addEventListener('click',fetchSteamStats);
 
 async function fetchSteamStats(){
-    var input=document.getElementById('steamInput').value.trim();
-    if(!input){alert('Введите Steam ID или ссылку');return;}
+    var input=document.getElementById('steamInput').value.trim();if(!input){alert('Введите Steam ID');return;}
     var accountId=input;
     if(input.indexOf('/profiles/')!==-1){var m=input.match(/\/profiles\/(\d+)/);if(m)accountId=m[1];}
     else if(input.indexOf('/id/')!==-1){var m2=input.match(/\/id\/([^\/\?]+)/);if(m2)accountId=m2[1];}
@@ -1196,8 +1459,7 @@ async function fetchSteamStats(){
     res.classList.remove('visible');res.innerHTML='';prog.classList.add('visible');fill.style.width='0%';txt.textContent='Получение данных...';
     try{
         fill.style.width='15%';
-        var pRes=await fetch(DOTA_API+'players/'+accountId);
-        if(!pRes.ok)throw new Error('Игрок не найден');
+        var pRes=await fetch(DOTA_API+'players/'+accountId);if(!pRes.ok)throw new Error('Игрок не найден');
         var pData=await pRes.json();
         fill.style.width='50%';txt.textContent='Загрузка матчей...';
         var df=currentPeriod>0?'?date='+(Math.floor(Date.now()/1000)-currentPeriod*86400):'';
@@ -1206,7 +1468,7 @@ async function fetchSteamStats(){
         fill.style.width='70%';txt.textContent='Анализ героев...';
         var hRes=await fetch(DOTA_API+'players/'+accountId+'/heroes'+df);
         var heroesData=hRes.ok?await hRes.json():[];
-        fill.style.width='90%';txt.textContent='Формирование отчёта...';
+        fill.style.width='90%';txt.textContent='Формирование...';
         var total=matches.length,wins=0,losses=0,tK=0,tD=0,tA=0,tGPM=0,tXPM=0,tLH=0,tHD=0,tDur=0;
         matches.forEach(function(m){if(m.radiant_win===(m.player_slot<128))wins++;else losses++;tK+=m.kills||0;tD+=m.deaths||0;tA+=m.assists||0;tGPM+=m.gold_per_min||0;tXPM+=m.xp_per_min||0;tLH+=m.last_hits||0;tHD+=m.hero_damage||0;tDur+=m.duration||0;});
         var wr=total>0?Math.round(wins/total*100):0;
@@ -1219,8 +1481,7 @@ async function fetchSteamStats(){
         prog.classList.remove('visible');
         var html='',prof=pData.profile||{},avatar=prof.avatarmedium||'',name=prof.personaname||'Неизвестный',medal='';
         if(pData.rank_tier){var rn2=Math.floor(pData.rank_tier/10);var rns=['','Рекрут','Страж','Рыцарь','Герой','Легенда','Властелин','Божество','Титан'];medal=rn2>=1&&rn2<=8?rns[rn2]:'';}
-        html+='<div class="profile-header">';
-        if(avatar)html+='<img class="profile-avatar" src="'+avatar+'" alt="'+name+'">';
+        html+='<div class="profile-header">';if(avatar)html+='<img class="profile-avatar" src="'+avatar+'" alt="'+name+'">';
         html+='<div class="profile-info"><h2>'+name+'</h2><div class="profile-info-meta">Матчей: '+total+(medal?' · Ранг: '+medal:'')+'</div></div>';
         html+='<div class="result-badge '+(wr>=50?'win':'lose')+'">'+wr+'% WR</div></div>';
         if(total===0){html+='<div class="result-block"><div class="problem-text">За период матчей не найдено.</div></div>';}
@@ -1247,10 +1508,10 @@ async function fetchSteamStats(){
 // ============================================================
 // EVENT LISTENERS
 // ============================================================
-document.getElementById('dotaAnalyzeBtn').addEventListener('click', function(){runAnalysis('dota');});
-document.getElementById('csAnalyzeBtn').addEventListener('click', function(){runAnalysis('cs');});
-document.getElementById('faceitAnalyzeBtn').addEventListener('click', runFaceitAnalysis);
-window.addEventListener('load', function(){var u=getCurrentUser();if(u)enterApp();});
+document.getElementById('dotaAnalyzeBtn').addEventListener('click',function(){runAnalysis('dota');});
+document.getElementById('csAnalyzeBtn').addEventListener('click',function(){runAnalysis('cs');});
+document.getElementById('faceitAnalyzeBtn').addEventListener('click',runFaceitAnalysis);
+window.addEventListener('load',function(){var u=getCurrentUser();if(u)enterApp();});
 </script>
 </body>
 </html>
