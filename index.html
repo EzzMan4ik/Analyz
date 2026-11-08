@@ -444,7 +444,7 @@
             </div>
             <div class="features-grid">
                 <div class="feature-card"><span class="feature-icon">📊</span><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
-                <div class="feature-card"><span class="feature-icon">🤖</span><div class="feature-title">ИИ-тренер (Groq)</div><div class="feature-text">Нейросеть анализирует ваш матч как профессиональный тренер и даёт конкретные советы.</div></div>
+                <div class="feature-card"><span class="feature-icon">🤖</span><div class="feature-title">ИИ-помощник</div><div class="feature-text">Нейросеть анализирует ваш матч как профессиональный тренер и даёт конкретные советы.</div></div>
                 <div class="feature-card"><span class="feature-icon">💡</span><div class="feature-title">Рекомендации тренера</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
                 <div class="feature-card"><span class="feature-icon">👤</span><div class="feature-title">Личный кабинет</div><div class="feature-text">История анализов, график прогресса и статистика достижений.</div></div>
                 <div class="feature-card"><span class="feature-icon">📈</span><div class="feature-title">График прогресса</div><div class="feature-text">Отслеживай рост KD, ADR и GPM на основе реальных матчей.</div></div>
@@ -514,7 +514,7 @@
                     <div class="subscription-price">250 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">10 анализов матчей ежедневно</li>
-                        <li class="benefit">ИИ-разбор тренера (Groq)</li>
+                        <li class="benefit">ИИ-помощник</li>
                         <li class="benefit">Лучшие паттерны фарма</li>
                         <li class="benefit">Тайминги всех действий, предметов</li>
                     </ul>
@@ -526,7 +526,7 @@
                     <div class="subscription-price">250 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">10 анализов матчей ежедневно</li>
-                        <li class="benefit">ИИ-разбор тренера (Groq)</li>
+                        <li class="benefit">ИИ-помощник</li>
                         <li class="benefit">Лайнапы гранат на всех картах</li>
                         <li class="benefit">FACEIT анализ с про-сравнением</li>
                     </ul>
@@ -610,7 +610,7 @@
                         </div>
                         <button class="steam-btn" id="steamFetchBtn">Получить статистику</button>
                     </div>
-                    <div class="steam-hint">Steam ID можно найти на сайте steamid.xyz</div>
+                    <div class="steam-hint">Подойдёт Steam ID (64-бит), friend code, ссылка на профиль или имя из ссылки. Узнать ID можно на steamid.xyz. В Dota 2 должна быть включена опция «Предоставлять публичный доступ к данным матчей».</div>
                     <div class="steam-progress" id="steamProgress">
                         <div class="progress-bar"><div class="progress-fill" id="steamProgressFill"></div></div>
                         <div class="progress-text" id="steamProgressText">Загрузка...</div>
@@ -627,6 +627,7 @@
                 <div class="dota-subtab active" data-cs2subtab="analysis"><span class="dota-subtab-icon">🔫</span><span class="dota-subtab-text">Анализ матча</span></div>
                 <div class="dota-subtab" data-cs2subtab="history"><span class="dota-subtab-icon">🕐</span><span class="dota-subtab-text">История</span></div>
                 <div class="dota-subtab" data-cs2subtab="faceit"><span class="dota-subtab-icon">🎯</span><span class="dota-subtab-text">FACEIT Анализ</span></div>
+                <div class="dota-subtab" data-cs2subtab="stats"><span class="dota-subtab-icon">👤</span><span class="dota-subtab-text">Моя статистика</span></div>
             </div>
             <div class="dota-subcontent active" id="cs2Sub-analysis">
                 <div class="game-block">
@@ -650,6 +651,23 @@
             <div class="dota-subcontent" id="cs2Sub-history">
                 <div class="section-title">История анализов CS 2</div>
                 <div id="csHistoryList" class="history-list"><div class="history-empty">История пуста.</div></div>
+            </div>
+            <div class="dota-subcontent" id="cs2Sub-stats">
+                <div class="steam-block">
+                    <div class="game-icon">👤</div>
+                    <div class="section-title">Моя статистика CS 2</div>
+                    <div class="section-desc">Введите ваш Steam ID — сервис загрузит статистику вашего аккаунта в CS 2.</div>
+                    <div class="steam-form">
+                        <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль" id="csSteamInput"/>
+                        <button class="steam-btn" id="csSteamFetchBtn">Получить статистику</button>
+                    </div>
+                    <div class="steam-hint">Steam отдаёт статистику CS 2 за всё время игры. В Steam → Приватность профиля пункт «Игровые данные» должен быть «Открытый».</div>
+                    <div class="steam-progress" id="csSteamProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="csSteamProgressFill"></div></div>
+                        <div class="progress-text" id="csSteamProgressText">Загрузка...</div>
+                    </div>
+                    <div class="steam-results" id="csSteamResults"></div>
+                </div>
             </div>
             <div class="dota-subcontent" id="cs2Sub-faceit">
                 <div class="game-block" style="max-width:900px;">
@@ -690,23 +708,24 @@ const DOTA_API = '/api/dota/';
 async function runGroqAnalysis(game, stats, containerId) {
     var el = document.getElementById(containerId);
     if (!el) return;
-    el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">Groq AI</span></div><div class="ai-loading"><div class="ai-loading-spinner"></div><span>Нейросеть анализирует матч...</span></div></div>';
+    el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">ИИ-помощник</span></div><div class="ai-loading"><div class="ai-loading-spinner"></div><span>Нейросеть анализирует матч...</span></div></div>';
     try {
         var response = await fetch('/api/ai-analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ game: game, stats: stats })
         });
-        if (!response.ok) throw new Error('Gemini API недоступен');
+        if (!response.ok) throw new Error('сервис недоступен');
         var data = await response.json();
         if (data.error) throw new Error(data.error);
         var text = data.analysis || 'Анализ недоступен';
         // Форматируем markdown-подобный текст
         text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">Groq AI · Llama 3</span></div><div class="ai-analysis-content">'+text+'</div></div>';
+        el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">ИИ-помощник</span></div><div class="ai-analysis-content">'+text+'</div></div>';
     } catch(err) {
-        el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">Groq AI</span></div><div class="ai-error">ИИ-анализ временно недоступен. Проверьте GROQ_API_KEY в Vercel. (' + err.message + ')</div></div>';
+        console.error('AI error:', err);
+        el.innerHTML = '<div class="ai-analysis-block"><div class="ai-analysis-header"><div class="ai-analysis-icon">🤖</div><div class="ai-analysis-title">ИИ-разбор тренера</div><span class="ai-analysis-badge">ИИ-помощник</span></div><div class="ai-error">ИИ-анализ временно недоступен. Попробуйте позже.</div></div>';
     }
 }
 
@@ -833,7 +852,7 @@ async function runFaceitAnalysis(){
     try{
         fill.style.width='20%';txt.textContent='Загрузка матча...';
         var mr=await fetch('/api/faceit?path=matches/'+matchId);
-        if(!mr.ok){var ed=await mr.json();throw new Error(ed.error||'Матч не найден');}
+        if(!mr.ok){var ed={};try{ed=await mr.json();}catch(e){}throw new Error((ed.error&&(ed.error.message||ed.error))||'Матч не найден (HTTP '+mr.status+')');}
         var md=await mr.json();
         fill.style.width='50%';txt.textContent='Загрузка статистики...';
         var sr=await fetch('/api/faceit?path=matches/'+matchId+'/stats');
@@ -846,9 +865,10 @@ async function runFaceitAnalysis(){
         var s1=(md.results&&md.results.score&&md.results.score.faction1)||'?';
         var s2=(md.results&&md.results.score&&md.results.score.faction2)||'?';
         var rounds=parseInt(s1)+parseInt(s2)||24;
+        if(sd&&sd.rounds&&sd.rounds[0]&&sd.rounds[0].round_stats&&parseInt(sd.rounds[0].round_stats.Rounds))rounds=parseInt(sd.rounds[0].round_stats.Rounds);
         var map=(md.voting&&md.voting.map&&md.voting.map.pick&&md.voting.map.pick[0])||'Unknown';
         var ps={};
-        if(sd&&sd.rounds){sd.rounds.forEach(function(r){r.teams.forEach(function(t){t.players.forEach(function(p){ps[p.player_id]=p.player_stats;ps[p.player_id]._nick=p.nickname;});});});}
+        if(sd&&sd.rounds&&sd.rounds[0]){(sd.rounds[0].teams||[]).forEach(function(tm){(tm.players||[]).forEach(function(p){ps[p.player_id]=p.player_stats||{};ps[p.player_id]._nick=p.nickname;});});}
         var opts='';
         allP.forEach(function(p,i){var pst=ps[p.player_id]||{};var k=pst.Kills||pst.kills||'?',d=pst.Deaths||pst.deaths||'?';opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+p.nickname+' ('+p._team+') — '+k+'/'+d+'</option>';});
         var fp=allP[0],fs=ps[fp&&fp.player_id]||{};
@@ -861,17 +881,21 @@ async function runFaceitAnalysis(){
         prog.classList.remove('visible');
         res.innerHTML=buildDeepAnalysis(ns,mi);res.classList.add('visible');
         res.scrollIntoView({behavior:'smooth',block:'start'});
-        await incrementUsage('cs');
-        var nick=ns.nickname||'Игрок';
-        await saveAnalysis('cs2',matchId,nick+' KD:'+ns.kd.toFixed(2)+' ADR:'+Math.round(ns.adr),ns.kd,ns.adr,0,0);
-        await showLimitWarning('faceitLimitWarning','cs');
+        // Побочные действия (лимиты/история) не должны стирать готовый результат
+        try{
+            var nick=ns.nickname||'Игрок';
+            var nkd=ns.deaths>0?ns.kills/ns.deaths:ns.kills;
+            await incrementUsage('cs');
+            await saveAnalysis('cs2',matchId,nick+' KD:'+nkd.toFixed(2)+' ADR:'+Math.round(ns.adr),nkd,ns.adr,0,0);
+            await showLimitWarning('faceitLimitWarning','cs');
+        }catch(e2){console.warn('Не удалось сохранить анализ:',e2);}
     }catch(err){
         txt.textContent='Ошибка: '+err.message;fill.style.width='0%';
         setTimeout(function(){prog.classList.remove('visible');fill.style.width='0%';txt.textContent='Загрузка...';res.innerHTML='<div class="problem-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+err.message+'</div></div>';res.classList.add('visible');},3000);
     }
 }
 
-function normalizeStats(raw){return{nickname:raw.nickname||raw._nick||'Игрок',kills:parseInt(raw.Kills||raw.kills||0),deaths:parseInt(raw.Deaths||raw.deaths||0),assists:parseInt(raw.Assists||raw.assists||0),headshots:parseInt(raw.Headshots||raw.headshots||0),headshots_percentage:parseFloat(raw['Headshots %']||raw.headshots_percentage||0),adr:parseFloat(raw.ADR||raw.adr||raw['Average Damage per Round']||0),mvps:parseInt(raw.MVPs||raw.mvps||0),entry_count:parseInt(raw['Entry Count']||raw.entry_count||0),entry_wins:parseInt(raw['Entry Wins']||raw.entry_wins||0),utility_damage:parseInt(raw['Utility Damage']||raw.utility_damage||0),flash_assists:parseInt(raw['Flash Assists']||raw.flash_assists||0),awpKillRate:parseFloat(raw['Sniper Kill Rate']||raw.awpKillRate||0)};}
+function normalizeStats(raw){return{nickname:raw.nickname||raw._nick||'Игрок',kills:parseInt(raw.Kills||raw.kills||0),deaths:parseInt(raw.Deaths||raw.deaths||0),assists:parseInt(raw.Assists||raw.assists||0),headshots:parseInt(raw.Headshots||raw.headshots||0),headshots_percentage:parseFloat(raw['Headshots %']||raw.headshots_percentage||0),adr:parseFloat(raw.ADR||raw.adr||raw['Average Damage per Round']||0)||(parseFloat(raw['Damage']||raw.damage||0)/Math.max(1,parseInt(raw.Rounds||raw.rounds||0)||0)),mvps:parseInt(raw.MVPs||raw.mvps||0),entry_count:parseInt(raw['Entry Count']||raw.entry_count||0),entry_wins:parseInt(raw['Entry Wins']||raw.entry_wins||0),utility_damage:parseInt(raw['Utility Damage']||raw.utility_damage||0),flash_assists:parseInt(raw['Flash Assists']||raw.flash_assists||0),awpKillRate:parseFloat(raw['Sniper Kill Rate']||raw.awpKillRate||0)};}
 
 window.switchFaceitPlayer=function(){
     var sel=document.getElementById('faceitPlayerSelect');if(!sel||!window._faceitMatchData)return;
@@ -1124,7 +1148,168 @@ async function runAnalysis(game){
 var currentPeriod=7;
 document.querySelectorAll('.period-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.period-btn').forEach(function(b){b.classList.remove('active');});this.classList.add('active');currentPeriod=parseInt(this.dataset.period);});});
 document.getElementById('steamFetchBtn').addEventListener('click',fetchSteamStats);
-async function fetchSteamStats(){var input=document.getElementById('steamInput').value.trim();if(!input){alert('Введите Steam ID');return;}var accountId=input;if(input.indexOf('/profiles/')!==-1){var m=input.match(/\/profiles\/(\d+)/);if(m)accountId=m[1];}else if(input.indexOf('/id/')!==-1){var m2=input.match(/\/id\/([^\/\?]+)/);if(m2)accountId=m2[1];}var prog=document.getElementById('steamProgress'),fill=document.getElementById('steamProgressFill'),txt=document.getElementById('steamProgressText'),res=document.getElementById('steamResults');res.classList.remove('visible');res.innerHTML='';prog.classList.add('visible');fill.style.width='0%';txt.textContent='Получение данных...';try{fill.style.width='15%';var pRes=await fetch(DOTA_API+'players/'+accountId);if(!pRes.ok)throw new Error('Игрок не найден');var pData=await pRes.json();fill.style.width='50%';txt.textContent='Загрузка матчей...';var df=currentPeriod>0?'?date='+(Math.floor(Date.now()/1000)-currentPeriod*86400):'';var mRes=await fetch(DOTA_API+'players/'+accountId+'/recentMatches'+df);var matches=mRes.ok?await mRes.json():[];fill.style.width='70%';txt.textContent='Анализ героев...';var hRes=await fetch(DOTA_API+'players/'+accountId+'/heroes'+df);var heroesData=hRes.ok?await hRes.json():[];fill.style.width='90%';txt.textContent='Формирование...';var total=matches.length,wins=0,losses=0,tK=0,tD=0,tA=0,tGPM=0,tXPM=0,tLH=0,tHD=0,tDur=0;matches.forEach(function(m){if(m.radiant_win===(m.player_slot<128))wins++;else losses++;tK+=m.kills||0;tD+=m.deaths||0;tA+=m.assists||0;tGPM+=m.gold_per_min||0;tXPM+=m.xp_per_min||0;tLH+=m.last_hits||0;tHD+=m.hero_damage||0;tDur+=m.duration||0;});var wr=total>0?Math.round(wins/total*100):0;var aK=total>0?(tK/total).toFixed(1):'0',aD=total>0?(tD/total).toFixed(1):'0',aA=total>0?(tA/total).toFixed(1):'0';var aGPM=total>0?Math.round(tGPM/total):0,aXPM=total>0?Math.round(tXPM/total):0,aLH=total>0?Math.round(tLH/total):0,aHD=total>0?Math.round(tHD/total/1000):0,aDur=total>0?Math.floor(tDur/total/60):0;var topH=heroesData.filter(function(h){return h.games>0;}).sort(function(a,b){return b.games-a.games;}).slice(0,8);if(!tierlistData){try{var sR=await fetch(DOTA_API+'heroStats');if(sR.ok)tierlistData=await sR.json();}catch(e){}}fill.style.width='100%';txt.textContent='Готово!';await new Promise(function(r){setTimeout(r,400);});prog.classList.remove('visible');var html='',prof=pData.profile||{},avatar=prof.avatarmedium||'',name=prof.personaname||'Неизвестный',medal='';if(pData.rank_tier){var rn2=Math.floor(pData.rank_tier/10);var rns=['','Рекрут','Страж','Рыцарь','Герой','Легенда','Властелин','Божество','Титан'];medal=rn2>=1&&rn2<=8?rns[rn2]:'';}html+='<div class="profile-header">';if(avatar)html+='<img class="profile-avatar" src="'+avatar+'" alt="'+name+'">';html+='<div class="profile-info"><h2>'+name+'</h2><div class="profile-info-meta">Матчей: '+total+(medal?' · Ранг: '+medal:'')+'</div></div>';html+='<div class="result-badge '+(wr>=50?'win':'lose')+'">'+wr+'% WR</div></div>';if(total===0){html+='<div class="result-block"><div class="problem-text">За период матчей не найдено.</div></div>';}else{html+='<div class="result-block"><div class="result-block-title">Средние показатели</div><div class="metrics-grid">';html+='<div class="metric-card"><div class="metric-label">Винрейт</div><div class="metric-value">'+wr+'%</div><div class="metric-sub '+(wr>=50?'good':'bad')+'">'+wins+'В / '+losses+'П</div></div>';html+='<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+aK+'/'+aD+'/'+aA+'</div></div>';html+='<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+aGPM+'</div></div>';html+='<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">'+aXPM+'</div></div>';html+='<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+aLH+'</div></div>';html+='<div class="metric-card"><div class="metric-label">Урон/матч</div><div class="metric-value">'+aHD+'K</div></div>';html+='<div class="metric-card"><div class="metric-label">Длительность</div><div class="metric-value">'+aDur+' мин</div></div>';html+='</div></div>';if(topH.length>0){html+='<div class="result-block"><div class="result-block-title">Топ героев</div>';topH.forEach(function(h){var hn=getHeroName(h.hero_id);var hh=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===parseInt(h.hero_id);}):null;var hi=hh?'https://cdn.cloudflare.steamstatic.com/'+(hh.img||'').replace(/^\//,''):'';var hw2=h.games>0?Math.round(h.win/h.games*100):0;html+='<div class="hero-stats-row">';if(hi)html+='<img class="hero-stats-img" src="'+hi+'" alt="'+hn+'">';html+='<div class="hero-stats-name">'+hn+'</div><div class="hero-stats-games">'+h.games+' игр · '+h.win+'В</div><div class="hero-stats-wr '+(hw2>=50?'good':'bad')+'">'+hw2+'%</div></div>';});html+='</div>';}}res.innerHTML=html;res.classList.add('visible');res.scrollIntoView({behavior:'smooth',block:'start'});}catch(err){prog.classList.remove('visible');res.innerHTML='<div class="result-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+err.message+'</div></div>';res.classList.add('visible');}}
+document.getElementById('csSteamFetchBtn').addEventListener('click',fetchCsSteamStats);
+['steamInput','csSteamInput'].forEach(function(id){document.getElementById(id).addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById(id==='steamInput'?'steamFetchBtn':'csSteamFetchBtn').click();});});
+
+function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+var STEAM64_BASE=BigInt('76561197960265728');
+
+// Приводит любой формат ввода к SteamID64 и 32-битному account_id (нужен OpenDota)
+async function resolveSteamInput(raw){
+    var s=String(raw||'').trim(),m,steam64=null,vanity=null;
+    if((m=s.match(/steamcommunity\.com\/profiles\/(\d{17})/i)))steam64=m[1];
+    else if((m=s.match(/steamcommunity\.com\/id\/([^\/\?#\s]+)/i)))vanity=decodeURIComponent(m[1]);
+    else if(/^7656\d{13}$/.test(s))steam64=s;
+    else if((m=s.match(/^STEAM_[0-5]:([01]):(\d+)$/i)))steam64=(BigInt(m[2])*BigInt(2)+BigInt(m[1])+STEAM64_BASE).toString();
+    else if((m=s.match(/^\[U:1:(\d+)\]$/i)))steam64=(BigInt(m[1])+STEAM64_BASE).toString();
+    else if(/^\d{1,10}$/.test(s))steam64=(BigInt(s)+STEAM64_BASE).toString();
+    else if(/^[A-Za-z0-9_\-]{2,32}$/.test(s))vanity=s;
+    else throw new Error('Не удалось распознать Steam ID. Вставьте ссылку на профиль или числовой ID (steamid.xyz).');
+    if(!steam64){
+        var r=null;
+        try{r=await fetch('/api/steam?action=resolve&vanity='+encodeURIComponent(vanity));}catch(e){}
+        var d=null;if(r&&r.ok){try{d=await r.json();}catch(e){}}
+        if(!d||!d.steamid)throw new Error('Не удалось найти профиль по имени «'+vanity+'». Вставьте числовой Steam ID (steamid.xyz) или ссылку вида steamcommunity.com/profiles/7656...');
+        steam64=d.steamid;
+    }
+    return{steam64:steam64,accountId:(BigInt(steam64)-STEAM64_BASE).toString()};
+}
+function steamUI(prefix){
+    return{prog:document.getElementById(prefix+'Progress'),fill:document.getElementById(prefix+'ProgressFill'),txt:document.getElementById(prefix+'ProgressText'),res:document.getElementById(prefix+'Results')};
+}
+function steamShowError(ui,msg){ui.prog.classList.remove('visible');ui.res.innerHTML='<div class="result-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+escHtml(msg)+'</div></div>';ui.res.classList.add('visible');}
+async function fetchJsonSafe(url){var r=await fetch(url);var d=null;try{d=await r.json();}catch(e){}return{ok:r.ok,status:r.status,data:d};}
+
+// ---------- Dota 2 ----------
+async function fetchSteamStats(){
+    var input=document.getElementById('steamInput').value.trim();
+    if(!input){alert('Введите Steam ID');return;}
+    var ui=steamUI('steam');
+    ui.res.classList.remove('visible');ui.res.innerHTML='';ui.prog.classList.add('visible');ui.fill.style.width='5%';ui.txt.textContent='Определяем аккаунт...';
+    try{
+        var ids=await resolveSteamInput(input),acc=ids.accountId;
+        ui.fill.style.width='20%';ui.txt.textContent='Загрузка профиля...';
+        var p=await fetchJsonSafe(DOTA_API+'players/'+acc);
+        if(!p.ok||!p.data||!p.data.profile)throw new Error('Профиль Dota 2 не найден. Проверьте ID и включите в Dota 2 «Предоставлять публичный доступ к данным матчей».');
+        var pData=p.data;
+        ui.fill.style.width='45%';ui.txt.textContent='Загрузка матчей...';
+        var dateQ=currentPeriod>0?'&date='+currentPeriod:'';
+        var proj=['hero_id','player_slot','radiant_win','duration','kills','deaths','assists','gold_per_min','xp_per_min','last_hits','hero_damage'].map(function(f){return'project='+f;}).join('&');
+        var matches=[];
+        var mr=await fetchJsonSafe(DOTA_API+'players/'+acc+'/matches?limit=100&'+proj+dateQ);
+        if(mr.ok&&Array.isArray(mr.data))matches=mr.data;
+        else{
+            var rr=await fetchJsonSafe(DOTA_API+'players/'+acc+'/recentMatches');
+            if(rr.ok&&Array.isArray(rr.data)){
+                matches=rr.data;
+                if(currentPeriod>0){var from=Math.floor(Date.now()/1000)-currentPeriod*86400;matches=matches.filter(function(m){return (m.start_time||0)>=from;});}
+            }
+        }
+        ui.fill.style.width='70%';ui.txt.textContent='Анализ героев...';
+        var hr=await fetchJsonSafe(DOTA_API+'players/'+acc+'/heroes'+(currentPeriod>0?'?date='+currentPeriod:''));
+        var heroesData=hr.ok&&Array.isArray(hr.data)?hr.data:[];
+        if(!tierlistData){try{var sR=await fetch(DOTA_API+'heroStats');if(sR.ok)tierlistData=await sR.json();}catch(e){}}
+        ui.fill.style.width='100%';ui.txt.textContent='Готово!';
+        await new Promise(function(r){setTimeout(r,300);});
+        ui.prog.classList.remove('visible');
+
+        var total=matches.length,wins=0,losses=0,tK=0,tD=0,tA=0,tGPM=0,tXPM=0,tLH=0,tHD=0,tDur=0;
+        matches.forEach(function(m){if(m.radiant_win===(m.player_slot<128))wins++;else losses++;tK+=m.kills||0;tD+=m.deaths||0;tA+=m.assists||0;tGPM+=m.gold_per_min||0;tXPM+=m.xp_per_min||0;tLH+=m.last_hits||0;tHD+=m.hero_damage||0;tDur+=m.duration||0;});
+        var wr=total>0?Math.round(wins/total*100):0;
+        var avg=function(x,d){return total>0?(x/total).toFixed(d):'0';};
+        var topH=heroesData.filter(function(h){return h.games>0;}).sort(function(a,b){return b.games-a.games;}).slice(0,8);
+        var prof=pData.profile||{},name=prof.personaname||'Неизвестный',medal='';
+        if(pData.rank_tier){var rn=Math.floor(pData.rank_tier/10),rns=['','Рекрут','Страж','Рыцарь','Герой','Легенда','Властелин','Божество','Титан'];medal=rn>=1&&rn<=8?rns[rn]:'';}
+        var html='<div class="profile-header">';
+        if(prof.avatarmedium)html+='<img class="profile-avatar" src="'+escHtml(prof.avatarmedium)+'" alt="">';
+        html+='<div class="profile-info"><h2>'+escHtml(name)+'</h2><div class="profile-info-meta">Матчей: '+total+(medal?' · Ранг: '+medal:'')+'</div></div>';
+        if(total>0)html+='<div class="result-badge '+(wr>=50?'win':'lose')+'">'+wr+'% WR</div>';
+        html+='</div>';
+        if(total===0){
+            html+='<div class="result-block"><div class="problem-text">За выбранный период матчей не найдено. Выберите больший период или проверьте, что в Dota 2 включён публичный доступ к данным матчей.</div></div>';
+        }else{
+            html+='<div class="result-block"><div class="result-block-title">Средние показатели</div><div class="metrics-grid">';
+            html+='<div class="metric-card"><div class="metric-label">Винрейт</div><div class="metric-value">'+wr+'%</div><div class="metric-sub '+(wr>=50?'good':'bad')+'">'+wins+'В / '+losses+'П</div></div>';
+            html+='<div class="metric-card"><div class="metric-label">K/D/A</div><div class="metric-value">'+avg(tK,1)+'/'+avg(tD,1)+'/'+avg(tA,1)+'</div></div>';
+            html+='<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+avg(tGPM,0)+'</div></div>';
+            html+='<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">'+avg(tXPM,0)+'</div></div>';
+            html+='<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+avg(tLH,0)+'</div></div>';
+            html+='<div class="metric-card"><div class="metric-label">Урон/матч</div><div class="metric-value">'+(total>0?Math.round(tHD/total/1000):0)+'K</div></div>';
+            html+='<div class="metric-card"><div class="metric-label">Длительность</div><div class="metric-value">'+(total>0?Math.floor(tDur/total/60):0)+' мин</div></div>';
+            html+='</div></div>';
+            if(topH.length>0){
+                html+='<div class="result-block"><div class="result-block-title">Топ героев</div>';
+                topH.forEach(function(h){
+                    var hn=getHeroName(h.hero_id),hh=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===parseInt(h.hero_id);}):null;
+                    var hi=hh?'https://cdn.cloudflare.steamstatic.com/'+(hh.img||'').replace(/^\//,''):'';
+                    var hw=h.games>0?Math.round(h.win/h.games*100):0;
+                    html+='<div class="hero-stats-row">'+(hi?'<img class="hero-stats-img" src="'+hi+'" alt="">':'')+'<div class="hero-stats-name">'+escHtml(hn)+'</div><div class="hero-stats-games">'+h.games+' игр · '+h.win+'В</div><div class="hero-stats-wr '+(hw>=50?'good':'bad')+'">'+hw+'%</div></div>';
+                });
+                html+='</div>';
+            }
+        }
+        ui.res.innerHTML=html;ui.res.classList.add('visible');ui.res.scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(err){steamShowError(ui,err.message);}
+}
+
+// ---------- CS 2 ----------
+var CS_WEAPONS={ak47:'AK-47',m4a1:'M4A4 / M4A1-S',awp:'AWP',glock:'Glock-18',hkp2000:'USP-S / P2000',deagle:'Desert Eagle',famas:'FAMAS',galilar:'Galil AR',ssg08:'SSG 08',p250:'P250',aug:'AUG',sg556:'SG 553',mp7:'MP7',mp9:'MP9',mac10:'MAC-10',ump45:'UMP-45',bizon:'PP-Bizon',nova:'Nova',xm1014:'XM1014',m249:'M249',negev:'Negev',tec9:'Tec-9',fiveseven:'Five-SeveN',elite:'Dual Berettas',mag7:'MAG-7',sawedoff:'Sawed-Off',p90:'P90',g3sg1:'G3SG1',scar20:'SCAR-20',knife:'Нож',hegrenade:'Граната',molotov:'Молотов'};
+async function fetchCsSteamStats(){
+    var input=document.getElementById('csSteamInput').value.trim();
+    if(!input){alert('Введите Steam ID');return;}
+    var ui=steamUI('csSteam');
+    ui.res.classList.remove('visible');ui.res.innerHTML='';ui.prog.classList.add('visible');ui.fill.style.width='10%';ui.txt.textContent='Определяем аккаунт...';
+    try{
+        var ids=await resolveSteamInput(input);
+        ui.fill.style.width='40%';ui.txt.textContent='Загрузка статистики CS 2...';
+        var r=await fetchJsonSafe('/api/steam?action=cs2&steamid='+ids.steam64);
+        if(!r.ok||!r.data){
+            if(r.status===404)throw new Error('Серверная функция /api/steam не найдена. Добавьте файл api/steam.mjs в проект и задайте STEAM_API_KEY в Vercel.');
+            throw new Error((r.data&&r.data.error)||'Не удалось получить данные Steam (HTTP '+r.status+')');
+        }
+        var d=r.data,prof=d.profile||{},st=d.stats||null,pt=d.playtime||{};
+        ui.fill.style.width='90%';ui.txt.textContent='Формирование...';
+        await new Promise(function(x){setTimeout(x,300);});
+        ui.fill.style.width='100%';ui.prog.classList.remove('visible');
+        var name=prof.personaname||'Игрок';
+        var html='<div class="profile-header">';
+        if(prof.avatarmedium)html+='<img class="profile-avatar" src="'+escHtml(prof.avatarmedium)+'" alt="">';
+        var hours=pt.forever?Math.round(pt.forever/60):(st&&st.total_time_played?Math.round(st.total_time_played/3600):0);
+        html+='<div class="profile-info"><h2>'+escHtml(name)+'</h2><div class="profile-info-meta">CS 2'+(hours?' · Часов в игре: '+hours:'')+(pt.twoWeeks?' · За 2 недели: '+Math.round(pt.twoWeeks/60)+' ч':'')+'</div></div>';
+        var kd=null;
+        if(st&&st.total_deaths>0){kd=st.total_kills/st.total_deaths;html+='<div class="result-badge '+(kd>=1?'win':'lose')+'">K/D '+kd.toFixed(2)+'</div>';}
+        html+='</div>';
+        if(!st){
+            html+='<div class="result-block"><div class="problem-title">Статистика недоступна</div><div class="problem-text">'+(d.statsError==='private'?'Игровые данные профиля скрыты. В Steam откройте Профиль → Редактировать профиль → Приватность и поставьте «Игровые данные» = «Открытый». Затем повторите запрос.':'Steam не вернул статистику CS 2 для этого аккаунта (возможно, в CS 2 ещё нет сыгранных матчей).')+'</div></div>';
+        }else{
+            var g=function(k){return Number(st[k])||0;};
+            var kills=g('total_kills'),deaths=g('total_deaths'),hsK=g('total_kills_headshot'),shots=g('total_shots_fired'),hits=g('total_shots_hit'),rounds=g('total_rounds_played'),dmg=g('total_damage_done');
+            var mPlayed=g('total_matches_played'),mWon=g('total_matches_won');
+            var cards=[];
+            cards.push(['K/D',kd!==null?kd.toFixed(2):'—',kd!==null?(kd>=1?'good':'bad'):'','']);
+            cards.push(['Убийства',kills.toLocaleString('ru-RU'),'','']);
+            cards.push(['Смерти',deaths.toLocaleString('ru-RU'),'','']);
+            if(kills>0)cards.push(['HS%',Math.round(hsK/kills*100)+'%',hsK/kills>=0.45?'good':'bad','']);
+            if(shots>0)cards.push(['Точность',Math.round(hits/shots*100)+'%','','']);
+            if(rounds>0&&dmg>0)cards.push(['ADR (≈)',Math.round(dmg/rounds),dmg/rounds>=70?'good':'bad','']);
+            if(mPlayed>0)cards.push(['Винрейт',Math.round(mWon/mPlayed*100)+'%',mWon/mPlayed>=0.5?'good':'bad',mWon+'В / '+(mPlayed-mWon)+'П']);
+            if(g('total_mvps')>0)cards.push(['MVP',g('total_mvps').toLocaleString('ru-RU'),'','']);
+            if(rounds>0)cards.push(['Раундов',rounds.toLocaleString('ru-RU'),'','']);
+            if(g('total_planted_bombs')>0)cards.push(['Бомб заложено',g('total_planted_bombs'),'','']);
+            if(g('total_defused_bombs')>0)cards.push(['Бомб разминировано',g('total_defused_bombs'),'','']);
+            html+='<div class="result-block"><div class="result-block-title">Статистика за всё время</div><div class="metrics-grid">'+cards.map(function(c){return'<div class="metric-card"><div class="metric-label">'+c[0]+'</div><div class="metric-value">'+c[1]+'</div>'+(c[3]?'<div class="metric-sub '+c[2]+'">'+c[3]+'</div>':(c[2]?'<div class="metric-sub '+c[2]+'">&nbsp;</div>':''))+'</div>';}).join('')+'</div></div>';
+            var weapons=[];
+            Object.keys(CS_WEAPONS).forEach(function(w){var k=g('total_kills_'+w);if(k>0)weapons.push({name:CS_WEAPONS[w],kills:k});});
+            weapons.sort(function(a,b){return b.kills-a.kills;});
+            if(weapons.length){
+                html+='<div class="result-block"><div class="result-block-title">Топ оружия</div>';
+                weapons.slice(0,6).forEach(function(w){html+='<div class="hero-stats-row"><div class="hero-stats-name">'+escHtml(w.name)+'</div><div class="hero-stats-games">'+w.kills.toLocaleString('ru-RU')+' убийств</div><div class="hero-stats-wr good">'+(kills>0?Math.round(w.kills/kills*100):0)+'%</div></div>';});
+                html+='</div>';
+            }
+        }
+        ui.res.innerHTML=html;ui.res.classList.add('visible');ui.res.scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(err){steamShowError(ui,err.message);}
+}
 
 // ============================================================
 // EVENT LISTENERS
