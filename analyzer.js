@@ -689,7 +689,7 @@
   /* ------------------------------------------------------------------ */
   function renderReport(r) {
     if (!r) return '';
-    var h = '<div class="result-block"><div class="result-block-title">🧠 ' + esc(r.title) + '</div>';
+    var h = '<div class="result-block"><div class="result-block-title"><svg class="ico"><use href="#i-spark"/></svg> ' + esc(r.title) + '</div>';
     if (r.score) {
       var cls = r.score.value >= 60 ? 'good' : (r.score.value < 40 ? 'bad' : '');
       h += '<div class="metrics-grid"><div class="metric-card"><div class="metric-label">Оценка матча</div><div class="metric-value">' + r.score.value + '<span style="font-size:0.9rem;color:#888;"> / 100</span></div><div class="metric-sub ' + cls + '">' + esc(r.score.label) + '</div></div></div>';
@@ -700,7 +700,7 @@
         (r.main.drill ? '<div class="rec-exercise" style="margin-top:12px;"><strong>Упражнение:</strong> ' + esc(r.main.drill) + '</div>' : '') + '</div>';
     }
     if (r.problems.length > 1 || (r.problems.length === 1 && !r.main)) {
-      h += '<div class="analysis-section"><div class="analysis-section-title">⚠️ Что исправить</div>';
+      h += '<div class="analysis-section"><div class="analysis-section-title"><svg class="ico"><use href="#i-warn"/></svg> Что исправить</div>';
       r.problems.forEach(function (p, i) {
         if (i === 0 && r.main) return;
         h += '<div class="analysis-item negative"><strong>' + esc(p.title) + '</strong> — ' + esc(p.text) +
@@ -709,21 +709,21 @@
       h += '</div>';
     }
     if (r.strengths.length) {
-      h += '<div class="analysis-section"><div class="analysis-section-title">✅ Сильные стороны</div>';
+      h += '<div class="analysis-section"><div class="analysis-section-title"><svg class="ico"><use href="#i-check"/></svg> Сильные стороны</div>';
       r.strengths.forEach(function (p) {
         h += '<div class="analysis-item positive"><strong>' + esc(p.title) + '</strong> — ' + esc(p.text) + '</div>';
       });
       h += '</div>';
     }
     if (r.notes.length) {
-      h += '<div class="analysis-section"><div class="analysis-section-title">💬 Контекст</div>';
+      h += '<div class="analysis-section"><div class="analysis-section-title"><svg class="ico"><use href="#i-chat"/></svg> Контекст</div>';
       r.notes.forEach(function (p) {
         h += '<div class="analysis-item neutral"><strong>' + esc(p.title) + '</strong> — ' + esc(p.text) + '</div>';
       });
       h += '</div>';
     }
     if (r.plan.length) {
-      h += '<div class="analysis-section"><div class="analysis-section-title">📅 План на неделю</div>';
+      h += '<div class="analysis-section"><div class="analysis-section-title"><svg class="ico"><use href="#i-calendar"/></svg> План на неделю</div>';
       r.plan.forEach(function (d, i) {
         h += '<div class="recommendation-item"><span class="marker">' + (i + 1) + '.</span><div>' + esc(d) + '</div></div>';
       });
