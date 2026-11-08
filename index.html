@@ -1127,12 +1127,23 @@ var ITEM_NAMES={'blink':'Blink Dagger','black_king_bar':'BKB','assault':'Assault
 var KEY_ITEMS=Object.keys(ITEM_NAMES);
 var PRO_BENCH={1:{lh10:50,lh20:150,lh30:250,gpm:700,xpm:680,name:'керри',blink:18},2:{lh10:45,lh20:130,lh30:200,gpm:650,xpm:720,name:'мида',blink:12},3:{lh10:30,lh20:80,lh30:150,gpm:500,xpm:480,name:'оффлейнера',blink:13},4:{lh10:15,lh20:40,lh30:80,gpm:400,xpm:380,name:'саппорта',blink:20},5:{lh10:10,lh20:25,lh30:50,gpm:350,xpm:320,name:'хард-саппорта',blink:25}};
 
+function fetchStratz(matchId){
+    // Данные STRATZ — необязательное дополнение: при любой ошибке возвращаем null, анализ идёт на OpenDota.
+    var ctrl=(typeof AbortController!=='undefined')?new AbortController():null,tm=setTimeout(function(){if(ctrl)ctrl.abort();},6000);
+    return fetch('/api/stratz?matchId='+encodeURIComponent(matchId),ctrl?{signal:ctrl.signal}:{}).then(function(r){return r.ok?r.json():null;}).then(function(j){return j&&Array.isArray(j.players)?j:null;}).catch(function(){return null;}).then(function(v){clearTimeout(tm);return v;});
+}
+function stratzFor(data,player){
+    if(!data||!data._stratz||!player||!player.account_id)return null;
+    var l=data._stratz.players,id=Number(player.account_id);
+    for(var i=0;i<l.length;i++){if(l[i].steamAccountId===id&&(l[i].heroId==null||l[i].heroId===Number(player.hero_id)))return l[i];}
+    return null;
+}
 function getMatchPosition(p){var lr=p.lane_role||0,h=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===parseInt(p.hero_id);}):null;var r=(h&&h.roles)||[],s=r.some(function(x){return x.indexOf('Support')!==-1;}),c=r.indexOf('Carry')!==-1,e=r.indexOf('Escape')!==-1,i=r.indexOf('Initiator')!==-1;if(lr===2)return 2;if(lr===4)return 4;if(lr===1){if(s&&!c)return 5;return 1;}if(lr===3){if(s&&!c){if(e||i)return 4;return 5;}return 3;}if(s&&!c){if(e||i)return 4;return 5;}return 1;}
 
 function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     var durSec=data.duration||0,durMin=Math.floor(durSec/60),durStr=durMin+':'+String(durSec%60).padStart(2,'0');
     var matchId=data.match_id,isRad=player.player_slot<128,won=isRad?data.radiant_win:!data.radiant_win;
-    var hName=getHeroName(player.hero_id),pos=getMatchPosition(player);
+    var hName=getHeroName(player.hero_id),sz=stratzFor(data,player),pos=(sz&&sz.pos)||getMatchPosition(player);
     var posNames=['—','Керри','Мид','Оффлейнер','Саппорт','Хард-саппорт'],posName=posNames[pos]||'Игрок';
     var bm=PRO_BENCH[pos]||PRO_BENCH[1];
     var k=player.kills||0,d=player.deaths||0,a=player.assists||0,gpm=player.gold_per_min||0,xpm=player.xp_per_min||0;
@@ -1167,13 +1178,13 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
         html+='</table></div>';
     }
     if(kp2.length>0){html+='<div class="result-block"><div class="result-block-title">Ключевые предметы</div><div class="item-timeline">';kp2.forEach(function(p){html+='<div class="item-chip">'+p.name+' — <span class="item-time">'+p.ts+'</span></div>';});html+='</div>';if(blink){var bm2=blink.time/60;if(bm2>bm.blink+3)html+='<div class="analysis-text"><strong style="color:var(--red);">Blink в '+blink.ts+'</strong> — поздновато.</div>';else if(bm2<=bm.blink+1)html+='<div class="analysis-text"><strong style="color:var(--green);">Blink в '+blink.ts+'</strong> — отлично.</div>';}html+='</div>';}
-    try{html+=GA.renderReport(GA.analyzeDota(GA.normalizeDotaPlayer(player,data,pos,hName)));}catch(e){console.error('Ошибка разбора:',e);}
+    try{html+=GA.renderReport(GA.analyzeDota(GA.normalizeDotaPlayer(player,data,pos,hName,sz?{imp:sz.imp,stratz:true}:null)));}catch(e){console.error('Ошибка разбора:',e);}
     html+='<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
     return html;
 }
 
 function generateDotaResultsFromAPI(data){var players=data.players||[],opts='';players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});var player=players[0];if(!player)return'<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';return buildDotaAnalysis(data,player,0,opts);}
-window.switchDotaPlayer=async function(matchId){var rd=document.getElementById('dotaResults'),dd=rd.querySelector('.player-select-dropdown'),pi=parseInt(dd.value);try{var res=await fetch(DOTA_API+'matches/'+matchId),data=await res.json(),player=data.players[pi];if(!player)return;var opts='';data.players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===pi?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});rd.innerHTML=buildDotaAnalysis(data,player,pi,opts);}catch(err){console.error(err);}};
+window.switchDotaPlayer=async function(matchId){var rd=document.getElementById('dotaResults'),dd=rd.querySelector('.player-select-dropdown'),pi=parseInt(dd.value);try{var res=await fetch(DOTA_API+'matches/'+matchId),data=await res.json();data._stratz=await fetchStratz(matchId);var player=data.players[pi];if(!player)return;var opts='';data.players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===pi?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});rd.innerHTML=buildDotaAnalysis(data,player,pi,opts);}catch(err){console.error(err);}};
 window.resetAnalysis=function(game){var p=game==='dota'?'dota':'cs';document.getElementById(p+'Results').classList.remove('visible');document.getElementById(p+'Results').innerHTML='';document.getElementById(p+'Progress').classList.remove('visible');document.getElementById(p+'ProgressFill').style.width='0%';document.getElementById(p+'Link').value='';if(game==='cs'){var fi=document.getElementById('csFile');if(fi)fi.value='';}};
 function generateCsResults(){return'<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда</div></div><div class="result-badge lose">Поражение</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Норма: 45%+</div></div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Используйте FACEIT анализ для глубокого разбора.<div class="rec-exercise"><strong>Перейдите во вкладку FACEIT Анализ</strong></div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';}
 
@@ -1195,6 +1206,7 @@ async function runAnalysis(game){
             if(!res.ok)throw new Error('Матч не найден');
             var data=await res.json();
             if(!data.players||data.players.length===0)throw new Error('Матч не обработан');
+            t.textContent='Данные STRATZ...';data._stratz=await fetchStratz(matchId);
             f.style.width='90%';t.textContent='Сравнение...';
             await new Promise(function(r){setTimeout(r,400);});
             f.style.width='100%';t.textContent='Готово!';
