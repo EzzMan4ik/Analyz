@@ -105,8 +105,8 @@
   }
 
   /** Приводит игрока из ответа OpenDota (/matches/{id}) к плоскому виду. */
-  function normalizeDotaPlayer(p, match, pos, heroName) {
-    p = p || {}; match = match || {};
+  function normalizeDotaPlayer(p, match, pos, heroName, extra) {
+    p = p || {}; match = match || {}; extra = extra || {};
     var dur = num(match.duration, 0), durMin = Math.max(1, dur / 60);
     var isRad = num(p.player_slot, 0) < 128;
     var won = isRad ? !!match.radiant_win : !match.radiant_win;
@@ -148,6 +148,8 @@
       sen: isNum(p.sen_placed) ? num(p.sen_placed) : null,
       stacked: isNum(p.camps_stacked) ? num(p.camps_stacked) : null,
       buybacks: num(p.buyback_count, 0),
+      imp: isNum(extra.imp) ? num(extra.imp) : null,
+      stratz: !!extra.stratz,
       items: items,
       parsed: lhT.length > 0 || Array.isArray(p.gold_t) || isNum(p.actions_per_min)
     };
@@ -283,6 +285,14 @@
           'Планируйте покупку: после ботинок и основной вещи сразу собирайте 2250 золота на Blink и откладывайте дорогую слабую вещь.'));
       }
     }
+    /* --- ВКЛАД В МАТЧ (STRATZ IMP) --- */
+    if (m.imp != null) {
+      if (m.imp <= -12) items.push(P('imp', 30 + Math.min(30, -m.imp), 'Низкий импакт по оценке STRATZ',
+        'Индекс вклада в матч (IMP) — ' + Math.round(m.imp) + ': ваши действия принесли команде меньше пользы, чем у большинства игроков на этой позиции.',
+        'Разберите повтор: в каких 2–3 драках вы могли быть полезнее (позиция, тайминг входа, использование способностей)?'));
+      else if (m.imp >= 15) items.push(S('imp', 44, 'Высокий импакт по оценке STRATZ', 'Индекс вклада в матч (IMP) — +' + Math.round(m.imp) + ': вы сильно повлияли на ход игры.'));
+    }
+
     /* --- КОНТЕКСТ РЕЗУЛЬТАТА --- */
     var parts = [];
     ['gpm', 'xpm', 'hd', 'kills'].forEach(function (k) { if (sc[k] != null) parts.push(sc[k]); });
