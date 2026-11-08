@@ -52,8 +52,8 @@ async function gql(token, query, variables) {
         const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), 7000);
         try {
             const r = await fetch(URL_, { method: 'POST', signal: ctrl.signal, headers: mk(token), body: JSON.stringify({ query, variables }) });
-            let body = null; try { body = await r.json(); } catch (e) { /* не JSON */ }
-            last = { status: r.status, ok: r.ok, body };
+            let body = null, raw = ''; try { raw = await r.text(); body = JSON.parse(raw); } catch (e) { /* не JSON */ }
+            last = { status: r.status, ok: r.ok, body, raw: raw.slice(0, 300) };
             if (r.status !== 403) return last;
         } finally { clearTimeout(timer); }
     }
@@ -75,7 +75,7 @@ async function main(req, res) {
         try {
             const r = await gql(TOKEN, '{ __typename }', {});
             const e = r.body && r.body.errors && r.body.errors[0] && r.body.errors[0].message;
-            return res.status(200).json({ tokenSet: true, stratzHttp: r.status, ok: r.ok && !e, error: e || (r.ok ? null : 'HTTP ' + r.status) });
+            return res.status(200).json({ tokenSet: true, tokenLength: TOKEN.length, stratzHttp: r.status, ok: r.ok && !e, error: e || (r.ok ? null : 'HTTP ' + r.status), cloudflare: /cloudflare|just a moment|attention required/i.test(r.raw || ''), answer: String(r.raw || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) });
         } catch (err) { return res.status(200).json({ tokenSet: true, ok: false, error: err.name === 'AbortError' ? 'таймаут' : err.message }); }
     }
 
@@ -87,7 +87,7 @@ async function main(req, res) {
         const msg = (r.body && r.body.errors && r.body.errors[0] && String(r.body.errors[0].message)) || '';
         if (msg && /position|Cannot query field/i.test(msg)) r = await gql(TOKEN, QUERY_SAFE, { id: Number(matchId) });   // поля position нет — берём роль+линию
 
-        if (!r.body) return res.status(r.status === 429 ? 429 : 502).json({ error: 'STRATZ вернул HTTP ' + r.status + (r.status === 403 ? ' (доступ запрещён: проверьте токен)' : '') });
+        if (!r.body) return res.status(r.status === 429 ? 429 : 502).json({ error: 'STRATZ вернул HTTP ' + r.status + (r.status === 403 ? (/cloudflare|just a moment|attention required/i.test(r.raw || '') ? ' (Cloudflare блокирует серверы Vercel — токен не при чём)' : ' (STRATZ отклонил токен: ' + String(r.raw || '').replace(/<[^>]*>/g, ' ').trim().slice(0, 80) + ')') : '') });
         if (r.status === 401) return res.status(502).json({ error: 'STRATZ: токен не принят (HTTP 401)' });
         if (r.body.errors && r.body.errors.length) {
             console.error('STRATZ errors:', JSON.stringify(r.body.errors).slice(0, 500));
