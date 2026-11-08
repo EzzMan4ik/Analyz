@@ -4,21 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GamerAnalyzer</title>
-    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path d="M24 4 L42 12 L42 26 Q42 38 24 44 Q6 38 6 26 L6 12 Z" fill="%231e1e30" stroke="%236366f1" stroke-width="2"/><circle cx="24" cy="24" r="12" fill="none" stroke="%236366f1" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="%236366f1"/></svg>'/>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="analyzer.js"></script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22 width=%2248%22 height=%2248%22%3E%3Cdefs%3E%3ClinearGradient id=%22lg%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22%3E%0A      %3Cstop offset=%220%22 stop-color=%22%2322d3ee%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%23818cf8%22/%3E%3Cstop offset=%221%22 stop-color=%22%237c3aed%22/%3E%0A    %3C/linearGradient%3E%3C/defs%3E%3Cg transform=%22translate(-6 -6) scale(.185)%22%3E%3Cpath d=%22M256.9 82.5 L140.0 15.0 L10.1 90.0 V240.0 L140.0 315.0 L256.9 247.5%22 fill=%22none%22 stroke=%22url(%23lg)%22 stroke-width=%228%22 stroke-linejoin=%22miter%22 stroke-linecap=%22butt%22/%3E%0A    %3Cpath d=%22M237.6 90.3 L140.0 34.0 L26.6 99.5 V230.5 L140.0 296.0 L237.6 239.7%22 fill=%22none%22 stroke=%22url(%23lg)%22 stroke-width=%223%22 stroke-linejoin=%22miter%22 stroke-linecap=%22butt%22 opacity=%22.9%22/%3E%0A    %3Cg transform=%22translate(141 169) rotate(-42) scale(1.75)%22%3E%0A      %3Cpath d=%22M0 -60 L10 -48 V4 H-10 V-48 Z%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%222.2%22 stroke-linejoin=%22miter%22/%3E%0A      %3Cpath d=%22M0 -44 V-2%22 stroke=%22url(%23lg)%22 stroke-width=%222%22 opacity=%22.7%22/%3E%0A      %3Cpath d=%22M-19 4 H19 V12 H-19 Z%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%223%22 stroke-linejoin=%22miter%22/%3E%0A      %3Cpath d=%22M-4 12 V32 H4 V12%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%223%22 stroke-linejoin=%22miter%22/%3E%0A      %3Ccircle cx=%220%22 cy=%2238%22 r=%225.5%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%223%22/%3E%0A    %3C/g%3E%3Cg transform=%22translate(141 169) rotate(42) scale(1.75)%22%3E%0A      %3Cpath d=%22M0 -60 L10 -48 V4 H-10 V-48 Z%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%222.2%22 stroke-linejoin=%22miter%22/%3E%0A      %3Cpath d=%22M0 -44 V-2%22 stroke=%22url(%23lg)%22 stroke-width=%222%22 opacity=%22.7%22/%3E%0A      %3Cpath d=%22M-19 4 H19 V12 H-19 Z%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%223%22 stroke-linejoin=%22miter%22/%3E%0A      %3Cpath d=%22M-4 12 V32 H4 V12%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%223%22 stroke-linejoin=%22miter%22/%3E%0A      %3Ccircle cx=%220%22 cy=%2238%22 r=%225.5%22 fill=%22%230b1020%22 stroke=%22url(%23lg)%22 stroke-width=%223%22/%3E%0A    %3C/g%3E%3C/g%3E%3C/svg%3E"/>
+    <meta name="theme-color" content="#0a0e14">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         :root {
-            --dark-gold: #c5a028; --beige: #d4c5a0; --gold-hover: #d4af37;
+            --dark-gold: #22d3ee; --beige: #a5f3fc; --gold-hover: #67e8f9; --logo-fill: #0b1020; --neon: #22d3ee; --neon-2: #818cf8; --neon-3: #a855f7; --pink: #ff3d81;
             --dark-bg: #14141f; --card-bg: #1e1e30; --sidebar-width: 260px;
-            --error-color: #e74c3c; --green: #2ecc71; --red: #e74c3c; --orange: #e67e22;
+            --error-color: #e74c3c; --green: #2ecc71; --red: #e74c3c; --orange: #a78bfa;
             --logo-primary: #6366f1; --logo-secondary: #fff;
             --bg: #0a0e14; --card-bg-2: #1a2030; --border: rgba(255,255,255,0.08);
             --text: #e8e8e8; --text-dim: #8b8b8b; --accent: #6366f1; --accent-2: #818cf8;
         }
-        html.light-theme { --dark-bg: #f5f5f8; --card-bg: #fff; --logo-primary: #4f46e5; --logo-secondary: #1a1a2a; --bg: #f0f2f5; --card-bg-2: #f7f8fa; --border: rgba(0,0,0,0.08); --text: #1a1a1a; --text-dim: #666; }
+        html.light-theme { --dark-gold: #0891b2; --gold-hover: #0e7490; --logo-fill: #f0f2f5; --orange: #7c3aed; --dark-bg: #f5f5f8; --card-bg: #fff; --logo-primary: #4f46e5; --logo-secondary: #1a1a2a; --bg: #f0f2f5; --card-bg-2: #f7f8fa; --border: rgba(0,0,0,0.08); --text: #1a1a1a; --text-dim: #666; }
         body { background-color: var(--dark-bg); color: #fff; line-height: 1.6; overflow-x: hidden; transition: background-color 0.3s ease, color 0.3s ease; }
         html.light-theme body { color: #333; }
         html { scroll-behavior: smooth; }
@@ -51,7 +49,7 @@
         .app-wrapper.active { display: block; }
         html.light-theme .app-wrapper { background: radial-gradient(circle at 80% 10%, rgba(99,102,241,0.06), transparent 45%), radial-gradient(circle at 10% 80%, rgba(129,140,248,0.04), transparent 45%), var(--dark-bg); }
         .burger { position: fixed; top: 20px; left: 20px; z-index: 200; cursor: pointer; padding: 10px; background-color: var(--card-bg); border-radius: 8px; border: 1px solid rgba(99,102,241,0.2); transition: background-color 0.3s ease, border-color 0.3s ease; }
-        .burger span { display: block; width: 26px; height: 3px; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 2px; margin: 5px 0; transition: all 0.3s ease; }
+        .burger span { display: block; width: 26px; height: 3px; background: linear-gradient(90deg, #6366f1, #818cf8); border-radius: 2px; margin: 5px 0; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; }
         .burger.open span:nth-child(1) { transform: rotate(45deg) translate(6px,6px); }
         .burger.open span:nth-child(2) { opacity: 0; }
         .burger.open span:nth-child(3) { transform: rotate(-45deg) translate(6px,-6px); }
@@ -62,7 +60,7 @@
         .sidebar-user-label { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
         .sidebar-user-name { background: linear-gradient(135deg, #6366f1, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700; font-size: 1.1rem; margin-top: 4px; }
         .sidebar-user-plan { color: #888; font-size: 0.9rem; margin-top: 4px; }
-        .sidebar-item { padding: 14px 24px; cursor: pointer; color: #aaa; font-size: 1rem; transition: all 0.25s ease; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
+        .sidebar-item { padding: 14px 24px; cursor: pointer; color: #aaa; font-size: 1rem; transition: background-color .2s, border-color .2s, color .2s, transform .2s, box-shadow .2s, opacity .2s; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
         html.light-theme .sidebar-item { color: #555; }
         .sidebar-item:hover { background-color: rgba(99,102,241,0.08); color: #a5b4fc; }
         html.light-theme .sidebar-item:hover { background-color: rgba(99,102,241,0.05); color: #4f46e5; }
@@ -70,7 +68,7 @@
         .sidebar-item .icon { font-size: 1.2rem; width: 24px; text-align: center; }
         .sidebar-divider { height: 1px; background: rgba(99,102,241,0.15); margin: 8px 20px; }
         html.light-theme .sidebar-divider { background: rgba(99,102,241,0.1); }
-        .theme-toggle { padding: 14px 24px; cursor: pointer; color: #aaa; font-size: 1rem; transition: all 0.25s ease; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
+        .theme-toggle { padding: 14px 24px; cursor: pointer; color: #aaa; font-size: 1rem; transition: background-color .2s, border-color .2s, color .2s, transform .2s, box-shadow .2s, opacity .2s; border-left: 3px solid transparent; display: flex; align-items: center; gap: 12px; }
         .theme-toggle:hover { background-color: rgba(99,102,241,0.08); color: #a5b4fc; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s; z-index: 100; }
         .overlay.visible { opacity: 1; visibility: visible; }
@@ -93,7 +91,7 @@
         .section-desc { color: #bbb; font-size: 1.05rem; margin-bottom: 30px; max-width: 700px; line-height: 1.8; }
         html.light-theme .section-desc { color: #666; }
         #section-subscriptions .section-title, #section-dota2 .section-title, #section-cs2 .section-title, .dota-subcontent .section-title { background: none; -webkit-text-fill-color: var(--dark-gold); color: var(--dark-gold); }
-        .back-home-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem; transition: all 0.3s; margin-bottom: 24px; }
+        .back-home-btn { display: inline-flex; align-items: center; gap: 8px; background-color: var(--card-bg); border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; padding: 10px 20px; cursor: pointer; color: #aaa; font-size: 0.95rem; transition: background-color .2s, border-color .2s, color .2s, transform .2s, box-shadow .2s, opacity .2s; margin-bottom: 24px; }
         .back-home-btn:hover { border-color: #6366f1; color: #818cf8; }
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
         .feature-card { background: linear-gradient(145deg, var(--card-bg), rgba(99,102,241,0.04)); border-radius: 12px; padding: 24px; border: 1px solid rgba(99,102,241,0.15); transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; }
@@ -112,7 +110,7 @@
         .account-plan-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; margin-top: 8px; }
         .account-plan-badge.free { background: rgba(107,114,128,0.15); color: #9ca3af; border: 1px solid rgba(107,114,128,0.3); }
         .account-plan-badge.pro { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
-        .account-plan-badge.premium { background: rgba(197,160,40,0.15); color: var(--dark-gold); border: 1px solid rgba(197,160,40,0.3); }
+        .account-plan-badge.premium { background: rgba(34,211,238,0.15); color: var(--dark-gold); border: 1px solid rgba(34,211,238,0.3); }
         .limit-bar-wrap { margin-top: 10px; }
         .limit-bar-label { display: flex; justify-content: space-between; font-size: 0.82rem; color: #888; margin-bottom: 6px; }
         .limit-bar { height: 6px; background: rgba(99,102,241,0.15); border-radius: 3px; overflow: hidden; }
@@ -127,7 +125,7 @@
         .chart-block { background: var(--card-bg); border: 1px solid rgba(99,102,241,0.15); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
         .chart-block-title { font-size: 1.1rem; font-weight: 700; color: var(--dark-gold); margin-bottom: 8px; }
         .chart-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .chart-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.2); background: transparent; color: #aaa; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; }
+        .chart-tab { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.2); background: transparent; color: #aaa; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: background-color .2s, border-color .2s, color .2s, transform .2s, box-shadow .2s, opacity .2s; }
         .chart-tab.active { background: rgba(99,102,241,0.12); border-color: #6366f1; color: #818cf8; }
         .chart-empty { text-align: center; padding: 40px; color: #666; font-size: 0.95rem; }
         .history-list { display: flex; flex-direction: column; gap: 10px; }
@@ -171,20 +169,20 @@
         .subscription-card:hover { box-shadow: 0 8px 25px rgba(99,102,241,0.15); transform: translateY(-4px); }
         .subscription-card.active-plan { border-color: #6366f1; box-shadow: 0 0 20px rgba(99,102,241,0.3); }
         .premium-badge { position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #6366f1, #818cf8, #a5b4fc); border-radius: 10px 10px 0 0; }
-        .subscription-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 0; color: var(--dark-gold); text-align: center; padding-bottom: 16px; border-bottom: 1px solid rgba(197,160,40,0.2); }
+        .subscription-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 0; color: var(--dark-gold); text-align: center; padding-bottom: 16px; border-bottom: 1px solid rgba(34,211,238,0.2); }
         .subscription-price { font-size: 2.4rem; font-weight: 800; color: var(--dark-gold); text-align: center; margin: 16px 0; letter-spacing: -1px; }
         .subscription-price::after { content: '/мес'; font-size: 1rem; font-weight: 400; color: #888; margin-left: 4px; }
         .benefits-list { list-style: none; padding-left: 0; }
         .benefit { margin-bottom: 10px; padding-left: 22px; position: relative; color: #999; }
         html.light-theme .benefit { color: #666; }
         .benefit::before { content: "\2022"; color: var(--dark-gold); font-weight: bold; position: absolute; left: 0; top: 2px; }
-        .card-btn { display: block; width: 100%; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; margin-top: 20px; transition: all 0.3s ease; }
+        .card-btn { display: block; width: 100%; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 1rem; cursor: pointer; font-weight: 600; margin-top: 20px; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; }
         .card-btn:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(99,102,241,0.4); }
         .card-btn.current { background: linear-gradient(135deg, #4f46e5, #6366f1); cursor: default; }
         .current-badge { display: none; text-align: center; color: #818cf8; font-size: 0.85rem; font-weight: 600; margin-top: 8px; }
         .current-badge.visible { display: block; }
         .dota-subtabs { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
-        .dota-subtab { display: flex; align-items: center; gap: 10px; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 14px 24px; cursor: pointer; transition: all 0.3s ease; }
+        .dota-subtab { display: flex; align-items: center; gap: 10px; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 14px 24px; cursor: pointer; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; }
         .dota-subtab:hover { border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
         .dota-subtab.active { border-color: #6366f1; box-shadow: 0 0 14px rgba(99,102,241,0.25); background-color: rgba(99,102,241,0.08); }
         .dota-subtab-icon { font-size: 1.4rem; }
@@ -200,7 +198,7 @@
         .file-input { width: 100%; padding: 12px; border: 1px dashed rgba(99,102,241,0.3); border-radius: 8px; background-color: #222; color: #999; font-size: 0.9rem; cursor: pointer; }
         html.light-theme .file-input { background-color: #f9f9f9; color: #777; }
         .file-hint { color: #666; font-size: 0.85rem; margin-top: -8px; }
-        .analyze-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 16px; font-size: 1.05rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
+        .analyze-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 16px; font-size: 1.05rem; cursor: pointer; font-weight: 600; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; align-self: flex-start; min-width: 200px; }
         .analyze-btn:hover { opacity: 0.9; box-shadow: 0 0 18px rgba(99,102,241,0.4); transform: translateY(-1px); }
         .progress-wrapper { display: none; margin-top: 24px; }
         .progress-wrapper.visible { display: block; }
@@ -240,7 +238,7 @@
         .rec-exercise { margin-top: 8px; padding: 12px 16px; background-color: rgba(99,102,241,0.06); border-left: 3px solid #6366f1; border-radius: 0 6px 6px 0; color: #ccc; font-size: 0.92rem; }
         html.light-theme .rec-exercise { color: #555; }
         .rec-exercise strong { color: #818cf8; }
-        .new-analysis-btn { display: inline-block; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 14px 28px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; margin-bottom: 30px; transition: all 0.3s ease; }
+        .new-analysis-btn { display: inline-block; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 14px 28px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; margin-bottom: 30px; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; }
         .new-analysis-btn:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(99,102,241,0.4); }
         .game-block { max-width: 700px; margin: 0 auto; }
         .game-icon { font-size: 3rem; margin-bottom: 16px; text-align: center; }
@@ -255,12 +253,12 @@
         .pro-style-info p { color: #888; font-size: 0.9rem; }
         .pro-style-match { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-top: 6px; }
         .pro-style-match.high { background: rgba(46,204,113,0.15); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
-        .pro-style-match.medium { background: rgba(230,126,34,0.15); color: var(--orange); border: 1px solid rgba(230,126,34,0.3); }
+        .pro-style-match.medium { background: rgba(167,139,250,0.15); color: var(--orange); border: 1px solid rgba(167,139,250,0.3); }
         .pro-style-match.low { background: rgba(231,76,60,0.15); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
         .pro-style-traits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .pro-trait { padding: 6px 12px; border-radius: 6px; font-size: 0.82rem; font-weight: 600; background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); color: #a5b4fc; }
         .tier-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; }
-        .tier-badge.t1 { background: rgba(197,160,40,0.15); color: var(--dark-gold); border: 1px solid rgba(197,160,40,0.3); }
+        .tier-badge.t1 { background: rgba(34,211,238,0.15); color: var(--dark-gold); border: 1px solid rgba(34,211,238,0.3); }
         .tier-badge.t2 { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
         .tier-badge.t3 { background: rgba(120,113,108,0.15); color: #78716c; border: 1px solid rgba(120,113,108,0.3); }
         .analysis-section { margin-bottom: 20px; }
@@ -284,13 +282,13 @@
         .item-chip .item-time { color: #818cf8; font-weight: 700; }
         .analysis-text { color: #ccc; font-size: 0.95rem; line-height: 1.8; margin-top: 12px; }
         .rank-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 30px; }
-        .rank-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.15); transition: all 0.3s ease; min-width: 80px; }
+        .rank-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 18px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.15); transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; min-width: 80px; }
         .rank-badge:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.35); }
         .rank-badge.active { border-color: #6366f1; box-shadow: 0 0 12px rgba(99,102,241,0.3); }
         .rank-badge-name { font-size: 0.78rem; color: #aaa; text-align: center; }
         .rank-badge.active .rank-badge-name { color: #818cf8; }
         .position-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-        .position-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 14px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.15); transition: all 0.3s ease; min-width: 70px; }
+        .position-badge { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 14px; border-radius: 10px; cursor: pointer; background-color: var(--card-bg); border: 2px solid rgba(99,102,241,0.15); transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; min-width: 70px; }
         .position-badge:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.35); }
         .position-badge.active { border-color: #6366f1; box-shadow: 0 0 12px rgba(99,102,241,0.3); }
         .position-badge-name { font-size: 0.72rem; color: #aaa; text-align: center; }
@@ -298,14 +296,14 @@
         .tier-table { display: flex; flex-direction: column; gap: 12px; }
         .tier-row { display: flex; gap: 12px; align-items: stretch; background-color: var(--card-bg); border-radius: 10px; padding: 16px; border: 1px solid rgba(99,102,241,0.12); min-height: 80px; }
         .tier-label { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 70px; border-radius: 8px; font-weight: 800; font-size: 1.6rem; padding: 8px; flex-shrink: 0; }
-        .tier-label.s { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
-        .tier-label.a { background: linear-gradient(135deg, #e67e22, #d35400); color: #fff; }
-        .tier-label.b { background: linear-gradient(135deg, #f1c40f, #d4ac0d); color: #333; }
+        .tier-label.s { background: linear-gradient(135deg, #ff3d81, #be185d); color: #fff; }
+        .tier-label.a { background: linear-gradient(135deg, #a855f7, #7e22ce); color: #fff; }
+        .tier-label.b { background: linear-gradient(135deg, #22d3ee, #0891b2); color: #04222b; }
         .tier-label.c { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: #fff; }
         .tier-label.d { background: linear-gradient(135deg, #7f8c8d, #636e72); color: #ccc; }
         .tier-label-desc { font-size: 0.6rem; font-weight: 500; margin-top: 2px; text-align: center; }
         .tier-heroes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex: 1; }
-        .hero-card { position: relative; width: 84px; height: 48px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 2px solid rgba(99,102,241,0.2); transition: all 0.25s ease; }
+        .hero-card { position: relative; width: 84px; height: 48px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 2px solid rgba(99,102,241,0.2); transition: background-color .2s, border-color .2s, color .2s, transform .2s, box-shadow .2s, opacity .2s; }
         .hero-card:hover { border-color: #6366f1; transform: translateY(-3px) scale(1.08); z-index: 10; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
         .hero-card img { width: 100%; height: 100%; object-fit: cover; }
         .hero-card-tooltip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background-color: #111; border: 1px solid #6366f1; border-radius: 6px; padding: 6px 10px; white-space: nowrap; font-size: 0.78rem; color: #fff; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 20; }
@@ -320,17 +318,17 @@
         .tier-info-title { color: var(--dark-gold); font-weight: 600; font-size: 1.05rem; margin-bottom: 12px; }
         .tier-info-item { display: flex; align-items: start; gap: 8px; margin-bottom: 6px; font-size: 0.9rem; color: #aaa; }
         .tier-info-letter { font-weight: 800; min-width: 20px; }
-        .tier-info-letter.s { color: #e74c3c; } .tier-info-letter.a { color: #e67e22; } .tier-info-letter.b { color: #f1c40f; } .tier-info-letter.c { color: #95a5a6; } .tier-info-letter.d { color: #636e72; }
+        .tier-info-letter.s { color: #ff3d81; } .tier-info-letter.a { color: #a855f7; } .tier-info-letter.b { color: #22d3ee; } .tier-info-letter.c { color: #95a5a6; } .tier-info-letter.d { color: #636e72; }
         .steam-block { max-width: 700px; margin: 0 auto; }
         .steam-form { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
         .steam-input { width: 100%; padding: 16px; border: 1px solid #444; border-radius: 8px; background-color: #222; color: #fff; font-size: 1rem; outline: none; transition: border 0.3s; }
         html.light-theme .steam-input { background-color: #f9f9f9; color: #333; border-color: #ccc; }
         .steam-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
         .steam-input::placeholder { color: #666; }
-        .steam-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 16px; font-size: 1.05rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease; align-self: flex-start; min-width: 200px; }
+        .steam-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 16px; font-size: 1.05rem; cursor: pointer; font-weight: 600; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; align-self: flex-start; min-width: 200px; }
         .steam-btn:hover { opacity: 0.9; box-shadow: 0 0 18px rgba(99,102,241,0.4); }
         .period-selector { display: flex; gap: 8px; flex-wrap: wrap; }
-        .period-btn { padding: 10px 20px; border-radius: 8px; border: 2px solid rgba(99,102,241,0.2); background-color: var(--card-bg); color: #aaa; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; }
+        .period-btn { padding: 10px 20px; border-radius: 8px; border: 2px solid rgba(99,102,241,0.2); background-color: var(--card-bg); color: #aaa; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; }
         .period-btn:hover { border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
         .period-btn.active { border-color: #6366f1; color: #818cf8; box-shadow: 0 0 12px rgba(99,102,241,0.25); background-color: rgba(99,102,241,0.08); }
         .steam-progress { display: none; margin-top: 24px; }
@@ -363,14 +361,103 @@
             .profile-header { flex-direction: column; text-align: center; }
             .account-grid { grid-template-columns: 1fr 1fr; }
         }
+
+        /* ===== neon visual pass ===== */
+        .ico { width: 1.15em; height: 1.15em; flex-shrink: 0; vertical-align: -0.2em; stroke: currentColor; fill: none; }
+        .sidebar-item .icon { display: inline-flex; align-items: center; justify-content: center; }
+        .sidebar-item .icon .ico { width: 20px; height: 20px; }
+        .btn-ico { display: inline-flex; align-items: center; gap: 8px; }
+        .ga-mark { width: 34px; height: 40px; flex-shrink: 0; filter: drop-shadow(0 0 6px rgba(34,211,238,.45)); }
+        .ga-logo-text { background: linear-gradient(135deg, #22d3ee, #818cf8 55%, #a855f7) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+        html.light-theme .ga-logo-text { background: linear-gradient(135deg, #0891b2, #4f46e5 60%, #7c3aed) !important; -webkit-background-clip: text !important; background-clip: text !important; }
+        .auth-logo { display: flex; flex-direction: column; align-items: center; gap: 12px; background: none !important; -webkit-text-fill-color: initial !important; margin-bottom: 14px; }
+        .auth-logo .am { width: 84px; height: 99px; filter: drop-shadow(0 0 14px rgba(34,211,238,.4)); }
+        .auth-logo .aw { width: 230px; height: 72px; }
+        .theme-btn-nav { display: inline-flex; align-items: center; color: var(--neon); border-color: rgba(34,211,238,.3); }
+        .theme-btn-nav:hover { border-color: var(--neon); }
+        .back-home-btn .ico { width: 1em; height: 1em; }
+        /* hero banner */
+        .hero-banner { position: relative; overflow: hidden; border-radius: 18px; padding: 34px 40px; margin-bottom: 36px; display: flex; align-items: center; gap: 36px; border: 1px solid rgba(34,211,238,.25); background: radial-gradient(circle at 85% 20%, rgba(168,85,247,.22), transparent 55%), radial-gradient(circle at 10% 90%, rgba(34,211,238,.16), transparent 50%), linear-gradient(145deg, #0d1322, #0a0e14); box-shadow: inset 0 0 60px rgba(34,211,238,.05); }
+        .hero-banner::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(34,211,238,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,.06) 1px, transparent 1px); background-size: 34px 34px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 70%); mask-image: linear-gradient(90deg, transparent, #000 70%); pointer-events: none; }
+        .hero-banner .hb-mark { width: 150px; height: 177px; flex-shrink: 0; filter: drop-shadow(0 0 22px rgba(34,211,238,.35)); position: relative; }
+        .hero-banner .hb-body { position: relative; min-width: 0; }
+        .hero-banner .hb-word { width: min(440px, 100%); height: auto; aspect-ratio: 500/156; display: block; }
+        .hero-banner .hb-tag { margin-top: 14px; font-size: .95rem; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: #67e8f9; }
+        .hero-banner .hb-sub { margin-top: 10px; color: #9aa6bd; font-size: .98rem; max-width: 520px; }
+        html.light-theme .hero-banner { --logo-fill: #0b1020; }
+        /* clickable cards */
+        .feature-card { position: relative; cursor: pointer; display: block; color: inherit; text-decoration: none; border: 1px solid rgba(34,211,238,.18); background: linear-gradient(145deg, var(--card-bg), rgba(34,211,238,.04)); }
+        .feature-card:focus-visible { outline: 2px solid var(--neon); outline-offset: 2px; }
+        .feature-card:active { transform: scale(.985); }
+        @media (hover:hover) { .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(34,211,238,.18); border-color: rgba(34,211,238,.55); } .feature-card:hover .fc-go { transform: translateX(4px); color: var(--neon); } }
+        .feature-icon { width: 48px; height: 48px; border-radius: 12px; display: flex !important; align-items: center; justify-content: center; margin-bottom: 14px; color: var(--neon); background: rgba(34,211,238,.08); border: 1px solid rgba(34,211,238,.25); }
+        .feature-icon .ico { width: 26px; height: 26px; }
+        .fc-go { position: absolute; top: 22px; right: 20px; width: 20px; height: 20px; color: var(--text-dim); transition: transform .2s, color .2s; }
+        .game-icon { display: flex; justify-content: center; color: var(--neon); }
+        .game-icon .ico { width: 52px; height: 52px; }
+        .dota-subtab-icon { display: inline-flex; color: var(--neon); }
+        .dota-subtab-icon .ico { width: 22px; height: 22px; }
+        .history-game-icon, .achievement-icon { display: inline-flex; align-items: center; justify-content: center; color: var(--neon); }
+        .history-game-icon .ico { width: 22px; height: 22px; }
+        .achievement-icon .ico { width: 28px; height: 28px; }
+        .pro-style-avatar { font-size: .95rem !important; font-weight: 800; letter-spacing: 1px; color: var(--neon); background: rgba(34,211,238,.08) !important; border-color: var(--neon) !important; }
+        .result-block-title, .analysis-section-title, .chart-block-title, .limit-warning-title, .subscription-title, .current-badge { display: flex; align-items: center; gap: 8px; }
+        .subscription-title, .current-badge { justify-content: center; }
+        .current-badge .ico { width: 1em; height: 1em; }
+        .limit-bar-label span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+        .tier-label.a, .tier-label.b { text-shadow: none; }
+        .sidebar-item.active { border-left-color: var(--neon); }
+        .home-tagline { display: flex; align-items: center; gap: 8px; color: var(--neon) !important; }
+        .home-tagline .ico { width: 16px; height: 16px; }
+        .limit-bar-fill { background: linear-gradient(90deg, #22d3ee, #818cf8) !important; }
+        .limit-bar-fill.danger { background: linear-gradient(90deg, #a855f7, #ff3d81) !important; }
+        /* mobile speed */
+        @media (max-width: 768px) {
+            .navbar { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: #0d1322 !important; }
+            html.light-theme .navbar { background: #fff !important; }
+            .section, .dota-subcontent.active, .results-wrapper.visible, .steam-results.visible { animation: fadeInM .2s ease !important; }
+            .tier-row, .history-item, .subscription-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+            .feature-card, .tier-row, .hero-card, .dota-subtab, .sidebar-item { transition: none !important; }
+            .app-wrapper { background: var(--dark-bg) !important; }
+            .hero-banner { flex-direction: column; text-align: center; padding: 24px 18px; gap: 16px; }
+            .hero-banner .hb-mark { width: 96px; height: 113px; }
+            .hero-banner .hb-tag { letter-spacing: 2px; font-size: .8rem; }
+            .ga-logo-text { font-size: .8rem; letter-spacing: 0; }
+            .ga-logo { gap: 8px; }
+            .navbar-right { gap: 8px; }
+            .logout-btn { padding: 8px 12px; font-size: .85rem; }
+            .theme-btn-nav { padding: 6px 9px; }
+            .hero-banner .hb-word { width: min(280px, 100%); margin: 0 auto; }
+            .ga-mark { width: 28px; height: 33px; filter: none; }
+            .feature-icon, .ga-mark, .hero-banner .hb-mark, .auth-logo .am { filter: none !important; }
+            .auth-card { box-shadow: none; }
+        }
+        @media (hover: none) { .tier-row:hover, .hero-card:hover, .dota-subtab:hover, .sidebar-item:hover { transform: none; } }
+        @keyframes fadeInM { from { opacity: 0; } to { opacity: 1; } }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
     </style>
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs><linearGradient id="gaGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset=".45" stop-color="#818cf8"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h4.5V14h4v5.5h4.5V10"/></symbol><symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20.5c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></symbol><symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol><symbol id="i-swords" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.6 2.6 L5.7 3.4 L14.7 12.4 L12.4 14.7 L3.4 5.7zM17.2 11.3 L11.3 17.2M14.3 14.3 L17.8 17.8"/><path d="M21.4 2.6 L18.3 3.4 L9.3 12.4 L11.6 14.7 L20.6 5.7zM6.8 11.3 L12.7 17.2M9.7 14.3 L6.2 17.8"/><circle cx="18.7" cy="18.7" r="1"/><circle cx="5.3" cy="18.7" r="1"/></symbol><symbol id="i-crosshair" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7.5"/><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/><circle cx="12" cy="12" r="1.2"/></symbol><symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.1 6.9L21 12l-6.9 2.1L12 21l-2.1-6.9L3 12l6.9-2.1z"/></symbol><symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18"/><path d="M5 16l5-5 4 3 6-8"/><circle cx="5" cy="16" r="1"/><circle cx="10" cy="11" r="1"/><circle cx="14" cy="14" r="1"/><circle cx="20" cy="6" r="1"/></symbol><symbol id="i-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17.5h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></symbol><symbol id="i-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol><symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.5 2"/></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M4 12h11M4 17.5h6"/></symbol><symbol id="i-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4h9v6a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6H4.5v1.5A3 3 0 0 0 7.5 10.5M16.5 6h3v1.5a3 3 0 0 1-3 3"/><path d="M12 14.5v3.5M8.5 20.5h7M9.5 18h5"/></symbol><symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.8-3.4 7.9-8 9-4.6-1.1-8-4.2-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol><symbol id="i-bolt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2.5L5 13.5h6L10 21.5l9-11.5h-6z"/></symbol><symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 10v4.5M12 17.2v.3"/></symbol><symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M7.8 12.4l2.8 2.8 5.6-6.2"/></symbol><symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H11l-5 4v-4H4z"/></symbol><symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v14H4zM4 10.5h16M8 3.5v4M16 3.5v4"/></symbol><symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l9 4.7-9 4.7-9-4.7z"/><path d="M3 12.5l9 4.7 9-4.7M3 16.5l9 4.7 9-4.7"/></symbol><symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3zM3 10h18M6.5 14.5h4"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol><symbol id="i-contrast" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></symbol><symbol id="i-ban" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol><symbol id="i-pad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10a4 4 0 0 1 4 4v1.5a3 3 0 0 1-5.2 2l-1.3-1.5H9.5L8.2 15.5A3 3 0 0 1 3 13.5V12a4 4 0 0 1 4-4z"/><path d="M8 10.5v3M6.5 12h3M16.5 11.5v.01M18.2 13v.01"/></symbol><symbol id="i-crown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18.5l-1-11 5.5 4.5L12 5l4 7 5.5-4.5-1 11z"/><path d="M4 21h16"/></symbol><symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.8-7 10-7 10 7 10 7-3.8 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-gem" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 4h11l4 5-9.5 11L2.5 9z"/><path d="M2.5 9h19M9 4l-1.5 5L12 20l4.5-11L15 4"/></symbol><symbol id="ga-mark" viewBox="0 0 280 330"><path d="M256.9 82.5 L140.0 15.0 L10.1 90.0 V240.0 L140.0 315.0 L256.9 247.5" fill="none" stroke="url(#gaGrad)" stroke-width="8" stroke-linejoin="miter" stroke-linecap="butt"/>
+    <path d="M237.6 90.3 L140.0 34.0 L26.6 99.5 V230.5 L140.0 296.0 L237.6 239.7" fill="none" stroke="url(#gaGrad)" stroke-width="3" stroke-linejoin="miter" stroke-linecap="butt" opacity=".9"/>
+    <g transform="translate(141 169) rotate(-42) scale(1.75)">
+      <path d="M0 -60 L10 -48 V4 H-10 V-48 Z" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="2.2" stroke-linejoin="miter"/>
+      <path d="M0 -44 V-2" stroke="url(#gaGrad)" stroke-width="2" opacity=".7"/>
+      <path d="M-19 4 H19 V12 H-19 Z" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="3" stroke-linejoin="miter"/>
+      <path d="M-4 12 V32 H4 V12" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="3" stroke-linejoin="miter"/>
+      <circle cx="0" cy="38" r="5.5" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="3"/>
+    </g><g transform="translate(141 169) rotate(42) scale(1.75)">
+      <path d="M0 -60 L10 -48 V4 H-10 V-48 Z" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="2.2" stroke-linejoin="miter"/>
+      <path d="M0 -44 V-2" stroke="url(#gaGrad)" stroke-width="2" opacity=".7"/>
+      <path d="M-19 4 H19 V12 H-19 Z" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="3" stroke-linejoin="miter"/>
+      <path d="M-4 12 V32 H4 V12" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="3" stroke-linejoin="miter"/>
+      <circle cx="0" cy="38" r="5.5" style="fill:var(--logo-fill,#0b1020)" stroke="url(#gaGrad)" stroke-width="3"/>
+    </g></symbol><symbol id="ga-word" viewBox="0 0 500 156"><path d="M36 14 L30 8 H10 L6 14 V42 L10 48 H30 L36 42 V30 H21" transform="translate(0.0 0) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 48 V14 L12 8 H30 L36 14 V48 M6 30 H36" transform="translate(62.2 0) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 48 V8 L21 28 L36 8 V48" transform="translate(124.4 0) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M36 8 H10 L6 12 V44 L10 48 H36 M6 28 H30" transform="translate(186.7 0) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 48 V8 H30 L36 14 V22 L30 28 H6 M21 28 L36 48" transform="translate(248.9 0) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 48 V14 L12 8 H30 L36 14 V48 M6 30 H36" transform="translate(0.0 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 48 V8 L36 48 V8" transform="translate(62.2 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 48 V14 L12 8 H30 L36 14 V48 M6 30 H36" transform="translate(124.4 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 8 V48 H36" transform="translate(186.7 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 8 L21 30 L36 8 M21 30 V48" transform="translate(248.9 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 8 H36 L6 48 H36" transform="translate(311.1 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M36 8 H10 L6 12 V44 L10 48 H36 M6 28 H30" transform="translate(373.3 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/><path d="M6 48 V8 H30 L36 14 V22 L30 28 H6 M21 28 L36 48" transform="translate(435.5 86) scale(1.22)" fill="none" stroke="url(#gaGrad)" stroke-width="7.2" stroke-linejoin="miter" stroke-linecap="butt"/></symbol></svg>
 
 <!-- AUTH -->
 <div id="authScreen">
     <div class="auth-card">
-        <div class="auth-logo">GAMERANALYZER</div>
+        <div class="auth-logo"><svg class="am" viewBox="0 0 280 330" aria-hidden="true"><use href="#ga-mark"/></svg><svg class="aw" viewBox="0 0 500 156" role="img" aria-label="GamerAnalyzer"><use href="#ga-word"/></svg></div>
         <div class="auth-subtitle">Анализ матчей Dota 2 и CS 2</div>
         <div id="loginForm">
             <div class="input-group"><label>Логин</label><input type="text" id="loginInput" placeholder="Введите логин"></div>
@@ -402,34 +489,22 @@
             <div class="sidebar-user-name" id="userName">—</div>
             <div class="sidebar-user-plan" id="userPlan">Бесплатный</div>
         </div>
-        <div class="sidebar-item active" data-section="home"><span class="icon">🏠</span> Главная</div>
-        <div class="sidebar-item" data-section="account"><span class="icon">👤</span> Личный кабинет</div>
-        <div class="sidebar-item" data-section="subscriptions"><span class="icon">⭐</span> Подписки</div>
+        <div class="sidebar-item active" data-section="home"><span class="icon"><svg class="ico"><use href="#i-home"/></svg></span> Главная</div>
+        <div class="sidebar-item" data-section="account"><span class="icon"><svg class="ico"><use href="#i-user"/></svg></span> Личный кабинет</div>
+        <div class="sidebar-item" data-section="subscriptions"><span class="icon"><svg class="ico"><use href="#i-star"/></svg></span> Подписки</div>
         <div class="sidebar-divider"></div>
-        <div class="sidebar-item" data-section="dota2"><span class="icon">⚔️</span> DOTA 2</div>
-        <div class="sidebar-item" data-section="cs2"><span class="icon">🔫</span> CS 2</div>
+        <div class="sidebar-item" data-section="dota2"><span class="icon"><svg class="ico"><use href="#i-swords"/></svg></span> DOTA 2</div>
+        <div class="sidebar-item" data-section="cs2"><span class="icon"><svg class="ico"><use href="#i-crosshair"/></svg></span> CS 2</div>
         <div class="sidebar-divider"></div>
-        <div class="theme-toggle" id="themeToggle"><span class="icon">🌓</span> Сменить тему</div>
+        <div class="theme-toggle" id="themeToggle"><span class="icon"><svg class="ico"><use href="#i-contrast"/></svg></span> Сменить тему</div>
     </div>
     <div class="navbar">
-        <div class="ga-logo">
-            <div class="ga-logo-svg-wrap">
-                <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" width="44" height="44">
-                    <defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#6366f1"/><stop offset="50%" style="stop-color:#818cf8"/><stop offset="100%" style="stop-color:#a5b4fc"/></linearGradient></defs>
-                    <path d="M22 3 L37 11.5 L37 30.5 L22 39 L7 30.5 L7 11.5 Z" stroke="url(#logoGrad)" stroke-width="1.8" fill="rgba(99,102,241,0.06)" stroke-linejoin="round"/>
-                    <path d="M29 5.5 L37 11.5" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round"/>
-                    <line x1="16" y1="13" x2="27" y2="29" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="28" y1="13" x2="17" y2="29" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="13" y1="16" x2="19" y2="10" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                    <line x1="31" y1="16" x2="25" y2="10" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                    <line x1="12" y1="18" x2="20" y2="18" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                    <line x1="24" y1="18" x2="32" y2="18" stroke="url(#logoGrad)" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
-            </div>
-            <span class="ga-logo-text">GAMERANALYZER</span>
+        <div class="ga-logo" id="gaLogo" role="link" tabindex="0">
+            <svg class="ga-mark" viewBox="0 0 280 330" aria-hidden="true"><use href="#ga-mark"/></svg>
+            <span class="ga-logo-text">GAMER ANALYZER</span>
         </div>
         <div class="navbar-right">
-            <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему">🌓</button>
+            <button class="theme-btn-nav" id="themeBtnNav" title="Сменить тему" aria-label="Сменить тему"><svg class="ico"><use href="#i-contrast"/></svg></button>
             <button class="logout-btn" id="logoutBtn">Выйти</button>
         </div>
     </div>
@@ -438,24 +513,32 @@
 
         <!-- HOME -->
         <div class="section active" id="section-home">
+            <div class="hero-banner">
+                <svg class="hb-mark" viewBox="0 0 280 330" aria-hidden="true"><use href="#ga-mark"/></svg>
+                <div class="hb-body">
+                    <svg class="hb-word" viewBox="0 0 500 156" role="img" aria-label="GamerAnalyzer"><use href="#ga-word"/></svg>
+                    <div class="hb-tag">Превосходи вчерашнего себя</div>
+                    <div class="hb-sub">Разбор матчей Dota 2 и CS 2: сильные стороны, ошибки и конкретный план тренировок.</div>
+                </div>
+            </div>
             <div class="home-hero">
-                <div class="home-tagline">⚡ Smart game analysis</div>
+                <div class="home-tagline"><svg class="ico"><use href="#i-bolt"/></svg> Smart game analysis</div>
                 <div class="section-title">Функционал сервиса</div>
                 <p class="section-desc">GamerAnalyzer — умный сервис для анализа матчей в Dota 2 и CS 2. Персональный разбор, сравнение с актуальными про-игроками 2026 года и конкретные тренерские рекомендации.</p>
             </div>
             <div class="features-grid">
-                <div class="feature-card"><span class="feature-icon">📊</span><div class="feature-title">Анализ матчей</div><div class="feature-text">Вставьте ссылку на матч — получите детальный разбор с таймстампами и метриками.</div></div>
-                <div class="feature-card"><span class="feature-icon">🧠</span><div class="feature-title">Умный тренер</div><div class="feature-text">Алгоритм проверяет десятки правил по вашему матчу, находит главную проблему и даёт конкретные упражнения.</div></div>
-                <div class="feature-card"><span class="feature-icon">💡</span><div class="feature-title">Рекомендации тренера</div><div class="feature-text">Конкретные упражнения: что тренировать, сколько времени, какой результат ожидать.</div></div>
-                <div class="feature-card"><span class="feature-icon">👤</span><div class="feature-title">Личный кабинет</div><div class="feature-text">История анализов, график прогресса и статистика достижений.</div></div>
-                <div class="feature-card"><span class="feature-icon">📈</span><div class="feature-title">График прогресса</div><div class="feature-text">Отслеживай рост KD, ADR и GPM на основе реальных матчей.</div></div>
-                <div class="feature-card"><span class="feature-icon">🔫</span><div class="feature-title">FACEIT анализ CS2</div><div class="feature-text">Анализ матчей по ссылке FACEIT с глубоким разбором стиля игры.</div></div>
+                <div class="feature-card" role="link" tabindex="0" data-go="dota2:analysis"><span class="feature-icon"><svg class="ico"><use href="#i-swords"/></svg></span><svg class="ico fc-go"><use href="#i-arrow"/></svg><div class="feature-title">Анализ матча Dota 2</div><div class="feature-text">Вставьте ссылку или ID матча — «Умный тренер» разберёт фарм, лайнинг, смерти и участие в драках.</div></div>
+                <div class="feature-card" role="link" tabindex="0" data-go="cs2:faceit"><span class="feature-icon"><svg class="ico"><use href="#i-crosshair"/></svg></span><svg class="ico fc-go"><use href="#i-arrow"/></svg><div class="feature-title">FACEIT анализ CS2</div><div class="feature-text">Разбор матча по ссылке FACEIT: K/D, ADR, дуэли, клатчи — в сравнении с вашей личной нормой.</div></div>
+                <div class="feature-card" role="link" tabindex="0" data-go="dota2:tierlist"><span class="feature-icon"><svg class="ico"><use href="#i-list"/></svg></span><svg class="ico fc-go"><use href="#i-arrow"/></svg><div class="feature-title">Тир-лист героев</div><div class="feature-text">Актуальные герои по позициям и рангам на основе свежей статистики матчей.</div></div>
+                <div class="feature-card" role="link" tabindex="0" data-go="dota2:stats"><span class="feature-icon"><svg class="ico"><use href="#i-pad"/></svg></span><svg class="ico fc-go"><use href="#i-arrow"/></svg><div class="feature-title">Моя статистика</div><div class="feature-text">Подключите Steam ID и получите разбор профиля Dota 2 и CS 2 за выбранный период.</div></div>
+                <div class="feature-card" role="link" tabindex="0" data-go="account"><span class="feature-icon"><svg class="ico"><use href="#i-chart"/></svg></span><svg class="ico fc-go"><use href="#i-arrow"/></svg><div class="feature-title">Личный кабинет</div><div class="feature-text">История анализов, график прогресса по KD, ADR и GPM, достижения и лимиты.</div></div>
+                <div class="feature-card" role="link" tabindex="0" data-go="subscriptions"><span class="feature-icon"><svg class="ico"><use href="#i-crown"/></svg></span><svg class="ico fc-go"><use href="#i-arrow"/></svg><div class="feature-title">Тарифы</div><div class="feature-text">Бесплатный план, PRO для одной игры или PREMIUM без лимитов на анализы.</div></div>
             </div>
         </div>
 
         <!-- ЛИЧНЫЙ КАБИНЕТ -->
         <div class="section" id="section-account">
-            <div class="section-title">👤 Личный кабинет</div>
+            <div class="section-title btn-ico"><svg class="ico"><use href="#i-user"/></svg> Личный кабинет</div>
             <p class="section-desc">Ваша статистика, прогресс и история анализов.</p>
             <div class="account-grid" id="accountStats">
                 <div class="account-card">
@@ -480,15 +563,15 @@
                 </div>
             </div>
             <div class="chart-block" id="limitsBlock">
-                <div class="chart-block-title">📊 Лимиты анализов сегодня</div>
+                <div class="chart-block-title"><svg class="ico"><use href="#i-chart"/></svg> Лимиты анализов сегодня</div>
                 <div id="limitsContent"></div>
             </div>
             <div class="chart-block">
-                <div class="chart-block-title">🏆 Достижения</div>
+                <div class="chart-block-title"><svg class="ico"><use href="#i-trophy"/></svg> Достижения</div>
                 <div class="achievements-row" id="achievementsList"></div>
             </div>
             <div class="chart-block">
-                <div class="chart-block-title">📈 График прогресса</div>
+                <div class="chart-block-title"><svg class="ico"><use href="#i-chart"/></svg> График прогресса</div>
                 <div class="chart-tabs">
                     <button class="chart-tab active" data-chart="kd">K/D (CS2)</button>
                     <button class="chart-tab" data-chart="adr">ADR (CS2)</button>
@@ -499,14 +582,14 @@
                 <div class="chart-empty" id="chartEmpty" style="display:none;">Недостаточно данных. Проведите минимум 2 анализа для отображения графика.</div>
             </div>
             <div class="chart-block">
-                <div class="chart-block-title">🕐 История анализов</div>
+                <div class="chart-block-title"><svg class="ico"><use href="#i-clock"/></svg> История анализов</div>
                 <div id="historyList" class="history-list"><div class="history-empty">История пуста. Проведите первый анализ!</div></div>
             </div>
         </div>
 
         <!-- SUBSCRIPTIONS -->
         <div class="section" id="section-subscriptions">
-            <button class="back-home-btn" data-back="home">← На главную страницу</button>
+            <button class="back-home-btn btn-ico" data-back="home"><svg class="ico"><use href="#i-back"/></svg> На главную страницу</button>
             <div class="section-title">Тарифы и подписки</div>
             <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
             <div class="subscription-cards">
@@ -520,7 +603,7 @@
                         <li class="benefit">Тайминги всех действий, предметов</li>
                     </ul>
                     <button class="card-btn" id="btn-dota">Выбрать тариф</button>
-                    <div class="current-badge" id="badge-dota">✓ Ваша текущая подписка</div>
+                    <div class="current-badge" id="badge-dota"><svg class="ico"><use href="#i-check"/></svg> Ваша текущая подписка</div>
                 </div>
                 <div class="subscription-card" id="card-cs" data-plan="pro_cs2">
                     <div class="subscription-title">PRO CS 2</div>
@@ -532,11 +615,11 @@
                         <li class="benefit">FACEIT анализ с про-сравнением</li>
                     </ul>
                     <button class="card-btn" id="btn-cs">Выбрать тариф</button>
-                    <div class="current-badge" id="badge-cs">✓ Ваша текущая подписка</div>
+                    <div class="current-badge" id="badge-cs"><svg class="ico"><use href="#i-check"/></svg> Ваша текущая подписка</div>
                 </div>
                 <div class="subscription-card" id="card-premium" data-plan="premium">
                     <div class="premium-badge"></div>
-                    <div class="subscription-title">⭐ PREMIUM</div>
+                    <div class="subscription-title"><svg class="ico"><use href="#i-star"/></svg> PREMIUM</div>
                     <div class="subscription-price" style="font-size:2.6rem;">499 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">Всё из PRO DOTA 2 и PRO CS 2</li>
@@ -545,23 +628,23 @@
                         <li class="benefit">Более глубокий анализ ситуаций</li>
                     </ul>
                     <button class="card-btn" id="btn-premium">Выбрать тариф</button>
-                    <div class="current-badge" id="badge-premium">✓ Ваша текущая подписка</div>
+                    <div class="current-badge" id="badge-premium"><svg class="ico"><use href="#i-check"/></svg> Ваша текущая подписка</div>
                 </div>
             </div>
         </div>
 
         <!-- DOTA 2 -->
         <div class="section" id="section-dota2">
-            <button class="back-home-btn" data-back="home">← На главную страницу</button>
+            <button class="back-home-btn btn-ico" data-back="home"><svg class="ico"><use href="#i-back"/></svg> На главную страницу</button>
             <div class="dota-subtabs">
-                <div class="dota-subtab active" data-subtab="analysis"><span class="dota-subtab-icon">⚔️</span><span class="dota-subtab-text">Анализ матча</span></div>
-                <div class="dota-subtab" data-subtab="history"><span class="dota-subtab-icon">🕐</span><span class="dota-subtab-text">История</span></div>
-                <div class="dota-subtab" data-subtab="tierlist"><span class="dota-subtab-icon">📋</span><span class="dota-subtab-text">Тир-лист героев</span></div>
-                <div class="dota-subtab" data-subtab="stats"><span class="dota-subtab-icon">👤</span><span class="dota-subtab-text">Моя статистика</span></div>
+                <div class="dota-subtab active" data-subtab="analysis"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-swords"/></svg></span><span class="dota-subtab-text">Анализ матча</span></div>
+                <div class="dota-subtab" data-subtab="history"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-clock"/></svg></span><span class="dota-subtab-text">История</span></div>
+                <div class="dota-subtab" data-subtab="tierlist"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-list"/></svg></span><span class="dota-subtab-text">Тир-лист героев</span></div>
+                <div class="dota-subtab" data-subtab="stats"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-user"/></svg></span><span class="dota-subtab-text">Моя статистика</span></div>
             </div>
             <div class="dota-subcontent active" id="dotaSub-analysis">
                 <div class="game-block">
-                    <div class="game-icon">⚔️</div>
+                    <div class="game-icon"><svg class="ico"><use href="#i-swords"/></svg></div>
                     <div class="section-title">Анализ матча Dota 2</div>
                     <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор с конкретными советами тренера.</div>
                     <div id="dotaLimitWarning"></div>
@@ -598,7 +681,7 @@
             </div>
             <div class="dota-subcontent" id="dotaSub-stats">
                 <div class="steam-block">
-                    <div class="game-icon">👤</div>
+                    <div class="game-icon"><svg class="ico"><use href="#i-user"/></svg></div>
                     <div class="section-title">Моя статистика</div>
                     <div class="section-desc">Введите ваш Steam ID — сервис выгрузит статистику за выбранный период.</div>
                     <div class="steam-form">
@@ -623,16 +706,16 @@
 
         <!-- CS 2 -->
         <div class="section" id="section-cs2">
-            <button class="back-home-btn" data-back="home">← На главную страницу</button>
+            <button class="back-home-btn btn-ico" data-back="home"><svg class="ico"><use href="#i-back"/></svg> На главную страницу</button>
             <div class="dota-subtabs" id="cs2Subtabs">
-                <div class="dota-subtab active" data-cs2subtab="analysis"><span class="dota-subtab-icon">🔫</span><span class="dota-subtab-text">Анализ матча</span></div>
-                <div class="dota-subtab" data-cs2subtab="history"><span class="dota-subtab-icon">🕐</span><span class="dota-subtab-text">История</span></div>
-                <div class="dota-subtab" data-cs2subtab="faceit"><span class="dota-subtab-icon">🎯</span><span class="dota-subtab-text">FACEIT Анализ</span></div>
-                <div class="dota-subtab" data-cs2subtab="stats"><span class="dota-subtab-icon">👤</span><span class="dota-subtab-text">Моя статистика</span></div>
+                <div class="dota-subtab active" data-cs2subtab="analysis"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-crosshair"/></svg></span><span class="dota-subtab-text">Анализ матча</span></div>
+                <div class="dota-subtab" data-cs2subtab="history"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-clock"/></svg></span><span class="dota-subtab-text">История</span></div>
+                <div class="dota-subtab" data-cs2subtab="faceit"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-target"/></svg></span><span class="dota-subtab-text">FACEIT Анализ</span></div>
+                <div class="dota-subtab" data-cs2subtab="stats"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-user"/></svg></span><span class="dota-subtab-text">Моя статистика</span></div>
             </div>
             <div class="dota-subcontent active" id="cs2Sub-analysis">
                 <div class="game-block">
-                    <div class="game-icon">🔫</div>
+                    <div class="game-icon"><svg class="ico"><use href="#i-crosshair"/></svg></div>
                     <div class="section-title">Анализ матча CS 2</div>
                     <div class="section-desc">Вставьте ссылку на матч FACEIT — анализ запустится автоматически.</div>
                     <div id="csLimitWarning"></div>
@@ -654,14 +737,14 @@
             </div>
             <div class="dota-subcontent" id="cs2Sub-stats">
                 <div class="steam-block">
-                    <div class="game-icon">👤</div>
+                    <div class="game-icon"><svg class="ico"><use href="#i-user"/></svg></div>
                     <div class="section-title">Моя статистика CS 2</div>
                     <div class="section-desc">Введите ваш Steam ID — сервис загрузит статистику вашего аккаунта в CS 2.</div>
                     <div class="steam-form">
                         <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль" id="csSteamInput"/>
                         <button class="steam-btn" id="csSteamFetchBtn">Получить статистику</button>
                     </div>
-                    <div class="steam-hint">Steam отдаёт статистику CS 2 за всё время игры. В Steam → Приватность профиля пункт «Игровые данные» должен быть «Открытый».</div>
+                    <div class="steam-hint">Steam отдаёт статистику CS 2 за всё время игры. В Steam › Приватность профиля пункт «Игровые данные» должен быть «Открытый».</div>
                     <div class="steam-progress" id="csSteamProgress">
                         <div class="progress-bar"><div class="progress-fill" id="csSteamProgressFill"></div></div>
                         <div class="progress-text" id="csSteamProgressText">Загрузка...</div>
@@ -671,7 +754,7 @@
             </div>
             <div class="dota-subcontent" id="cs2Sub-faceit">
                 <div class="game-block" style="max-width:900px;">
-                    <div class="game-icon">🎯</div>
+                    <div class="game-icon"><svg class="ico"><use href="#i-target"/></svg></div>
                     <div class="section-title">FACEIT Анализ матча</div>
                     <div class="section-desc">Вставьте ссылку на матч FACEIT — получите разбор тренера со сравнением с вашей личной нормой и с про-игроками 2026 года.</div>
                     <div id="faceitLimitWarning"></div>
@@ -691,6 +774,8 @@
     </div>
 </div>
 
+<script src="analyzer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================================
 // SUPABASE
@@ -741,17 +826,23 @@ const PLAN_LIMITS = {
     'premium':  { dota: 999,cs: 999,label: 'PREMIUM' }
 };
 function getTimeUntilMidnight() { var now=new Date(),midnight=new Date(now);midnight.setHours(24,0,0,0);var diff=midnight-now,h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000);return h+'ч '+m+'мин'; }
-async function getUsage() {
+var _heroStatsP=null;
+function fetchHeroStats(){if(!_heroStatsP){_heroStatsP=fetch(DOTA_API+'heroStats').then(function(r){if(!r.ok)_heroStatsP=null;return r;},function(e){_heroStatsP=null;throw e;});}return _heroStatsP.then(function(r){return r.clone();});}
+var _chartP=null;
+function ensureChart(){if(window.Chart)return Promise.resolve();if(!_chartP){_chartP=new Promise(function(res,rej){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';s.onload=res;s.onerror=function(){_chartP=null;rej(new Error('chart'));};document.head.appendChild(s);});}return _chartP;}
+var _usageCache=null;
+async function getUsage(){var n=Date.now();if(_usageCache&&n-_usageCache.t<4000)return _usageCache.v;var v=await _getUsage();_usageCache={t:n,v:v};return v;}
+async function _getUsage() {
     var u=getCurrentUser();if(!u)return{dota_today:0,cs_today:0};
     var today=new Date().toISOString().split('T')[0];
     if(supabaseClient){try{var r=await supabaseClient.from('usage_limits').select('*').eq('user_login',u.login).maybeSingle();if(r.data){if(r.data.last_reset!==today){await supabaseClient.from('usage_limits').update({dota_today:0,cs_today:0,last_reset:today}).eq('user_login',u.login);return{dota_today:0,cs_today:0};}return{dota_today:r.data.dota_today||0,cs_today:r.data.cs_today||0};}else{await supabaseClient.from('usage_limits').insert({user_login:u.login,dota_today:0,cs_today:0,last_reset:today});return{dota_today:0,cs_today:0};}}catch(e){return getLocalUsage();}}
     return getLocalUsage();
 }
 function getLocalUsage(){var today=new Date().toISOString().split('T')[0];try{var d=JSON.parse(localStorage.getItem('ga_usage')||'{}');if(d.date!==today)return{dota_today:0,cs_today:0};return{dota_today:d.dota||0,cs_today:d.cs||0};}catch(e){return{dota_today:0,cs_today:0};}}
-async function incrementUsage(game){var u=getCurrentUser();if(!u)return;var today=new Date().toISOString().split('T')[0];if(supabaseClient){try{var cur=await getUsage();var upd=game==='dota'?{dota_today:(cur.dota_today||0)+1,last_reset:today}:{cs_today:(cur.cs_today||0)+1,last_reset:today};await supabaseClient.from('usage_limits').upsert({user_login:u.login,...upd});}catch(e){incrementLocalUsage(game);}}else{incrementLocalUsage(game);}}
+async function incrementUsage(game){_usageCache=null;var u=getCurrentUser();if(!u)return;var today=new Date().toISOString().split('T')[0];if(supabaseClient){try{var cur=await getUsage();var upd=game==='dota'?{dota_today:(cur.dota_today||0)+1,last_reset:today}:{cs_today:(cur.cs_today||0)+1,last_reset:today};await supabaseClient.from('usage_limits').upsert({user_login:u.login,...upd});}catch(e){incrementLocalUsage(game);}}else{incrementLocalUsage(game);}}
 function incrementLocalUsage(game){var today=new Date().toISOString().split('T')[0];try{var d=JSON.parse(localStorage.getItem('ga_usage')||'{}');if(d.date!==today)d={date:today,dota:0,cs:0};if(game==='dota')d.dota++;else d.cs++;localStorage.setItem('ga_usage',JSON.stringify(d));}catch(e){}}
 async function checkLimit(game){var u=getCurrentUser();if(!u)return true;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];if(plan==='premium')return true;var usage=await getUsage();var used=game==='dota'?usage.dota_today:usage.cs_today;var max=game==='dota'?limits.dota:limits.cs;return used<max;}
-async function showLimitWarning(containerId,game){var u=getCurrentUser();if(!u)return;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];var usage=await getUsage();var used=game==='dota'?usage.dota_today:usage.cs_today;var max=game==='dota'?limits.dota:limits.cs;var el=document.getElementById(containerId);if(!el)return;if(plan==='premium'){el.innerHTML='';return;}var pct=Math.min(100,Math.round(used/max*100));var isFull=used>=max;el.innerHTML=isFull?'<div class="limit-warning"><div class="limit-warning-title">🚫 Лимит исчерпан</div><div class="limit-warning-text">Вы использовали все '+max+' анализов на сегодня ('+limits.label+').</div><div class="limit-warning-time">Обновление через: '+getTimeUntilMidnight()+' (в 00:00)</div></div>':'<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#888;margin-bottom:6px;"><span>Анализов сегодня: '+used+' / '+max+'</span><span>'+pct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(pct>=80?' danger':'')+'" style="width:'+pct+'%"></div></div><div class="limit-reset-time">Обновление в 00:00 · осталось '+getTimeUntilMidnight()+'</div></div>';}
+async function showLimitWarning(containerId,game){var u=getCurrentUser();if(!u)return;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];var usage=await getUsage();var used=game==='dota'?usage.dota_today:usage.cs_today;var max=game==='dota'?limits.dota:limits.cs;var el=document.getElementById(containerId);if(!el)return;if(plan==='premium'){el.innerHTML='';return;}var pct=Math.min(100,Math.round(used/max*100));var isFull=used>=max;el.innerHTML=isFull?'<div class="limit-warning"><div class="limit-warning-title"><svg class="ico"><use href="#i-ban"/></svg> Лимит исчерпан</div><div class="limit-warning-text">Вы использовали все '+max+' анализов на сегодня ('+limits.label+').</div><div class="limit-warning-time">Обновление через: '+getTimeUntilMidnight()+' (в 00:00)</div></div>':'<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#888;margin-bottom:6px;"><span>Анализов сегодня: '+used+' / '+max+'</span><span>'+pct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(pct>=80?' danger':'')+'" style="width:'+pct+'%"></div></div><div class="limit-reset-time">Обновление в 00:00 · осталось '+getTimeUntilMidnight()+'</div></div>';}
 
 // ============================================================
 // ИСТОРИЯ АНАЛИЗОВ
@@ -760,7 +851,7 @@ async function saveAnalysis(game,matchId,summary,kd,adr,gpm,wr){var u=getCurrent
 function saveLocalAnalysis(rec){try{var list=JSON.parse(localStorage.getItem('ga_analyses')||'[]');list.unshift({...rec,created_at:new Date().toISOString()});if(list.length>100)list=list.slice(0,100);localStorage.setItem('ga_analyses',JSON.stringify(list));}catch(e){}}
 async function loadAnalyses(game){var u=getCurrentUser();if(!u)return[];if(supabaseClient){try{var q=supabaseClient.from('analyses').select('*').eq('user_login',u.login).order('created_at',{ascending:false}).limit(50);if(game)q=q.eq('game',game);var r=await q;if(r.data)return r.data;}catch(e){}}var list=JSON.parse(localStorage.getItem('ga_analyses')||'[]');return game?list.filter(function(a){return a.game===game;}):list;}
 function timeAgo(dateStr){var d=new Date(dateStr),now=new Date(),diff=Math.floor((now-d)/1000);if(diff<60)return'только что';if(diff<3600)return Math.floor(diff/60)+' мин назад';if(diff<86400)return Math.floor(diff/3600)+' ч назад';return Math.floor(diff/86400)+' дн назад';}
-function renderHistoryList(analyses,containerId,game){var el=document.getElementById(containerId);if(!el)return;if(!analyses||analyses.length===0){el.innerHTML='<div class="history-empty">История пуста. Проведите первый анализ!</div>';return;}var html=analyses.map(function(a){var icon=a.game==='dota2'?'⚔️':'🔫';var badge=a.game==='dota2'?'<span class="history-badge dota">Dota 2</span>':'<span class="history-badge cs">CS 2</span>';var summary=a.result_summary||(a.game==='dota2'?'GPM: '+a.gpm:'KD: '+parseFloat(a.kd||0).toFixed(2));var mid=a.match_id?'Match: '+a.match_id.substring(0,12)+'...':'';return'<div class="history-item"><div class="history-game-icon">'+icon+'</div><div class="history-info"><div class="history-summary">'+summary+'</div><div class="history-match-id">'+mid+'</div></div>'+badge+'<div class="history-time">'+timeAgo(a.created_at)+'</div></div>';}).join('');el.innerHTML=html;}
+function renderHistoryList(analyses,containerId,game){var el=document.getElementById(containerId);if(!el)return;if(!analyses||analyses.length===0){el.innerHTML='<div class="history-empty">История пуста. Проведите первый анализ!</div>';return;}var html=analyses.map(function(a){var icon=a.game==='dota2'?'<svg class="ico"><use href="#i-swords"/></svg>':'<svg class="ico"><use href="#i-crosshair"/></svg>';var badge=a.game==='dota2'?'<span class="history-badge dota">Dota 2</span>':'<span class="history-badge cs">CS 2</span>';var summary=a.result_summary||(a.game==='dota2'?'GPM: '+a.gpm:'KD: '+parseFloat(a.kd||0).toFixed(2));var mid=a.match_id?'Match: '+a.match_id.substring(0,12)+'...':'';return'<div class="history-item"><div class="history-game-icon">'+icon+'</div><div class="history-info"><div class="history-summary">'+summary+'</div><div class="history-match-id">'+mid+'</div></div>'+badge+'<div class="history-time">'+timeAgo(a.created_at)+'</div></div>';}).join('');el.innerHTML=html;}
 
 // ============================================================
 // ГРАФИК ПРОГРЕССА
@@ -778,6 +869,7 @@ async function renderProgressChart(metric){
     var metricLabels={kd:'K/D',adr:'ADR',gpm:'GPM',wr:'Винрейт %'};
     var isDark=!document.documentElement.classList.contains('light-theme');
     var gridColor=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)',textColor=isDark?'#888':'#666';
+    try{await ensureChart();}catch(e){return;}
     if(progressChartInstance){progressChartInstance.destroy();progressChartInstance=null;}
     progressChartInstance=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[{label:metricLabels[metric],data:values,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,0.08)',borderWidth:2.5,pointBackgroundColor:'#818cf8',pointBorderColor:'#6366f1',pointRadius:5,pointHoverRadius:7,fill:true,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e1e30',titleColor:'#818cf8',bodyColor:'#ccc',borderColor:'#6366f1',borderWidth:1}},scales:{x:{grid:{color:gridColor},ticks:{color:textColor}},y:{grid:{color:gridColor},ticks:{color:textColor},beginAtZero:metric!=='kd'}}}});
 }
@@ -785,15 +877,15 @@ async function renderProgressChart(metric){
 // ============================================================
 // ДОСТИЖЕНИЯ
 // ============================================================
-function renderAchievements(total,dota,cs){var el=document.getElementById('achievementsList');if(!el)return;var achievements=[{icon:'🎮',name:'Первый анализ',desc:'Проведён 1 анализ',earned:total>=1},{icon:'📊',name:'Аналитик',desc:'5 анализов проведено',earned:total>=5},{icon:'🏆',name:'Про-игрок',desc:'20 анализов проведено',earned:total>=20},{icon:'⚔️',name:'Dota 2 мастер',desc:'10 анализов Dota 2',earned:dota>=10},{icon:'🔫',name:'CS 2 снайпер',desc:'10 анализов CS 2',earned:cs>=10},{icon:'💯',name:'Сотня',desc:'100 анализов проведено',earned:total>=100}];el.innerHTML=achievements.map(function(a){return'<div class="achievement" style="opacity:'+(a.earned?1:0.35)+'"><div class="achievement-icon">'+a.icon+'</div><div class="achievement-info"><div class="achievement-name">'+a.name+'</div><div class="achievement-desc">'+a.desc+'</div></div></div>';}).join('');}
+function renderAchievements(total,dota,cs){var el=document.getElementById('achievementsList');if(!el)return;var achievements=[{icon:'<svg class="ico"><use href="#i-pad"/></svg>',name:'Первый анализ',desc:'Проведён 1 анализ',earned:total>=1},{icon:'<svg class="ico"><use href="#i-chart"/></svg>',name:'Аналитик',desc:'5 анализов проведено',earned:total>=5},{icon:'<svg class="ico"><use href="#i-trophy"/></svg>',name:'Про-игрок',desc:'20 анализов проведено',earned:total>=20},{icon:'<svg class="ico"><use href="#i-swords"/></svg>',name:'Dota 2 мастер',desc:'10 анализов Dota 2',earned:dota>=10},{icon:'<svg class="ico"><use href="#i-crosshair"/></svg>',name:'CS 2 снайпер',desc:'10 анализов CS 2',earned:cs>=10},{icon:'<svg class="ico"><use href="#i-gem"/></svg>',name:'Сотня',desc:'100 анализов проведено',earned:total>=100}];el.innerHTML=achievements.map(function(a){return'<div class="achievement" style="opacity:'+(a.earned?1:0.35)+'"><div class="achievement-icon">'+a.icon+'</div><div class="achievement-info"><div class="achievement-name">'+a.name+'</div><div class="achievement-desc">'+a.desc+'</div></div></div>';}).join('');}
 
 async function loadAccountData(){var u=getCurrentUser();if(!u)return;var allAnalyses=await loadAnalyses(null);var dotaAnalyses=allAnalyses.filter(function(a){return a.game==='dota2'||a.game==='dota';});var csAnalyses=allAnalyses.filter(function(a){return a.game==='cs2'||a.game==='cs';});var total=allAnalyses.length,dota=dotaAnalyses.length,cs=csAnalyses.length;document.getElementById('statTotalAnalyses').textContent=total;document.getElementById('statDotaAnalyses').textContent=dota;document.getElementById('statCsAnalyses').textContent=cs;var plan=u.plan||'free';var planLabels={free:'Бесплатный',pro_dota2:'PRO DOTA 2',pro_cs2:'PRO CS 2',premium:'PREMIUM'};var planCls=plan==='premium'?'premium':plan==='free'?'free':'pro';document.getElementById('statPlan').innerHTML='<span class="account-plan-badge '+planCls+'">'+planLabels[plan]+'</span>';renderAchievements(total,dota,cs);renderHistoryList(allAnalyses,'historyList',null);await renderLimitsBlock();await renderProgressChart(currentChartMetric);}
-async function renderLimitsBlock(){var u=getCurrentUser();if(!u)return;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];var usage=await getUsage();var el=document.getElementById('limitsContent');if(!el)return;if(plan==='premium'){el.innerHTML='<div class="analysis-item positive">✅ PREMIUM: безлимитное количество анализов</div>';return;}var dotaPct=Math.min(100,Math.round((usage.dota_today||0)/limits.dota*100));var csPct=Math.min(100,Math.round((usage.cs_today||0)/limits.cs*100));el.innerHTML='<div class="limit-bar-wrap"><div class="limit-bar-label"><span>⚔️ Dota 2: '+usage.dota_today+' / '+limits.dota+'</span><span>'+dotaPct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(dotaPct>=80?' danger':'')+'" style="width:'+dotaPct+'%"></div></div></div><div class="limit-bar-wrap" style="margin-top:12px;"><div class="limit-bar-label"><span>🔫 CS 2: '+usage.cs_today+' / '+limits.cs+'</span><span>'+csPct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(csPct>=80?' danger':'')+'" style="width:'+csPct+'%"></div></div></div><div class="limit-reset-time" style="margin-top:10px;">🕐 Обновление лимитов в 00:00 · осталось '+getTimeUntilMidnight()+'</div>';}
+async function renderLimitsBlock(){var u=getCurrentUser();if(!u)return;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];var usage=await getUsage();var el=document.getElementById('limitsContent');if(!el)return;if(plan==='premium'){el.innerHTML='<div class="analysis-item positive"><svg class="ico"><use href="#i-check"/></svg> PREMIUM: безлимитное количество анализов</div>';return;}var dotaPct=Math.min(100,Math.round((usage.dota_today||0)/limits.dota*100));var csPct=Math.min(100,Math.round((usage.cs_today||0)/limits.cs*100));el.innerHTML='<div class="limit-bar-wrap"><div class="limit-bar-label"><span><svg class="ico"><use href="#i-swords"/></svg> Dota 2: '+usage.dota_today+' / '+limits.dota+'</span><span>'+dotaPct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(dotaPct>=80?' danger':'')+'" style="width:'+dotaPct+'%"></div></div></div><div class="limit-bar-wrap" style="margin-top:12px;"><div class="limit-bar-label"><span><svg class="ico"><use href="#i-crosshair"/></svg> CS 2: '+usage.cs_today+' / '+limits.cs+'</span><span>'+csPct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(csPct>=80?' danger':'')+'" style="width:'+csPct+'%"></div></div></div><div class="limit-reset-time" style="margin-top:10px;"><svg class="ico"><use href="#i-clock"/></svg> Обновление лимитов в 00:00 · осталось '+getTimeUntilMidnight()+'</div>';}
 
 // ============================================================
 // PRO PLAYERS DATABASE 2026
 // ============================================================
-const PRO_PLAYERS_2026=[{nick:'ZywOo',name:'Mathieu Herbaut',flag:'🇫🇷',team:'Vitality',tier:1,role:'awp',roleLabel:'AWPer',rating:1.31,adr:82.4,kd:1.38,hs:44,entryRate:0.12,utilDmg:18,traits:['Пассивный AWP','Чтение позиций','Высокий рейтинг','Клатч-мастер'],description:'Лучший AWPer мира по версии HLTV 2024-2025. Терпеливое удержание углов, минимум рисков, максимальный ADR.'},{nick:'sh1ro',name:'Dmitry Sorokin',flag:'🇷🇺',team:'Cloud9',tier:1,role:'awp',roleLabel:'AWPer',rating:1.28,adr:79.1,kd:1.32,hs:38,entryRate:0.10,utilDmg:14,traits:['Тихий AWP','Минимум смертей','Переигровка позиций','Читает катку'],description:'Феноменально низкая смертность — один из лучших KD на про-сцене.'},{nick:'NiKo',name:'Nikola Kovač',flag:'🇧🇦',team:'G2',tier:1,role:'rifler',roleLabel:'Rifler',rating:1.24,adr:81.2,kd:1.29,hs:58,entryRate:0.18,utilDmg:22,traits:['Агрессивный рифлер','Высокий HS%','Дуэли в открытую','Clutch'],description:'Один из лучших рифлеров в истории CS. Агрессивный стиль, высокий HS%.'},{nick:'donk',name:'Danil Kryshkovets',flag:'🇷🇺',team:'Spirit',tier:1,role:'rifler',roleLabel:'Star Rifler',rating:1.35,adr:88.3,kd:1.42,hs:62,entryRate:0.22,utilDmg:19,traits:['Взрывной старт','Высокий HS%','Агрессивные пики','#1 рейтинг 2024'],description:'#1 игрок мира 2024. Феноменальная скорость реакции.'},{nick:'jL',name:'Jere Salo',flag:'🇫🇮',team:'NAVI',tier:1,role:'rifler',roleLabel:'Rifler',rating:1.18,adr:76.8,kd:1.22,hs:55,entryRate:0.16,utilDmg:28,traits:['Утилити-мастер','Позиционная игра','Поддержка','Стабильность'],description:'Ключевой игрок NAVI. Высокий утилити дамаг, стабильная позиционная игра.'},{nick:'broky',name:'Helvijs Saukants',flag:'🇱🇻',team:'G2',tier:1,role:'awp',roleLabel:'AWPer',rating:1.19,adr:74.5,kd:1.21,hs:41,entryRate:0.13,utilDmg:16,traits:['Мобильный AWP','Агрессивные пики','Читает ротации','Клатч'],description:'AWPer G2, играет агрессивнее большинства AWPerов.'},{nick:'Jimpphat',name:'Jimi Lipisti',flag:'🇫🇮',team:'ENCE',tier:1,role:'entry',roleLabel:'Entry Fragger',rating:1.22,adr:83.1,kd:1.26,hs:64,entryRate:0.31,utilDmg:15,traits:['Главный входящий','Высокий Entry%','Жертвенный стиль','Открывает раунды'],description:'Один из лучших entry fraggers в Tier-1.'},{nick:'electroNic',name:'Denis Sharipov',flag:'🇷🇺',team:'Spirit',tier:2,role:'entry',roleLabel:'Entry/Support',rating:1.08,adr:71.2,kd:1.10,hs:52,entryRate:0.24,utilDmg:31,traits:['Entry+Support гибрид','Утилити при входе','Командная игра','Ротации'],description:'Универсальный игрок Spirit. Совмещает entry и support роли.'},{nick:'Perfecto',name:'Ilya Zalutsky',flag:'🇷🇺',team:'NAVI',tier:2,role:'support',roleLabel:'Support',rating:1.02,adr:64.1,kd:1.03,hs:47,entryRate:0.11,utilDmg:45,traits:['Высокий утилити дамаг','Флэши для команды','Саппорт-роль','Клатч'],description:'Классический support. Рекордно высокий утилити дамаг.'},{nick:'YEKINDAR',name:'Mareks Gaļinskis',flag:'🇱🇻',team:'Liquid',tier:2,role:'entry',roleLabel:'Aggressive Entry',rating:1.06,adr:74.8,kd:1.08,hs:59,entryRate:0.35,utilDmg:22,traits:['Самый агрессивный entry','Высокий риск','Открывает раунды','Хаотичный стиль'],description:'Самый агрессивный entry fragger в мире. Высокий риск — высокая награда.'}];
+const PRO_PLAYERS_2026=[{nick:'ZywOo',name:'Mathieu Herbaut',flag:'FR',team:'Vitality',tier:1,role:'awp',roleLabel:'AWPer',rating:1.31,adr:82.4,kd:1.38,hs:44,entryRate:0.12,utilDmg:18,traits:['Пассивный AWP','Чтение позиций','Высокий рейтинг','Клатч-мастер'],description:'Лучший AWPer мира по версии HLTV 2024-2025. Терпеливое удержание углов, минимум рисков, максимальный ADR.'},{nick:'sh1ro',name:'Dmitry Sorokin',flag:'RU',team:'Cloud9',tier:1,role:'awp',roleLabel:'AWPer',rating:1.28,adr:79.1,kd:1.32,hs:38,entryRate:0.10,utilDmg:14,traits:['Тихий AWP','Минимум смертей','Переигровка позиций','Читает катку'],description:'Феноменально низкая смертность — один из лучших KD на про-сцене.'},{nick:'NiKo',name:'Nikola Kovač',flag:'BA',team:'G2',tier:1,role:'rifler',roleLabel:'Rifler',rating:1.24,adr:81.2,kd:1.29,hs:58,entryRate:0.18,utilDmg:22,traits:['Агрессивный рифлер','Высокий HS%','Дуэли в открытую','Clutch'],description:'Один из лучших рифлеров в истории CS. Агрессивный стиль, высокий HS%.'},{nick:'donk',name:'Danil Kryshkovets',flag:'RU',team:'Spirit',tier:1,role:'rifler',roleLabel:'Star Rifler',rating:1.35,adr:88.3,kd:1.42,hs:62,entryRate:0.22,utilDmg:19,traits:['Взрывной старт','Высокий HS%','Агрессивные пики','#1 рейтинг 2024'],description:'#1 игрок мира 2024. Феноменальная скорость реакции.'},{nick:'jL',name:'Jere Salo',flag:'FI',team:'NAVI',tier:1,role:'rifler',roleLabel:'Rifler',rating:1.18,adr:76.8,kd:1.22,hs:55,entryRate:0.16,utilDmg:28,traits:['Утилити-мастер','Позиционная игра','Поддержка','Стабильность'],description:'Ключевой игрок NAVI. Высокий утилити дамаг, стабильная позиционная игра.'},{nick:'broky',name:'Helvijs Saukants',flag:'LV',team:'G2',tier:1,role:'awp',roleLabel:'AWPer',rating:1.19,adr:74.5,kd:1.21,hs:41,entryRate:0.13,utilDmg:16,traits:['Мобильный AWP','Агрессивные пики','Читает ротации','Клатч'],description:'AWPer G2, играет агрессивнее большинства AWPerов.'},{nick:'Jimpphat',name:'Jimi Lipisti',flag:'FI',team:'ENCE',tier:1,role:'entry',roleLabel:'Entry Fragger',rating:1.22,adr:83.1,kd:1.26,hs:64,entryRate:0.31,utilDmg:15,traits:['Главный входящий','Высокий Entry%','Жертвенный стиль','Открывает раунды'],description:'Один из лучших entry fraggers в Tier-1.'},{nick:'electroNic',name:'Denis Sharipov',flag:'RU',team:'Spirit',tier:2,role:'entry',roleLabel:'Entry/Support',rating:1.08,adr:71.2,kd:1.10,hs:52,entryRate:0.24,utilDmg:31,traits:['Entry+Support гибрид','Утилити при входе','Командная игра','Ротации'],description:'Универсальный игрок Spirit. Совмещает entry и support роли.'},{nick:'Perfecto',name:'Ilya Zalutsky',flag:'RU',team:'NAVI',tier:2,role:'support',roleLabel:'Support',rating:1.02,adr:64.1,kd:1.03,hs:47,entryRate:0.11,utilDmg:45,traits:['Высокий утилити дамаг','Флэши для команды','Саппорт-роль','Клатч'],description:'Классический support. Рекордно высокий утилити дамаг.'},{nick:'YEKINDAR',name:'Mareks Gaļinskis',flag:'LV',team:'Liquid',tier:2,role:'entry',roleLabel:'Aggressive Entry',rating:1.06,adr:74.8,kd:1.08,hs:59,entryRate:0.35,utilDmg:22,traits:['Самый агрессивный entry','Высокий риск','Открывает раунды','Хаотичный стиль'],description:'Самый агрессивный entry fragger в мире. Высокий риск — высокая награда.'}];
 
 function detectPlayStyle(stats){var er=(stats.entryKills||0)/(stats.kills||1);if(stats.awpKillRate&&stats.awpKillRate>0.35)return'awp';if(er>0.28)return'entry';if((stats.utilDmg||0)>35&&(stats.adr||0)<72)return'support';if(stats.assistsPerRound&&stats.assistsPerRound>0.6)return'igl';if(er<0.12&&(stats.kd||0)>1.0)return'lurk';return'rifler';}
 function findSimilarPro(style,stats){var cands=PRO_PLAYERS_2026.filter(function(p){return p.role===style;});if(!cands.length)cands=PRO_PLAYERS_2026;cands=cands.map(function(p){var s=100-Math.abs((stats.adr||70)-p.adr)*0.5-Math.abs((stats.hs||50)-p.hs)*0.3-Math.abs((stats.kd||1)-p.kd)*20;return{pro:p,score:Math.max(0,s)};});cands.sort(function(a,b){return b.score-a.score;});var best=cands[0],pct=Math.min(95,Math.max(25,Math.round(best.score)));return{pro:best.pro,matchPct:pct,level:pct>=70?'high':pct>=45?'medium':'low'};}
@@ -809,7 +901,7 @@ function buildDeepAnalysis(playerStats,matchData){
     var html='';
     html+='<div class="result-header"><div class="result-header-info"><h2>'+nick+' — '+(styleLabels[sty]||'Rifler')+'</h2><div class="result-header-meta">Карта: '+(matchData.map||'?')+' · Счёт: '+(matchData.score||'—')+' · '+rounds+' раундов</div></div><div class="result-badge '+(matchData.won?'win':'lose')+'">'+(matchData.won?'Победа':'Поражение')+'</div></div>';
     if(matchData.playerOptions)html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" id="faceitPlayerSelect" onchange="switchFaceitPlayer()">'+matchData.playerOptions+'</select></div>';
-    html+='<div class="result-block"><div class="result-block-title">📊 Основные показатели</div><div class="metrics-grid">';
+    html+='<div class="result-block"><div class="result-block-title"><svg class="ico"><use href="#i-chart"/></svg> Основные показатели</div><div class="metrics-grid">';
     html+='<div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">'+kd.toFixed(2)+'</div><div class="metric-sub '+(kd>=1?'good':'bad')+'">Про: '+pro.kd+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">'+Math.round(adr)+'</div><div class="metric-sub '+(adr>=pro.adr*0.85?'good':'bad')+'">Про: '+Math.round(pro.adr)+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">'+Math.round(hs)+'%</div><div class="metric-sub '+(hs>=pro.hs*0.8?'good':'bad')+'">Про: '+pro.hs+'%</div></div>';
@@ -818,7 +910,7 @@ function buildDeepAnalysis(playerStats,matchData){
     if(utilDmg>0)html+='<div class="metric-card"><div class="metric-label">Утилити дмг</div><div class="metric-value">'+utilDmg+'</div><div class="metric-sub '+(utilDmg>=30?'good':'bad')+'">Про: '+pro.utilDmg+'</div></div>';
     if(entryKills>0){var ew=Math.round(entryWins/entryKills*100);html+='<div class="metric-card"><div class="metric-label">Entry убийства</div><div class="metric-value">'+entryKills+'</div><div class="metric-sub '+(ew>=55?'good':'bad')+'">WR: '+ew+'%</div></div>';}
     html+='</div></div>';
-    html+='<div class="result-block"><div class="result-block-title">🏆 Похожий про-игрок</div><div class="pro-style-card"><div class="pro-style-header"><div class="pro-style-avatar">'+pro.flag+'</div><div class="pro-style-info"><h3>'+pro.flag+' '+pro.nick+' ('+pro.name+')</h3><p>'+pro.team+' · '+pro.roleLabel+'</p><p style="color:#888;font-size:0.85rem;margin-top:4px;">Rating: '+pro.rating+' · ADR: '+pro.adr+' · KD: '+pro.kd+'</p>';
+    html+='<div class="result-block"><div class="result-block-title"><svg class="ico"><use href="#i-trophy"/></svg> Похожий про-игрок</div><div class="pro-style-card"><div class="pro-style-header"><div class="pro-style-avatar">'+pro.flag+'</div><div class="pro-style-info"><h3>'+pro.flag+' '+pro.nick+' ('+pro.name+')</h3><p>'+pro.team+' · '+pro.roleLabel+'</p><p style="color:#888;font-size:0.85rem;margin-top:4px;">Rating: '+pro.rating+' · ADR: '+pro.adr+' · KD: '+pro.kd+'</p>';
     var tc=pro.tier===1?'t1':pro.tier===2?'t2':'t3',tl=pro.tier===1?'Tier-1':pro.tier===2?'Tier-2':'Tier-3';
     html+='<span class="tier-badge '+tc+'">'+tl+'</span><span class="pro-style-match '+pm.level+'" style="margin-left:8px;">Схожесть: '+pm.matchPct+'%</span></div></div><p style="color:#aaa;font-size:0.9rem;line-height:1.6;margin-bottom:12px;">'+pro.description+'</p><div class="pro-style-traits">'+pro.traits.map(function(t){return'<span class="pro-trait">'+t+'</span>';}).join('')+'</div></div></div>';
     html+='<div id="coachBlock_faceit"></div>';
@@ -944,7 +1036,7 @@ document.getElementById('loginBtn').addEventListener('click',async function(){
 });
 
 function enterApp(){document.getElementById('authScreen').style.display='none';setTimeout(function(){document.getElementById('appWrapper').classList.add('active');updateUserInfo();updateSubscriptionUI();initLimitWarnings();},10);}
-async function initLimitWarnings(){await showLimitWarning('dotaLimitWarning','dota');await showLimitWarning('csLimitWarning','cs');await showLimitWarning('faceitLimitWarning','cs');}
+async function initLimitWarnings(){await Promise.all([showLimitWarning('dotaLimitWarning','dota'),showLimitWarning('csLimitWarning','cs'),showLimitWarning('faceitLimitWarning','cs')]);}
 function updateUserInfo(){var u=getCurrentUser();if(!u)return;document.getElementById('userName').textContent=u.login;var pn={'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM'};document.getElementById('userPlan').textContent=pn[u.plan]||'Бесплатный';}
 function updateSubscriptionUI(){var u=getCurrentUser();if(!u)return;document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Выбрать тариф';bd.classList.remove('visible');});if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}}
 document.getElementById('logoutBtn').addEventListener('click',function(){clearCurrentUser();document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
@@ -973,6 +1065,18 @@ document.querySelectorAll('.sidebar-item').forEach(function(item){
         if(window.innerWidth<768)closeSidebar();
     });
 });
+
+function navigate(section,sub){
+    var it=document.querySelector('.sidebar-item[data-section="'+section+'"]');if(it)it.click();
+    if(sub){var t=document.querySelector('.dota-subtab[data-subtab="'+sub+'"]')&&section==='dota2'?document.querySelector('.dota-subtab[data-subtab="'+sub+'"]'):(section==='cs2'?document.querySelector('.dota-subtab[data-cs2subtab="'+sub+'"]'):null);if(t)t.click();}
+    window.scrollTo(0,0);
+}
+document.querySelectorAll('.feature-card[data-go]').forEach(function(c){
+    function go(){var p=c.getAttribute('data-go').split(':');navigate(p[0],p[1]);}
+    c.addEventListener('click',go);
+    c.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}});
+});
+(function(){var l=document.getElementById('gaLogo');if(!l)return;function h(){navigate('home');}l.addEventListener('click',h);l.addEventListener('keydown',function(e){if(e.key==='Enter')h();});})();
 function revealCards(){document.querySelectorAll('.subscription-card').forEach(function(c,i){c.classList.remove('visible');setTimeout(function(){c.classList.add('visible');},i*150);});}
 document.querySelectorAll('.back-home-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.sidebar-item').forEach(function(i){i.classList.remove('active');});document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});document.getElementById('section-home').classList.add('active');var hi=document.querySelector('.sidebar-item[data-section="home"]');if(hi)hi.classList.add('active');});});
 
@@ -1009,7 +1113,7 @@ var RANKS=[{num:1,name:'Рекрут',color:'#6b6b6b'},{num:2,name:'Страж',
 var POSITIONS=[{id:'all',name:'Все',icon:'Все'},{id:1,name:'Carry',icon:'1'},{id:2,name:'Mid',icon:'2'},{id:3,name:'Offlane',icon:'3'},{id:4,name:'Support',icon:'4'},{id:5,name:'Hard Support',icon:'5'}];
 var tierlistData=null,laneRolesMap={},currentRank=7,currentPosition='all';
 
-async function loadTierlist(){var c=document.getElementById('tierlistContent');c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';try{var sr=await fetch(DOTA_API+'heroStats'),lr=await fetch(DOTA_API+'scenarios/laneRoles');if(!sr.ok)throw new Error('Недоступно');tierlistData=await sr.json();if(lr.ok){var ld=await lr.json();laneRolesMap={};var hlg={};ld.forEach(function(e){var h=parseInt(e.hero_id);if(!hlg[h])hlg[h]={};hlg[h][e.lane_role]=(hlg[h][e.lane_role]||0)+(parseInt(e.games)||0);});Object.keys(hlg).forEach(function(h){var best=0,bg=0;Object.keys(hlg[h]).forEach(function(l){if(hlg[h][l]>bg){bg=hlg[h][l];best=parseInt(l);}});laneRolesMap[h]=best;});}renderPositionSelector();renderRankSelector();renderTierlist(currentRank);var now=new Date();document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}}
+async function loadTierlist(){var c=document.getElementById('tierlistContent');c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';try{var sr=await fetchHeroStats(),lr=await fetch(DOTA_API+'scenarios/laneRoles');if(!sr.ok)throw new Error('Недоступно');tierlistData=await sr.json();if(lr.ok){var ld=await lr.json();laneRolesMap={};var hlg={};ld.forEach(function(e){var h=parseInt(e.hero_id);if(!hlg[h])hlg[h]={};hlg[h][e.lane_role]=(hlg[h][e.lane_role]||0)+(parseInt(e.games)||0);});Object.keys(hlg).forEach(function(h){var best=0,bg=0;Object.keys(hlg[h]).forEach(function(l){if(hlg[h][l]>bg){bg=hlg[h][l];best=parseInt(l);}});laneRolesMap[h]=best;});}renderPositionSelector();renderRankSelector();renderTierlist(currentRank);var now=new Date();document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}}
 function renderPositionSelector(){var s=document.getElementById('positionSelector');s.innerHTML=POSITIONS.map(function(p){return'<div class="position-badge '+(p.id===currentPosition?'active':'')+'" data-pos="'+p.id+'"><div class="position-badge-icon"><span style="font-size:1.4rem;">'+p.icon+'</span></div><div class="position-badge-name">'+p.name+'</div></div>';}).join('');s.querySelectorAll('.position-badge').forEach(function(b){b.addEventListener('click',function(){currentPosition=b.dataset.pos;s.querySelectorAll('.position-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
 function renderRankSelector(){var s=document.getElementById('rankSelector');s.innerHTML=RANKS.map(function(r){return'<div class="rank-badge '+(r.num===currentRank?'active':'')+'" data-rank="'+r.num+'"><div class="rank-badge-icon" style="width:36px;height:36px;border-radius:50%;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;box-shadow:0 0 8px '+r.color+'99;">'+r.num+'</div><div class="rank-badge-name">'+r.name+'</div></div>';}).join('');s.querySelectorAll('.rank-badge').forEach(function(b){b.addEventListener('click',function(){currentRank=parseInt(b.dataset.rank);s.querySelectorAll('.rank-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
 function getHeroPosition(hid){var id=parseInt(hid),h=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===id;}):null;if(!h)return null;var r=h.roles||[],s=r.some(function(x){return x.indexOf('Support')!==-1;}),c=r.indexOf('Carry')!==-1,d=r.indexOf('Durable')!==-1,i=r.indexOf('Initiator')!==-1,e=r.indexOf('Escape')!==-1,n=r.indexOf('Nuker')!==-1;var l=laneRolesMap[id];if(l===2)return 2;if(l===3){if(s&&!c){if(e||i)return 4;return 5;}return 3;}if(l===4)return 4;if(s&&!c){if(e||i)return 4;return 5;}if(c&&s){if(e||i)return 4;return 5;}if(l===1)return 1;if(c&&!d&&!i)return 1;if(d||i)return 3;if(n)return 2;return 1;}
@@ -1085,7 +1189,7 @@ async function runAnalysis(game){
     try{
         if(game==='dota'){
             f.style.width='15%';t.textContent='Загрузка героев...';
-            if(!tierlistData){try{var sR=await fetch(DOTA_API+'heroStats');if(sR.ok)tierlistData=await sR.json();}catch(e){}}
+            if(!tierlistData){try{var sR=await fetchHeroStats();if(sR.ok)tierlistData=await sR.json();}catch(e){}}
             f.style.width='30%';t.textContent='Данные матча...';
             var res=await fetch(DOTA_API+'matches/'+matchId);
             if(!res.ok)throw new Error('Матч не найден');
@@ -1183,7 +1287,7 @@ async function fetchSteamStats(){
         ui.fill.style.width='70%';ui.txt.textContent='Анализ героев...';
         var hr=await fetchJsonSafe(DOTA_API+'players/'+acc+'/heroes'+(currentPeriod>0?'?date='+currentPeriod:''));
         var heroesData=hr.ok&&Array.isArray(hr.data)?hr.data:[];
-        if(!tierlistData){try{var sR=await fetch(DOTA_API+'heroStats');if(sR.ok)tierlistData=await sR.json();}catch(e){}}
+        if(!tierlistData){try{var sR=await fetchHeroStats();if(sR.ok)tierlistData=await sR.json();}catch(e){}}
         ui.fill.style.width='100%';ui.txt.textContent='Готово!';
         await new Promise(function(r){setTimeout(r,300);});
         ui.prog.classList.remove('visible');
@@ -1256,7 +1360,7 @@ async function fetchCsSteamStats(){
         if(st&&st.total_deaths>0){kd=st.total_kills/st.total_deaths;html+='<div class="result-badge '+(kd>=1?'win':'lose')+'">K/D '+kd.toFixed(2)+'</div>';}
         html+='</div>';
         if(!st){
-            html+='<div class="result-block"><div class="problem-title">Статистика недоступна</div><div class="problem-text">'+(d.statsError==='private'?'Игровые данные профиля скрыты. В Steam откройте Профиль → Редактировать профиль → Приватность и поставьте «Игровые данные» = «Открытый». Затем повторите запрос.':'Steam не вернул статистику CS 2 для этого аккаунта (возможно, в CS 2 ещё нет сыгранных матчей).')+'</div></div>';
+            html+='<div class="result-block"><div class="problem-title">Статистика недоступна</div><div class="problem-text">'+(d.statsError==='private'?'Игровые данные профиля скрыты. В Steam откройте Профиль › Редактировать профиль › Приватность и поставьте «Игровые данные» = «Открытый». Затем повторите запрос.':'Steam не вернул статистику CS 2 для этого аккаунта (возможно, в CS 2 ещё нет сыгранных матчей).')+'</div></div>';
         }else{
             var g=function(k){return Number(st[k])||0;};
             var kills=g('total_kills'),deaths=g('total_deaths'),hsK=g('total_kills_headshot'),shots=g('total_shots_fired'),hits=g('total_shots_hit'),rounds=g('total_rounds_played'),dmg=g('total_damage_done');
