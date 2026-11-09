@@ -450,6 +450,28 @@
         @keyframes pbspin { to { transform: rotate(360deg); } }
         .lane-table td.vs-name { color: var(--text-dim); }
         #dotaResults, #csResults, #faceitResults, #steamResults, #csSteamResults { scroll-margin-top: 88px; }
+        /* tierlist: modes + pro */
+        .tl-modes { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+        .tl-mode { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: .95rem; background: var(--card-bg); border: 1px solid rgba(34,211,238,.2); color: var(--text-dim); }
+        .tl-mode.active { color: var(--neon); border-color: var(--neon); box-shadow: 0 0 12px rgba(34,211,238,.25); }
+        .pro-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .88rem; color: var(--text-dim); margin-bottom: 16px; }
+        .pro-meta b { color: var(--neon); }
+        .pro-note { font-size: .82rem; color: var(--text-dim); background: rgba(167,139,250,.08); border: 1px solid rgba(167,139,250,.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; }
+        .tier-label.n { background: linear-gradient(135deg, #475569, #334155); color: #e2e8f0; }
+        .tier-label .tier-label-desc { white-space: normal; }
+        .hero-card.dim { opacity: .55; filter: grayscale(.5); }
+        .hero-card.dim:hover { opacity: 1; filter: none; }
+        .pro-table-wrap { overflow-x: auto; margin-top: 26px; border: 1px solid rgba(34,211,238,.15); border-radius: 10px; background: var(--card-bg); }
+        .pro-table { width: 100%; border-collapse: collapse; min-width: 560px; }
+        .pro-table th { text-align: right; padding: 10px 12px; color: #888; font-size: .78rem; text-transform: uppercase; border-bottom: 1px solid rgba(99,102,241,.15); cursor: pointer; white-space: nowrap; user-select: none; }
+        .pro-table th:first-child { text-align: left; }
+        .pro-table th.sorted { color: var(--neon); }
+        .pro-table td { padding: 8px 12px; text-align: right; border-bottom: 1px solid rgba(99,102,241,.08); font-variant-numeric: tabular-nums; }
+        .pro-table td:first-child { text-align: left; display: flex; align-items: center; gap: 10px; }
+        .pro-table td img { width: 44px; height: 25px; border-radius: 3px; object-fit: cover; }
+        .pro-bar { display: inline-block; height: 6px; border-radius: 3px; vertical-align: middle; margin-right: 8px; background: var(--neon); opacity: .8; }
+        .pro-bar.ban { background: var(--pink); }
+        .pro-table tr:last-child td { border-bottom: none; }
     </style>
 </head>
 <body>
@@ -680,7 +702,7 @@
             </div>
             <div class="dota-subcontent" id="dotaSub-tierlist">
                 <div class="section-title">Тир-лист героев Dota 2</div>
-                <div class="section-desc">Актуальный тир-лист героев по рангам и позициям.</div>
+                <div class="section-desc">Тиры строятся по винрейту. «Рейтинговые игры» — статистика по рангам, «Киберспорт» — про-матчи актуального патча с пик- и банрейтом.</div>
                 <div class="tier-info-block">
                     <div class="tier-info-title">Расшифровка тиров</div>
                     <div class="tier-info-item"><span class="tier-info-letter s">S</span> Очень метовые — лучший выбор в текущей мете</div>
@@ -688,6 +710,10 @@
                     <div class="tier-info-item"><span class="tier-info-letter b">B</span> Ситуативные — нужны под конкретный пик</div>
                     <div class="tier-info-item"><span class="tier-info-letter c">C</span> Объективно слабые</div>
                     <div class="tier-info-item"><span class="tier-info-letter d">D</span> Мусор — не стоит брать в нынешней мете</div>
+                </div>
+                <div class="tl-modes" id="tlModes" role="tablist">
+                    <button class="tl-mode active" data-mode="ranked" role="tab">Рейтинговые игры</button>
+                    <button class="tl-mode" data-mode="pro" role="tab"><svg class="ico"><use href="#i-trophy"/></svg> Киберспорт</button>
                 </div>
                 <div class="position-selector" id="positionSelector"></div>
                 <div class="rank-selector" id="rankSelector"></div>
@@ -1110,7 +1136,7 @@ document.querySelectorAll('.dota-subtab[data-subtab]').forEach(function(tab){
         parent.querySelectorAll('.dota-subcontent').forEach(function(c){c.classList.remove('active');});
         tab.classList.add('active');
         var t=tab.getAttribute('data-subtab');document.getElementById('dotaSub-'+t).classList.add('active');
-        if(t==='tierlist'&&!tierlistData)loadTierlist();
+        if(t==='tierlist'&&!tierlistReady)loadTierlist();
         if(t==='history')loadDotaHistory();
     });
 });
@@ -1134,13 +1160,119 @@ async function loadCsHistory(){var a=await loadAnalyses('cs2');renderHistoryList
 // ============================================================
 var RANKS=[{num:1,name:'Рекрут',color:'#6b6b6b'},{num:2,name:'Страж',color:'#4a9d4a'},{num:3,name:'Рыцарь',color:'#b8860b'},{num:4,name:'Герой',color:'#b0b0b0'},{num:5,name:'Легенда',color:'#4a90d9'},{num:6,name:'Властелин',color:'#8b5cf6'},{num:7,name:'Божество',color:'#06b6d4'},{num:8,name:'Титан',color:'#ef4444'}];
 var POSITIONS=[{id:'all',name:'Все',icon:'Все'},{id:1,name:'Carry',icon:'1'},{id:2,name:'Mid',icon:'2'},{id:3,name:'Offlane',icon:'3'},{id:4,name:'Support',icon:'4'},{id:5,name:'Hard Support',icon:'5'}];
-var tierlistData=null,laneRolesMap={},currentRank=7,currentPosition='all';
+var tierlistData=null,tierlistReady=false,laneRolesMap={},currentRank=7,currentPosition='all';
 
-async function loadTierlist(){var c=document.getElementById('tierlistContent');c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';try{var sr=await fetchHeroStats(),lr=await fetch(DOTA_API+'scenarios/laneRoles');if(!sr.ok)throw new Error('Недоступно');tierlistData=await sr.json();if(lr.ok){var ld=await lr.json();laneRolesMap={};var hlg={};ld.forEach(function(e){var h=parseInt(e.hero_id);if(!hlg[h])hlg[h]={};hlg[h][e.lane_role]=(hlg[h][e.lane_role]||0)+(parseInt(e.games)||0);});Object.keys(hlg).forEach(function(h){var best=0,bg=0;Object.keys(hlg[h]).forEach(function(l){if(hlg[h][l]>bg){bg=hlg[h][l];best=parseInt(l);}});laneRolesMap[h]=best;});}renderPositionSelector();renderRankSelector();renderTierlist(currentRank);var now=new Date();document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}}
+async function loadTierlist(){var c=document.getElementById('tierlistContent');c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка...</div></div>';try{var sr=await fetchHeroStats(),lr=await fetch(DOTA_API+'scenarios/laneRoles');if(!sr.ok)throw new Error('Недоступно');tierlistData=await sr.json();if(lr.ok){var ld=await lr.json();laneRolesMap={};var hlg={};ld.forEach(function(e){var h=parseInt(e.hero_id);if(!hlg[h])hlg[h]={};hlg[h][e.lane_role]=(hlg[h][e.lane_role]||0)+(parseInt(e.games)||0);});Object.keys(hlg).forEach(function(h){var best=0,bg=0;Object.keys(hlg[h]).forEach(function(l){if(hlg[h][l]>bg){bg=hlg[h][l];best=parseInt(l);}});laneRolesMap[h]=best;});}tierlistReady=true;renderPositionSelector();renderRankSelector();renderTierlist(currentRank);var now=new Date();document.getElementById('tierlistUpdated').textContent='Обновлено: '+now.toLocaleDateString('ru-RU')+' '+now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});}catch(err){c.innerHTML='<div class="tierlist-error">Ошибка: '+err.message+'</div>';}}
 function renderPositionSelector(){var s=document.getElementById('positionSelector');s.innerHTML=POSITIONS.map(function(p){return'<div class="position-badge '+(p.id===currentPosition?'active':'')+'" data-pos="'+p.id+'"><div class="position-badge-icon"><span style="font-size:1.4rem;">'+p.icon+'</span></div><div class="position-badge-name">'+p.name+'</div></div>';}).join('');s.querySelectorAll('.position-badge').forEach(function(b){b.addEventListener('click',function(){currentPosition=b.dataset.pos;s.querySelectorAll('.position-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
 function renderRankSelector(){var s=document.getElementById('rankSelector');s.innerHTML=RANKS.map(function(r){return'<div class="rank-badge '+(r.num===currentRank?'active':'')+'" data-rank="'+r.num+'"><div class="rank-badge-icon" style="width:36px;height:36px;border-radius:50%;background:'+r.color+';display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#fff;box-shadow:0 0 8px '+r.color+'99;">'+r.num+'</div><div class="rank-badge-name">'+r.name+'</div></div>';}).join('');s.querySelectorAll('.rank-badge').forEach(function(b){b.addEventListener('click',function(){currentRank=parseInt(b.dataset.rank);s.querySelectorAll('.rank-badge').forEach(function(x){x.classList.remove('active');});b.classList.add('active');renderTierlist(currentRank);});});}
 function getHeroPosition(hid){var id=parseInt(hid),h=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===id;}):null;if(!h)return null;var r=h.roles||[],s=r.some(function(x){return x.indexOf('Support')!==-1;}),c=r.indexOf('Carry')!==-1,d=r.indexOf('Durable')!==-1,i=r.indexOf('Initiator')!==-1,e=r.indexOf('Escape')!==-1,n=r.indexOf('Nuker')!==-1;var l=laneRolesMap[id];if(l===2)return 2;if(l===3){if(s&&!c){if(e||i)return 4;return 5;}return 3;}if(l===4)return 4;if(s&&!c){if(e||i)return 4;return 5;}if(c&&s){if(e||i)return 4;return 5;}if(l===1)return 1;if(c&&!d&&!i)return 1;if(d||i)return 3;if(n)return 2;return 1;}
-function renderTierlist(rn){if(!tierlistData)return;var c=document.getElementById('tierlistContent');var heroes=tierlistData.map(function(h){var picks,wins;if(rn===8){picks=h.pro_pick||0;wins=h.pro_win||0;}else{picks=h[rn+'_pick']||0;wins=h[rn+'_win']||0;}var wr=picks>0?(wins/picks*100):0;var ip=(h.img||'').replace(/^\//,'');return{id:h.id,name:h.localized_name,icon:'https://cdn.cloudflare.steamstatic.com/'+ip,fallback:DOTA_API+(h.icon||''),picks:picks,winRate:wr,position:getHeroPosition(h.id)};});if(currentPosition!=='all'){var pi=parseInt(currentPosition);heroes=heroes.filter(function(h){return h.position===pi;});}var th=50,hw=heroes.filter(function(h){return h.picks>=th;});if(hw.length<10){th=20;hw=heroes.filter(function(h){return h.picks>=th;});}if(hw.length<10){th=5;hw=heroes.filter(function(h){return h.picks>=th;});}if(hw.length<5){hw=heroes;}var nd=heroes.filter(function(h){return h.picks<th;});hw.sort(function(a,b){return b.winRate-a.winRate;});var tot=hw.length;if(tot===0){c.innerHTML='<div style="text-align:center;padding:40px;color:#888;">Нет данных</div>';return;}var sC=Math.ceil(tot*0.15),aC=Math.ceil(tot*0.20),bC=Math.ceil(tot*0.25),cC=Math.ceil(tot*0.25);var sH=hw.slice(0,sC),aH=hw.slice(sC,sC+aC),bH=hw.slice(sC+aC,sC+aC+bC),cH=hw.slice(sC+aC+bC,sC+aC+bC+cC),dH=hw.slice(sC+aC+bC+cC).concat(nd);var tiers=[{label:'S',cls:'s',h:sH,desc:'META'},{label:'A',cls:'a',h:aH,desc:'STRONG'},{label:'B',cls:'b',h:bH,desc:'SITUATION'},{label:'C',cls:'c',h:cH,desc:'WEAK'},{label:'D',cls:'d',h:dH,desc:'AVOID'}];c.innerHTML='<div class="tier-table">'+tiers.map(function(t){return'<div class="tier-row"><div class="tier-label '+t.cls+'">'+t.label+'<div class="tier-label-desc">'+t.desc+'</div></div><div class="tier-heroes">'+t.h.map(function(h){var wt=h.winRate>0?h.winRate.toFixed(1)+'%':'—';return'<div class="hero-card"><img src="'+h.icon+'" alt="'+h.name+'" loading="lazy" onerror="this.src=\''+h.fallback+'\'"><div class="hero-card-winrate">'+wt+'</div><div class="hero-card-tooltip">'+h.name+' · '+wt+' · '+h.picks+' игр</div></div>';}).join('')+'</div></div>';}).join('')+'</div>';}
+var tlMode='ranked',proStats=null,proSort={key:'contest',dir:-1};
+function heroImg(h){var ip=(h.img||'').replace(/^\//,'');return{icon:'https://cdn.cloudflare.steamstatic.com/'+ip,fallback:DOTA_API+(h.icon||'')};}
+function heroCardHtml(h,tip,wt,dim){return'<div class="hero-card'+(dim?' dim':'')+'"><img src="'+h.icon+'" alt="'+escHtml(h.name)+'" loading="lazy" decoding="async" onerror="this.src=\''+h.fallback+'\'">'+(wt?'<div class="hero-card-winrate">'+wt+'</div>':'')+'<div class="hero-card-tooltip">'+escHtml(h.name)+(tip?' · '+tip:'')+'</div></div>';}
+function tierRowHtml(label,cls,desc,heroes,tipFn,dim){return'<div class="tier-row"><div class="tier-label '+cls+'">'+label+'<div class="tier-label-desc">'+desc+'</div></div><div class="tier-heroes">'+(heroes.length?heroes.map(function(h){var wt=h.winRate>0?h.winRate.toFixed(1)+'%':'—';return heroCardHtml(h,tipFn(h,wt),dim?'':wt,dim);}).join(''):'<span style="color:var(--text-dim);font-size:.85rem;">—</span>')+'</div></div>';}
+// Делит героев на тиры по винрейту: S 15% · A 20% · B 25% · C 25% · D остальные
+function splitTiers(hw){hw=hw.slice().sort(function(a,b){return b.winRate-a.winRate;});var tot=hw.length,sC=Math.ceil(tot*0.15),aC=Math.ceil(tot*0.20),bC=Math.ceil(tot*0.25),cC=Math.ceil(tot*0.25);return[hw.slice(0,sC),hw.slice(sC,sC+aC),hw.slice(sC+aC,sC+aC+bC),hw.slice(sC+aC+bC,sC+aC+bC+cC),hw.slice(sC+aC+bC+cC)];}
+var TIER_META=[['S','s','META'],['A','a','STRONG'],['B','b','SITUATION'],['C','c','WEAK'],['D','d','AVOID']];
+function filterByPosition(list){if(currentPosition==='all')return list;var pi=parseInt(currentPosition);return list.filter(function(h){return h.position===pi;});}
+
+function renderTierlist(rn){
+    if(tlMode==='pro'){renderProTierlist();return;}
+    if(!tierlistData)return;var c=document.getElementById('tierlistContent');
+    // Ранги 1–8 (8 = Титан) берутся из своих рейтинговых корзин OpenDota: {rank}_pick / {rank}_win
+    var heroes=tierlistData.map(function(h){var picks=h[rn+'_pick']||0,wins=h[rn+'_win']||0,im=heroImg(h);return{id:h.id,name:h.localized_name,icon:im.icon,fallback:im.fallback,picks:picks,winRate:picks>0?wins/picks*100:0,position:getHeroPosition(h.id)};});
+    heroes=filterByPosition(heroes);
+    var th=50,hw=heroes.filter(function(h){return h.picks>=th;});if(hw.length<10){th=20;hw=heroes.filter(function(h){return h.picks>=th;});}if(hw.length<10){th=5;hw=heroes.filter(function(h){return h.picks>=th;});}if(hw.length<5){hw=heroes;}
+    var nd=heroes.filter(function(h){return hw.indexOf(h)===-1;});
+    if(hw.length===0){c.innerHTML='<div style="text-align:center;padding:40px;color:#888;">Нет данных</div>';return;}
+    var parts=splitTiers(hw);parts[4]=parts[4].concat(nd);
+    c.innerHTML='<div class="tier-table">'+TIER_META.map(function(t,i){return tierRowHtml(t[0],t[1],t[2],parts[i],function(h,wt){return wt+' · '+h.picks+' игр';});}).join('')+'</div>';
+}
+
+// ---------- Киберспорт: про-матчи актуального патча ----------
+function sqlProStats(since){
+    return "SELECT pb.hero_id, COUNT(*) FILTER (WHERE pb.is_pick) AS picks, COUNT(*) FILTER (WHERE NOT pb.is_pick) AS bans, "+
+        "COUNT(*) FILTER (WHERE pb.is_pick AND ((pb.team = 0) = m.radiant_win)) AS wins, "+
+        "(SELECT COUNT(DISTINCT p2.match_id) FROM picks_bans p2 JOIN matches m2 ON m2.match_id = p2.match_id WHERE m2.start_time >= "+since+" AND m2.leagueid > 0) AS total "+
+        "FROM picks_bans pb JOIN matches m ON m.match_id = pb.match_id WHERE m.start_time >= "+since+" AND m.leagueid > 0 GROUP BY pb.hero_id";
+}
+async function fetchProStats(){
+    try{var cached=JSON.parse(sessionStorage.getItem('ga_pro_stats')||'null');if(cached&&Date.now()-cached.t<30*60e3)return cached.v;}catch(e){}
+    var out=null;
+    try{
+        // 1) дата начала актуального патча
+        var pr=await fetch(DOTA_API+'constants/patch'),patches=pr.ok?await pr.json():[];
+        patches=(Array.isArray(patches)?patches:[]).filter(function(p){return p&&p.date;}).sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+        var cur=patches[patches.length-1],prev=patches[patches.length-2];
+        if(cur){
+            var tryFrom=[{p:cur,label:'патч '+cur.name}];if(prev)tryFrom.push({p:prev,label:'патчи '+prev.name+'–'+cur.name});
+            for(var i=0;i<tryFrom.length&&!out;i++){
+                var since=Math.floor(new Date(tryFrom[i].p.date).getTime()/1000);
+                var r=await fetch(DOTA_API+'explorer?sql='+encodeURIComponent(sqlProStats(since)));
+                if(!r.ok)continue;var j=await r.json();var rows=(j&&j.rows)||[];
+                var total=rows.length?parseInt(rows[0].total)||0:0;
+                if(rows.length&&total>=(i===0?15:1)){out={source:'patch',label:tryFrom[i].label,since:since,total:total,heroes:rows.map(function(x){return{id:parseInt(x.hero_id),picks:parseInt(x.picks)||0,bans:parseInt(x.bans)||0,wins:parseInt(x.wins)||0};}),thin:i>0||total<40};}
+            }
+        }
+    }catch(e){console.warn('pro stats (patch):',e);}
+    if(!out&&tierlistData){
+        // запасной вариант: сводка героев OpenDota (pro_pick/pro_win/pro_ban) — без привязки к патчу
+        var hs=tierlistData.map(function(h){return{id:parseInt(h.id),picks:h.pro_pick||0,bans:h.pro_ban||0,wins:h.pro_win||0};});
+        var totalPicks=hs.reduce(function(s,h){return s+h.picks;},0);
+        if(totalPicks>0)out={source:'heroStats',label:'сводка OpenDota',total:Math.round(totalPicks/10),heroes:hs,thin:false};
+    }
+    if(out)try{sessionStorage.setItem('ga_pro_stats',JSON.stringify({t:Date.now(),v:out}));}catch(e){}
+    return out;
+}
+function proRows(){
+    var byId={};(proStats.heroes||[]).forEach(function(x){byId[x.id]=x;});var tot=Math.max(1,proStats.total);
+    return tierlistData.map(function(h){var s=byId[parseInt(h.id)]||{picks:0,bans:0,wins:0},im=heroImg(h);
+        return{id:h.id,name:h.localized_name,icon:im.icon,fallback:im.fallback,picks:s.picks,bans:s.bans,wins:s.wins,winRate:s.picks>0?s.wins/s.picks*100:0,pickRate:s.picks/tot*100,banRate:s.bans/tot*100,contest:(s.picks+s.bans)/tot*100,position:getHeroPosition(h.id)};});
+}
+async function renderProTierlist(){
+    var c=document.getElementById('tierlistContent');if(!tierlistData)return;
+    if(!proStats){c.innerHTML='<div class="tierlist-loading"><div class="tierlist-loading-spinner"></div><div>Загрузка про-статистики актуального патча...</div></div>';proStats=await fetchProStats();}
+    if(tlMode!=='pro')return;
+    if(!proStats){c.innerHTML='<div class="tierlist-error">Не удалось получить про-статистику OpenDota. Попробуйте позже.<br><button class="pb-btn" style="margin-top:12px" onclick="proStats=null;renderProTierlist()">Повторить</button></div>';return;}
+    var all=proRows(),rows=filterByPosition(all);
+    var th=10,hw=rows.filter(function(h){return h.picks>=th;});if(hw.length<10){th=5;hw=rows.filter(function(h){return h.picks>=th;});}if(hw.length<10){th=3;hw=rows.filter(function(h){return h.picks>=th;});}
+    var few=rows.filter(function(h){return h.picks>0&&h.picks<th;}),never=rows.filter(function(h){return h.picks===0;});
+    var onlyBans=never.filter(function(h){return h.bans>0;}).sort(function(a,b){return b.bans-a.bans;}),untouched=never.filter(function(h){return h.bans===0;});
+    var h='';
+    h+='<div class="pro-meta"><span>Период: <b>'+escHtml(proStats.label)+'</b></span><span>Про-матчей с драфтом: <b>'+proStats.total+'</b></span>'+(proStats.since?'<span>С <b>'+new Date(proStats.since*1000).toLocaleDateString('ru-RU')+'</b></span>':'')+'</div>';
+    if(proStats.source==='heroStats')h+='<div class="pro-note">Данные по патчу сейчас недоступны — показана общая про-сводка OpenDota без привязки к версии игры.</div>';
+    else if(proStats.thin)h+='<div class="pro-note">Матчей на текущем патче пока мало, поэтому цифры могут сильно колебаться'+(proStats.label.indexOf('патчи')===0?' (добавлен предыдущий патч)':'')+'.</div>';
+    if(hw.length<1){h+='<div style="text-align:center;padding:30px;color:#888;">Для выбранной позиции нет героев с достаточным числом игр.</div>';}
+    else{var parts=splitTiers(hw);
+        h+='<div class="tier-table">'+TIER_META.map(function(t,i){return tierRowHtml(t[0],t[1],t[2],parts[i],function(x,wt){return wt+' · '+x.picks+' игр · пик '+x.pickRate.toFixed(0)+'% · бан '+x.banRate.toFixed(0)+'%';});}).join('');
+        if(few.length)h+=tierRowHtml('?','n','МАЛО ИГР',few.sort(function(a,b){return b.picks-a.picks;}),function(x,wt){return wt+' · всего '+x.picks+' '+(x.picks===1?'игра':'игр')+' (нужно ≥'+th+')';},true);
+        h+='</div>';
+    }
+    if(never.length){
+        h+='<div class="tier-table" style="margin-top:14px;">';
+        if(onlyBans.length)h+=tierRowHtml('0','n','НЕ ПИКАЛИ, ТОЛЬКО БАНЫ',onlyBans,function(x){return'не пикали · банов: '+x.bans+' ('+x.banRate.toFixed(0)+'%)';},true);
+        if(untouched.length)h+=tierRowHtml('0','n','НЕ БРАЛИ ВООБЩЕ',untouched,function(){return'ни пиков, ни банов за период';},true);
+        h+='</div>';
+    }
+    // таблица пик/бан
+    var cols=[['name','Герой'],['pickRate','Пик %'],['banRate','Бан %'],['contest','Пик+бан %'],['picks','Пики'],['bans','Баны'],['winRate','Винрейт']];
+    var list=rows.filter(function(x){return x.picks+x.bans>0;}),k=proSort.key,d=proSort.dir;
+    list.sort(function(a,b){if(k==='name')return d*a.name.localeCompare(b.name,'ru');return d*(a[k]-b[k])||b.contest-a.contest;});
+    var maxC=Math.max.apply(null,[1].concat(list.map(function(x){return Math.max(x.pickRate,x.banRate);})));
+    h+='<div class="pro-table-wrap"><table class="pro-table"><tr>'+cols.map(function(cc){return'<th data-k="'+cc[0]+'" class="'+(cc[0]===k?'sorted':'')+'">'+cc[1]+(cc[0]===k?(d<0?' ▼':' ▲'):'')+'</th>';}).join('')+'</tr>'+
+        list.map(function(x){return'<tr><td><img src="'+x.icon+'" alt="" loading="lazy" decoding="async" onerror="this.src=\''+x.fallback+'\'">'+escHtml(x.name)+'</td>'+
+            '<td><span class="pro-bar" style="width:'+Math.round(x.pickRate/maxC*40)+'px"></span>'+x.pickRate.toFixed(1)+'%</td>'+
+            '<td><span class="pro-bar ban" style="width:'+Math.round(x.banRate/maxC*40)+'px"></span>'+x.banRate.toFixed(1)+'%</td>'+
+            '<td>'+x.contest.toFixed(1)+'%</td><td>'+x.picks+'</td><td>'+x.bans+'</td><td>'+(x.picks?x.winRate.toFixed(1)+'%':'—')+'</td></tr>';}).join('')+'</table></div>';
+    h+='<div class="pro-note" style="margin-top:12px;">Пик % и бан % — доля про-матчей периода, где герой был выбран или забанен. Пик+бан % — «контест» героя в драфте.</div>';
+    c.innerHTML=h;
+    c.querySelectorAll('.pro-table th').forEach(function(th2){th2.addEventListener('click',function(){var kk=th2.getAttribute('data-k');if(proSort.key===kk)proSort.dir=-proSort.dir;else{proSort.key=kk;proSort.dir=kk==='name'?1:-1;}renderProTierlist();});});
+}
+function setTierlistMode(m){
+    tlMode=m;document.querySelectorAll('#tlModes .tl-mode').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-mode')===m);});
+    document.getElementById('rankSelector').style.display=m==='pro'?'none':'';
+    renderTierlist(currentRank);
+}
+document.querySelectorAll('#tlModes .tl-mode').forEach(function(b){b.addEventListener('click',function(){setTierlistMode(b.getAttribute('data-mode'));});});
 function getHeroName(hid){if(tierlistData){var h=tierlistData.find(function(x){return parseInt(x.id)===parseInt(hid);});if(h)return h.localized_name;}return'Hero #'+hid;}
 
 // ============================================================
