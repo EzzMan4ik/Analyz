@@ -789,7 +789,15 @@
     </div>
 </div>
 
-<script src="analyzer.js"></script>
+<script src="analyzer.js?v=20261109"></script>
+<script>
+// Защита от старой/закэшированной версии analyzer.js: сайт продолжит работать, но без новых правил разбора
+(function(){var G=window.GA=window.GA||{};
+if(!G.isDotaParsed)G.isDotaParsed=function(m){return !!m&&(m.version!=null||(m.players||[]).some(function(p){return Array.isArray(p.lh_t)&&p.lh_t.length>0;}));};
+if(!G.assignDotaPositions)G.assignDotaPositions=function(ps){return (ps||[]).map(function(){return{pos:null,approx:true};});};
+if(!G.findLaneOpponent)G.findLaneOpponent=function(){return -1;};
+if(!G.analyzeDota||!G.normalizeDotaPlayer||!G.renderReport)console.warn('analyzer.js не загружен или устарел — замените файл и обновите страницу (Ctrl+F5)');})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ============================================================
