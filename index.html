@@ -435,6 +435,21 @@
         @media (hover: none) { .tier-row:hover, .hero-card:hover, .dota-subtab:hover, .sidebar-item:hover { transform: none; } }
         @keyframes fadeInM { from { opacity: 0; } to { opacity: 1; } }
         @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+        /* parse banner + lane block */
+        .parse-banner { display: flex; gap: 14px; align-items: flex-start; border-radius: 12px; padding: 16px 18px; margin-bottom: 22px; border: 1px solid rgba(34,211,238,.3); background: rgba(34,211,238,.06); }
+        .parse-banner .pb-ico { color: var(--neon); flex-shrink: 0; margin-top: 2px; }
+        .parse-banner .pb-ico .ico { width: 22px; height: 22px; }
+        .parse-banner .pb-title { font-weight: 700; margin-bottom: 4px; }
+        .parse-banner .pb-text { font-size: .9rem; color: var(--text-dim); line-height: 1.5; }
+        .parse-banner.done { border-color: rgba(46,204,113,.35); background: rgba(46,204,113,.07); }
+        .parse-banner.done .pb-ico { color: var(--green); }
+        .parse-banner.error { border-color: rgba(255,61,129,.35); background: rgba(255,61,129,.06); }
+        .parse-banner.error .pb-ico { color: var(--pink); }
+        .parse-banner .pb-btn { margin-top: 10px; background: transparent; border: 1px solid var(--neon); color: var(--neon); border-radius: 8px; padding: 7px 14px; font-weight: 600; cursor: pointer; }
+        .parse-spin { animation: pbspin 1.2s linear infinite; transform-origin: 50% 50%; }
+        @keyframes pbspin { to { transform: rotate(360deg); } }
+        .lane-table td.vs-name { color: var(--text-dim); }
+        #dotaResults, #csResults, #faceitResults, #steamResults, #csSteamResults { scroll-margin-top: 88px; }
     </style>
 </head>
 <body>
@@ -1129,10 +1144,93 @@ var PRO_BENCH={1:{lh10:50,lh20:150,lh30:250,gpm:700,xpm:680,name:'керри',bl
 
 function getMatchPosition(p){var lr=p.lane_role||0,h=tierlistData?tierlistData.find(function(x){return parseInt(x.id)===parseInt(p.hero_id);}):null;var r=(h&&h.roles)||[],s=r.some(function(x){return x.indexOf('Support')!==-1;}),c=r.indexOf('Carry')!==-1,e=r.indexOf('Escape')!==-1,i=r.indexOf('Initiator')!==-1;if(lr===2)return 2;if(lr===4)return 4;if(lr===1){if(s&&!c)return 5;return 1;}if(lr===3){if(s&&!c){if(e||i)return 4;return 5;}return 3;}if(s&&!c){if(e||i)return 4;return 5;}return 1;}
 
+function heroInfoById(id){if(!tierlistData)return null;var h=tierlistData.find(function(x){return parseInt(x.id)===parseInt(id);});return h||null;}
+function dotaPositions(data){if(!data._pos){try{data._pos=GA.assignDotaPositions(data.players||[],heroInfoById);}catch(e){data._pos=(data.players||[]).map(function(p){return{pos:getMatchPosition(p),approx:true};});}}return data._pos;}
+function extractMatchId(link){var s=String(link||'').trim(),m=s.match(/matches\/(\d{6,13})/i)||s.match(/(\d{6,13})/);return m?m[1]:s;}
+var _dotaMatchCache={};
+
+// ---------- Парсинг матча через OpenDota ----------
+// OpenDota парсит запись матча по запросу POST /request/{id}. Пока парсинг идёт, показываем разбор по итоговой
+// статистике и раз в 20–30 с проверяем матч; как только он распарсен — разбор обновляется сам.
+var _parseWatch=null,_parseState={};
+function parsePendingGet(){try{return JSON.parse(localStorage.getItem('ga_parse_pending')||'{}')||{};}catch(e){return{};}}
+function parsePendingSet(o){try{localStorage.setItem('ga_parse_pending',JSON.stringify(o));}catch(e){}}
+async function requestDotaParse(matchId){
+    var pend=parsePendingGet(),now=Date.now();
+    Object.keys(pend).forEach(function(k){if(now-pend[k]>3*3600e3)delete pend[k];});
+    if(pend[matchId]&&now-pend[matchId]<10*60e3){parsePendingSet(pend);return{ok:true,already:true};}
+    try{
+        var r=await fetch(DOTA_API+'request/'+matchId,{method:'POST'}),j=null;
+        try{j=await r.json();}catch(e){}
+        if(!r.ok||(j&&j.error))return{ok:false,error:(j&&j.error)||('HTTP '+r.status)};
+        pend[matchId]=now;parsePendingSet(pend);return{ok:true};
+    }catch(e){return{ok:false,error:'нет связи с OpenDota'};}
+}
+function parseBannerHtml(matchId){
+    var s=_parseState[matchId];if(!s)return'';
+    var ico=s.status==='done'?'check':(s.status==='error'||s.status==='timeout'?'warn':'clock');
+    var spin=s.status==='wait'?' parse-spin':'';
+    var btn=s.status==='timeout'||s.status==='error'?'<button class="pb-btn" onclick="startParseWatch(\''+matchId+'\')">Проверить ещё раз</button>':'';
+    return'<div class="parse-banner '+(s.status==='wait'?'':s.status)+'" id="dotaParseBanner"><span class="pb-ico"><svg class="ico'+spin+'"><use href="#i-'+ico+'"/></svg></span><div><div class="pb-title">'+s.title+'</div><div class="pb-text">'+s.text+'</div>'+btn+'</div></div>';
+}
+function setParseState(matchId,status,title,text){
+    _parseState[matchId]={status:status,title:title,text:text};
+    var el=document.getElementById('dotaParseBanner');
+    if(el&&el.parentNode&&document.getElementById('dotaResults').getAttribute('data-match')===String(matchId)){var tmp=document.createElement('div');tmp.innerHTML=parseBannerHtml(matchId);el.parentNode.replaceChild(tmp.firstChild,el);}
+}
+function stopParseWatch(){if(_parseWatch)_parseWatch.stopped=true;_parseWatch=null;}
+function sleepWatch(ms,token,onTick){return new Promise(function(res){var left=ms;var iv=setInterval(function(){left-=1000;if(token.stopped||left<=0){clearInterval(iv);res();}else if(onTick)onTick();},1000);});}
+function fmtElapsed(ms){var s=Math.floor(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+window.startParseWatch=function(matchId,opts){
+    opts=opts||{};stopParseWatch();
+    var token={matchId:String(matchId),stopped:false,started:Date.now()};_parseWatch=token;
+    var old=opts.startTime&&(Date.now()/1000-opts.startTime>14*86400);
+    var waitText=function(){return'Обычно это занимает 1–10 минут. Разбор ниже построен на итоговой статистике и обновится сам, как только появятся данные по минутам. Прошло: '+fmtElapsed(Date.now()-token.started)+(old?'<br>Матчу больше двух недель — запись могла быть уже удалена Valve, тогда распарсить его не получится.':'');};
+    setParseState(matchId,'wait','Запрашиваем парсинг матча у OpenDota…',waitText());
+    (async function(){
+        var rq=await requestDotaParse(matchId);
+        if(token.stopped)return;
+        if(!rq.ok){setParseState(matchId,'error','Не удалось запросить парсинг','OpenDota ответил: '+escHtml(rq.error)+'. Подождите минуту и попробуйте снова — у бесплатного OpenDota есть лимит запросов.');return;}
+        setParseState(matchId,'wait','OpenDota парсит матч…',waitText());
+        var base=window.GA_PARSE_POLL_MS||20000,delay=base,maxMs=10*60e3;
+        while(!token.stopped&&Date.now()-token.started<maxMs){
+            await sleepWatch(delay,token,function(){var b=document.querySelector('#dotaParseBanner .pb-text');if(b&&_parseState[matchId]&&_parseState[matchId].status==='wait'){_parseState[matchId].text=waitText();b.innerHTML=waitText();}});
+            if(token.stopped)return;
+            try{
+                var r=await fetch(DOTA_API+'matches/'+matchId+'?_t='+Date.now(),{cache:'no-store'});
+                if(r.ok){var d=await r.json();
+                    if(d&&d.players&&d.players.length&&GA.isDotaParsed(d)){
+                        if(token.stopped)return;
+                        _dotaMatchCache[matchId]=d;
+                        var pend=parsePendingGet();delete pend[matchId];parsePendingSet(pend);
+                        _parseState[matchId]={status:'done',title:'Матч распарсен — разбор обновлён',text:'Добавлены лайнинг против соперника, ранние смерти, темп фарма и ход игры по золоту команды.'};
+                        var rd=document.getElementById('dotaResults');
+                        if(rd.getAttribute('data-match')===String(matchId)){var dd=rd.querySelector('.player-select-dropdown'),pi=dd?parseInt(dd.value):undefined;rd.innerHTML=generateDotaResultsFromAPI(d,pi);rd.classList.add('visible');}
+                        if(opts.onDone)try{await opts.onDone(d);}catch(e){console.error(e);}
+                        _parseWatch=null;return;
+                    }
+                }
+            }catch(e){}
+            delay=Math.min(base*1.5,delay+base/4);
+        }
+        if(!token.stopped)setParseState(matchId,'timeout','OpenDota пока не распарсил матч','Очередь парсинга бывает загружена — проверьте ещё раз через несколько минут.'+(old?' Если матчу больше двух недель, запись, скорее всего, уже удалена и парсинг невозможен.':''));
+    })();
+};
+
+function laneBlockHtml(data,player,pos,oi){
+    if(oi<0)return'';var o=data.players[oi];
+    var mg=(player.gold_t||[])[10],og=(o.gold_t||[])[10];if(mg==null||og==null)return'';
+    var rows=[['Золото',mg,og],['Опыт',(player.xp_t||[])[10],(o.xp_t||[])[10]],['Ластхиты',(player.lh_t||[])[10],(o.lh_t||[])[10]],['Денаи',(player.dn_t||[])[10],(o.dn_t||[])[10]]];
+    var on=getHeroName(o.hero_id),h='<div class="result-block"><div class="result-block-title"><svg class="ico"><use href="#i-swords"/></svg> Линия против '+on+' · 10&nbsp;мин</div><table class="farm-table lane-table"><tr><th></th><th>Вы</th><th>'+on+'</th><th>Разница</th></tr>';
+    rows.forEach(function(r){if(r[1]==null||r[2]==null)return;var df=Math.round(r[1]-r[2]);h+='<tr><td class="vs-name">'+r[0]+'</td><td class="gold-val">'+Math.round(r[1])+'</td><td class="pro-val">'+Math.round(r[2])+'</td><td class="'+(df>0?'diff-good':df<0?'diff-bad':'pro-val')+'">'+(df>0?'+':'')+df+'</td></tr>';});
+    return h+'</table></div>';
+}
+
 function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     var durSec=data.duration||0,durMin=Math.floor(durSec/60),durStr=durMin+':'+String(durSec%60).padStart(2,'0');
     var matchId=data.match_id,isRad=player.player_slot<128,won=isRad?data.radiant_win:!data.radiant_win;
-    var hName=getHeroName(player.hero_id),pos=getMatchPosition(player);
+    var hName=getHeroName(player.hero_id),posArr=dotaPositions(data),pos=(posArr[playerIndex]&&posArr[playerIndex].pos)||getMatchPosition(player),approxPos=!!(posArr[playerIndex]&&posArr[playerIndex].approx);
+    var oi=GA.findLaneOpponent(data.players,posArr,playerIndex),hi=heroInfoById(player.hero_id);
     var posNames=['—','Керри','Мид','Оффлейнер','Саппорт','Хард-саппорт'],posName=posNames[pos]||'Игрок';
     var bm=PRO_BENCH[pos]||PRO_BENCH[1];
     var k=player.kills||0,d=player.deaths||0,a=player.assists||0,gpm=player.gold_per_min||0,xpm=player.xp_per_min||0;
@@ -1141,14 +1239,14 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     var lh10=lhT.length>10?lhT[10]:null,lh20=lhT.length>20?lhT[20]:null,lh30=lhT.length>30?lhT[30]:null;
     var rs=data.radiant_score||0,ds=data.dire_score||0,tk=isRad?rs:ds;
     var kp=tk>0?Math.round((k+a)/tk*100):0;
-    var parsed=lhT.length>0||goldT.length>0||apm!=null;
+    var parsed=GA.isDotaParsed(data);
     var pl=player.purchase_log||[],kp2=[],sk={};
     pl.forEach(function(p){if(KEY_ITEMS.indexOf(p.key)!==-1&&!sk[p.key]){sk[p.key]=1;var nm=ITEM_NAMES[p.key]||p.key;var m=Math.floor(p.time/60),s=p.time%60;kp2.push({name:nm,key:p.key,time:p.time,ts:m+':'+String(s).padStart(2,'0')});}});
     kp2.sort(function(a,b){return a.time-b.time;});
     var blink=kp2.find(function(p){return p.key==='blink';});
     var html='';
-    if(!parsed)html+='<div class="problem-block" style="border-color:rgba(99,102,241,0.3);background-color:rgba(99,102,241,0.06);"><div class="problem-title" style="color:#818cf8;">Ограниченные данные</div><div class="problem-text">Матч не распарсен OpenDota.</div></div>';
-    html+='<div class="result-header"><div class="result-header-info"><h2>'+hName+' — '+posName+'</h2><div class="result-header-meta">Длительность: '+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
+    html+=parseBannerHtml(String(matchId));
+    html+='<div class="result-header"><div class="result-header-info"><h2>'+hName+' — '+posName+(approxPos?' <span style="font-size:.7em;color:var(--text-dim);font-weight:500;">(примерно)</span>':'')+'</h2><div class="result-header-meta">Длительность: '+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
     html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\''+matchId+'\')">'+playerOptions+'</select></div>';
     html+='<div class="result-block"><div class="result-block-title">Базовые показатели</div><div class="metrics-grid">';
     html+='<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+gpm+'</div><div class="metric-sub '+(gpm>=bm.gpm?'good':'bad')+'">Про: '+bm.gpm+'</div></div>';
@@ -1159,6 +1257,7 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     html+='<div class="metric-card"><div class="metric-label">Башни</div><div class="metric-value">'+(td/1000).toFixed(1)+'K</div></div>';
     html+='<div class="metric-card"><div class="metric-label">Ластхиты</div><div class="metric-value">'+lh+'</div></div>';
     html+='</div></div>';
+    html+=laneBlockHtml(data,player,pos,oi);
     if(parsed&&lhT.length>0){
         html+='<div class="result-block"><div class="result-block-title">Фарм по минутам</div><table class="farm-table"><tr><th>Время</th><th>10 мин</th><th>20 мин</th><th>30 мин</th></tr>';
         html+='<tr><td>Вы</td>'+(lh10!=null?'<td class="gold-val">'+lh10+'</td>':'<td class="pro-val">—</td>')+(lh20!=null?'<td class="gold-val">'+lh20+'</td>':'<td class="pro-val">—</td>')+(lh30!=null?'<td class="gold-val">'+lh30+'</td>':'<td class="pro-val">—</td>')+'</tr>';
@@ -1167,14 +1266,16 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
         html+='</table></div>';
     }
     if(kp2.length>0){html+='<div class="result-block"><div class="result-block-title">Ключевые предметы</div><div class="item-timeline">';kp2.forEach(function(p){html+='<div class="item-chip">'+p.name+' — <span class="item-time">'+p.ts+'</span></div>';});html+='</div>';if(blink){var bm2=blink.time/60;if(bm2>bm.blink+3)html+='<div class="analysis-text"><strong style="color:var(--red);">Blink в '+blink.ts+'</strong> — поздновато.</div>';else if(bm2<=bm.blink+1)html+='<div class="analysis-text"><strong style="color:var(--green);">Blink в '+blink.ts+'</strong> — отлично.</div>';}html+='</div>';}
-    try{html+=GA.renderReport(GA.analyzeDota(GA.normalizeDotaPlayer(player,data,pos,hName)));}catch(e){console.error('Ошибка разбора:',e);}
+    try{html+=GA.renderReport(GA.analyzeDota(GA.normalizeDotaPlayer(player,data,pos,hName,{opp:oi>=0?data.players[oi]:null,oppName:oi>=0?getHeroName(data.players[oi].hero_id):null,heroKey:hi&&hi.name,approxPos:approxPos})));}catch(e){console.error('Ошибка разбора:',e);}
     html+='<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
     return html;
 }
 
-function generateDotaResultsFromAPI(data){var players=data.players||[],opts='';players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});var player=players[0];if(!player)return'<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';return buildDotaAnalysis(data,player,0,opts);}
-window.switchDotaPlayer=async function(matchId){var rd=document.getElementById('dotaResults'),dd=rd.querySelector('.player-select-dropdown'),pi=parseInt(dd.value);try{var res=await fetch(DOTA_API+'matches/'+matchId),data=await res.json(),player=data.players[pi];if(!player)return;var opts='';data.players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||('Аноним #'+p.account_id);opts+='<option value="'+i+'"'+(i===pi?' selected':'')+'>'+hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists+'</option>';});rd.innerHTML=buildDotaAnalysis(data,player,pi,opts);}catch(err){console.error(err);}};
-window.resetAnalysis=function(game){var p=game==='dota'?'dota':'cs';document.getElementById(p+'Results').classList.remove('visible');document.getElementById(p+'Results').innerHTML='';document.getElementById(p+'Progress').classList.remove('visible');document.getElementById(p+'ProgressFill').style.width='0%';document.getElementById(p+'Link').value='';if(game==='cs'){var fi=document.getElementById('csFile');if(fi)fi.value='';}};
+function myDotaAccount(){try{return parseInt(localStorage.getItem('ga_dota_account')||'0')||0;}catch(e){return 0;}}
+function pickDotaPlayerIndex(data){var acc=myDotaAccount(),ps=data.players||[];if(acc){for(var i=0;i<ps.length;i++)if(parseInt(ps[i].account_id)===acc)return i;}return 0;}
+function generateDotaResultsFromAPI(data,preferIdx){var players=data.players||[],pi=(preferIdx!=null&&!isNaN(preferIdx)&&players[preferIdx])?preferIdx:pickDotaPlayerIndex(data),opts='';players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||(p.account_id?'Игрок #'+p.account_id:'Аноним');opts+='<option value="'+i+'"'+(i===pi?' selected':'')+'>'+escHtml(hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists)+'</option>';});var player=players[pi];if(!player)return'<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';return buildDotaAnalysis(data,player,pi,opts);}
+window.switchDotaPlayer=async function(matchId){var rd=document.getElementById('dotaResults'),dd=rd.querySelector('.player-select-dropdown'),pi=parseInt(dd.value);try{var data=_dotaMatchCache[matchId];if(!data){var res=await fetch(DOTA_API+'matches/'+matchId);data=await res.json();_dotaMatchCache[matchId]=data;}if(!data.players||!data.players[pi])return;rd.innerHTML=generateDotaResultsFromAPI(data,pi);}catch(err){console.error(err);}};
+window.resetAnalysis=function(game){var p=game==='dota'?'dota':'cs';if(game==='dota'){stopParseWatch();document.getElementById('dotaResults').removeAttribute('data-match');}document.getElementById(p+'Results').classList.remove('visible');document.getElementById(p+'Results').innerHTML='';document.getElementById(p+'Progress').classList.remove('visible');document.getElementById(p+'ProgressFill').style.width='0%';document.getElementById(p+'Link').value='';if(game==='cs'){var fi=document.getElementById('csFile');if(fi)fi.value='';}};
 function generateCsResults(){return'<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда</div></div><div class="result-badge lose">Поражение</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Норма: 45%+</div></div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Используйте FACEIT анализ для глубокого разбора.<div class="rec-exercise"><strong>Перейдите во вкладку FACEIT Анализ</strong></div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';}
 
 async function runAnalysis(game){
@@ -1183,7 +1284,8 @@ async function runAnalysis(game){
     if(!canAnalyze){await showLimitWarning(game==='dota'?'dotaLimitWarning':'csLimitWarning',game);return;}
     var p=game==='dota'?'dota':'cs',link=document.getElementById(p+'Link').value.trim();
     if(!link){alert('Вставьте ссылку или match_id');return;}
-    var matchId=link;if(link.indexOf('/')!==-1){var parts=link.split('/');matchId=parts[parts.length-1];}
+    var matchId=game==='dota'?extractMatchId(link):link;if(game!=='dota'&&link.indexOf('/')!==-1){var parts=link.split('/');matchId=parts[parts.length-1];}
+    if(game==='dota'){stopParseWatch();if(!/^\d{6,13}$/.test(matchId)){alert('Не удалось найти номер матча. Вставьте ссылку OpenDota/Dotabuff/STRATZ или match_id из клиента Dota 2.');return;}}
     var w=document.getElementById(p+'Progress'),f=document.getElementById(p+'ProgressFill'),t=document.getElementById(p+'ProgressText'),r=document.getElementById(p+'Results');
     r.classList.remove('visible');r.innerHTML='';w.classList.add('visible');f.style.width='0%';t.textContent='Обработка...';
     try{
@@ -1191,21 +1293,40 @@ async function runAnalysis(game){
             f.style.width='15%';t.textContent='Загрузка героев...';
             if(!tierlistData){try{var sR=await fetchHeroStats();if(sR.ok)tierlistData=await sR.json();}catch(e){}}
             f.style.width='30%';t.textContent='Данные матча...';
-            var res=await fetch(DOTA_API+'matches/'+matchId);
-            if(!res.ok)throw new Error('Матч не найден');
-            var data=await res.json();
-            if(!data.players||data.players.length===0)throw new Error('Матч не обработан');
-                        f.style.width='90%';t.textContent='Сравнение...';
-            await new Promise(function(r){setTimeout(r,400);});
+            var res=await fetch(DOTA_API+'matches/'+matchId),data=null;
+            if(res.ok){try{data=await res.json();}catch(e){}}
+            else if(res.status!==404)throw new Error('OpenDota недоступен (HTTP '+res.status+'), попробуйте через минуту');
+            var finishDota=async function(d){
+                var pi=pickDotaPlayerIndex(d),pp=d.players[pi]||d.players[0];
+                var summ=getHeroName(pp.hero_id)+' GPM:'+pp.gold_per_min+' K/D:'+pp.kills+'/'+pp.deaths;
+                await incrementUsage('dota');
+                await saveAnalysis('dota2',matchId,summ,0,0,pp.gold_per_min||0,0);
+                await showLimitWarning('dotaLimitWarning','dota');
+            };
+            r.setAttribute('data-match',String(matchId));
+            if(!data||!data.players||data.players.length===0){
+                // OpenDota ещё не знает этот матч — просим его загрузить и распарсить, результат покажем, когда будет готов
+                f.style.width='100%';t.textContent='Матч ещё не загружен в OpenDota';
+                await new Promise(function(r){setTimeout(r,400);});
+                w.classList.remove('visible');
+                _parseState[matchId]={status:'wait',title:'Запрашиваем матч у OpenDota…',text:''};
+                r.innerHTML=parseBannerHtml(String(matchId))+'<div class="analysis-text" style="color:var(--text-dim);">Матч '+matchId+' пока не обработан OpenDota. Мы запросили загрузку и парсинг — разбор появится здесь автоматически.</div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+                r.classList.add('visible');r.scrollIntoView({behavior:'smooth',block:'start'});
+                startParseWatch(matchId,{onDone:finishDota});
+                return;
+            }
+            _dotaMatchCache[matchId]=data;
+            f.style.width='90%';t.textContent='Сравнение...';
+            await new Promise(function(r){setTimeout(r,300);});
             f.style.width='100%';t.textContent='Готово!';
-            await new Promise(function(r){setTimeout(r,400);});
+            await new Promise(function(r){setTimeout(r,300);});
+            var needParse=!GA.isDotaParsed(data);
+            if(needParse)_parseState[matchId]={status:'wait',title:'Запрашиваем парсинг матча у OpenDota…',text:'Разбор ниже построен на итоговой статистике и обновится сам, когда появятся данные по минутам.'};
+            else delete _parseState[matchId];
             w.classList.remove('visible');r.innerHTML=generateDotaResultsFromAPI(data);r.classList.add('visible');
             r.scrollIntoView({behavior:'smooth',block:'start'});
-            var p0=data.players[0];
-            var summ=getHeroName(p0.hero_id)+' GPM:'+p0.gold_per_min+' K/D:'+p0.kills+'/'+p0.deaths;
-            await incrementUsage('dota');
-            await saveAnalysis('dota2',matchId,summ,0,0,p0.gold_per_min||0,0);
-            await showLimitWarning('dotaLimitWarning','dota');
+            if(needParse)startParseWatch(matchId,{startTime:data.start_time});
+            await finishDota(data);
         }
         if(game==='cs'){
             f.style.width='50%';t.textContent='Разбор...';
@@ -1267,6 +1388,7 @@ async function fetchSteamStats(){
     ui.res.classList.remove('visible');ui.res.innerHTML='';ui.prog.classList.add('visible');ui.fill.style.width='5%';ui.txt.textContent='Определяем аккаунт...';
     try{
         var ids=await resolveSteamInput(input),acc=ids.accountId;
+        try{localStorage.setItem('ga_dota_account',String(acc));}catch(e){}
         ui.fill.style.width='20%';ui.txt.textContent='Загрузка профиля...';
         var p=await fetchJsonSafe(DOTA_API+'players/'+acc);
         if(!p.ok||!p.data||!p.data.profile)throw new Error('Профиль Dota 2 не найден. Проверьте ID и включите в Dota 2 «Предоставлять публичный доступ к данным матчей».');
