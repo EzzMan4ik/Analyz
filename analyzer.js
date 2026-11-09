@@ -98,6 +98,81 @@
   };
   var DOTA_POS_NAMES = { 1: 'Керри', 2: 'Мид', 3: 'Оффлейнер', 4: 'Саппорт', 5: 'Хард-саппорт' };
 
+  function isRadiantSlot(p) { return num(p && p.player_slot, 0) < 128; }
+
+  /** Был ли матч распарсен OpenDota (есть поминутные данные). */
+  function isDotaParsed(match) {
+    if (!match) return false;
+    if (match.version != null) return true;
+    if (match.od_data && match.od_data.has_parsed) return true;
+    return (match.players || []).some(function (p) { return Array.isArray(p.lh_t) && p.lh_t.length > 0; });
+  }
+
+  /**
+   * Позиции 1–5 для всех 10 игроков матча. Каждой команде достаётся ровно по одной
+   * позиции каждого номера. heroInfo(id) → { roles: [...] } (из heroStats), может отсутствовать.
+   * Возвращает массив { pos, approx } в порядке match.players.
+   */
+  function assignDotaPositions(players, heroInfo) {
+    players = Array.isArray(players) ? players : [];
+    heroInfo = heroInfo || function () { return null; };
+    var out = players.map(function () { return { pos: null, approx: true }; });
+    [true, false].forEach(function (rad) {
+      var team = [];
+      players.forEach(function (p, i) { if (isRadiantSlot(p) === rad) team.push(i); });
+      if (!team.length) return;
+      function farm(i) { var p = players[i]; return num(p.net_worth) > 0 ? num(p.net_worth) : num(p.gold_per_min) * 40 + num(p.last_hits); }
+      function roles(i) { var h = heroInfo(players[i].hero_id); return (h && h.roles) || []; }
+      function supportish(i) { var r = roles(i); return r.some(function (x) { return x.indexOf('Support') !== -1; }) && r.indexOf('Carry') === -1; }
+      var free = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 }, left = team.slice();
+      function take(i, pos, exact) { out[i] = { pos: pos, approx: !exact }; delete free[pos]; left.splice(left.indexOf(i), 1); }
+      var hasLanes = team.every(function (i) { return isNum(players[i].lane_role) && num(players[i].lane_role) > 0; });
+      if (hasLanes) {
+        // линия известна (распарсенный матч): внутри линии самый «фармящий» — кор, второй — саппорт
+        var byLane = { 1: [], 2: [], 3: [], 4: [] };
+        team.forEach(function (i) { var lr = num(players[i].lane_role); (byLane[lr] || byLane[4]).push(i); });
+        Object.keys(byLane).forEach(function (k) { byLane[k].sort(function (x, y) { return farm(y) - farm(x); }); });
+        var coreOf = { 1: 1, 2: 2, 3: 3 }, supOf = { 1: 5, 2: 4, 3: 4 };
+        [2, 1, 3].forEach(function (lr) {
+          var l = byLane[lr];
+          if (l.length && free[coreOf[lr]] && !(l.length > 1 && supportish(l[0]) && !supportish(l[1]))) take(l[0], coreOf[lr], true);
+          else if (l.length > 1 && free[coreOf[lr]] && supportish(l[0])) take(l[1], coreOf[lr], true);
+        });
+        [1, 3, 2, 4].forEach(function (lr) {
+          byLane[lr].forEach(function (i) {
+            if (left.indexOf(i) === -1) return;
+            var want = lr === 1 ? 5 : 4;
+            if (free[want]) take(i, want, true);
+          });
+        });
+      }
+      // всё, что осталось, — по фарму: самый богатый получает свободную позицию с меньшим номером
+      var order = left.slice().sort(function (x, y) { return farm(y) - farm(x); });
+      var slots = Object.keys(free).map(Number).sort(function (x, y) { return x - y; });
+      // керри — тот из двух самых богатых, у кого есть роль Carry (второй — скорее мид)
+      if (slots[0] === 1 && slots[1] === 2 && order.length > 1 &&
+          roles(order[0]).indexOf('Carry') === -1 && roles(order[1]).indexOf('Carry') !== -1) {
+        var t = order[0]; order[0] = order[1]; order[1] = t;
+      }
+      order.forEach(function (i, n) { take(i, slots[n] || 5, false); });
+    });
+    return out;
+  }
+
+  /** Индекс оппонента по линии: 1↔3, 2↔2, 3↔1, 4↔5, 5↔4. */
+  var LANE_COUNTERPART = { 1: 3, 2: 2, 3: 1, 4: 5, 5: 4 };
+  function findLaneOpponent(players, positions, idx) {
+    var me = players[idx], myPos = positions[idx] && positions[idx].pos;
+    if (!me || !myPos) return -1;
+    var want = LANE_COUNTERPART[myPos], rad = isRadiantSlot(me);
+    for (var i = 0; i < players.length; i++) {
+      if (isRadiantSlot(players[i]) !== rad && positions[i] && positions[i].pos === want) return i;
+    }
+    return -1;
+  }
+
+  function at(arr, minute) { return Array.isArray(arr) && arr.length > minute && isNum(arr[minute]) ? num(arr[minute]) : null; }
+
   function pickBench(p, key) {
     var b = p && p.benchmarks && p.benchmarks[key];
     if (b && isNum(b.pct)) return clamp(parseFloat(b.pct), 0, 1);
@@ -148,11 +223,48 @@
       sen: isNum(p.sen_placed) ? num(p.sen_placed) : null,
       stacked: isNum(p.camps_stacked) ? num(p.camps_stacked) : null,
       buybacks: num(p.buyback_count, 0),
-      imp: isNum(extra.imp) ? num(extra.imp) : null,
-      stratz: !!extra.stratz,
       items: items,
-      parsed: lhT.length > 0 || Array.isArray(p.gold_t) || isNum(p.actions_per_min)
+      parsed: lhT.length > 0 || Array.isArray(p.gold_t) || isNum(p.actions_per_min),
+      approxPos: !!extra.approxPos,
+      // --- данные распарсенного матча ---
+      g10: at(p.gold_t, 10), x10: at(p.xp_t, 10),
+      g20: at(p.gold_t, 20), g30: at(p.gold_t, 30),
+      tfp: isNum(p.teamfight_participation) ? clamp(num(p.teamfight_participation), 0, 1) : null,
+      deadPct: isNum(p.life_state_dead) && dur > 0 ? clamp(num(p.life_state_dead) / dur, 0, 1) : null,
+      deadSec: isNum(p.life_state_dead) ? num(p.life_state_dead) : null,
+      tp: p.purchase && isNum(p.purchase.tpscroll) ? num(p.purchase.tpscroll) : null,
+      obsKills: isNum(p.observer_kills) ? num(p.observer_kills) : null,
+      runes: isNum(p.rune_pickups) ? num(p.rune_pickups) : null,
+      smokes: p.purchase && isNum(p.purchase.smoke_of_deceit) ? num(p.purchase.smoke_of_deceit) : null,
+      deathTimes: deathTimesOf(p, match, extra.heroKey),
+      opp: extra.opp ? {
+        hero: extra.oppName || ('Hero #' + extra.opp.hero_id),
+        lh10: at(extra.opp.lh_t, 10), g10: at(extra.opp.gold_t, 10), x10: at(extra.opp.xp_t, 10),
+        gpm: num(extra.opp.gold_per_min), d: num(extra.opp.deaths), k: num(extra.opp.kills)
+      } : null,
+      teamAdv: teamAdvOf(match, isRad)
     };
+  }
+
+  // Время смертей игрока: из kills_log врагов (ключ — внутреннее имя героя, npc_dota_hero_*)
+  function deathTimesOf(p, match, heroKey) {
+    if (!heroKey || !match || !Array.isArray(match.players)) return null;
+    var rad = isRadiantSlot(p), t = [], any = false;
+    match.players.forEach(function (e) {
+      if (isRadiantSlot(e) === rad || !Array.isArray(e.kills_log)) return;
+      any = true;
+      e.kills_log.forEach(function (k) { if (k && k.key === heroKey && isNum(k.time)) t.push(num(k.time)); });
+    });
+    return any ? t.sort(function (x, y) { return x - y; }) : null;
+  }
+
+  // Преимущество команды игрока по золоту (знак «+» — ваша команда впереди)
+  function teamAdvOf(match, isRad) {
+    var adv = match && match.radiant_gold_adv;
+    if (!Array.isArray(adv) || adv.length < 12) return null;
+    var s = isRad ? 1 : -1, out = [];
+    for (var i = 0; i < adv.length; i++) out.push(isNum(adv[i]) ? num(adv[i]) * s : 0);
+    return out;
   }
 
   // «оценка 0..1» метрики: процентиль OpenDota, а если его нет — отношение к про-ориентиру
@@ -162,6 +274,8 @@
     return null;
   }
   function pctText(p) { return Math.round(p * 100); }
+  function mmss(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+  function kfmt(v) { var s = Math.abs(v) >= 1000 ? (Math.round(Math.abs(v) / 100) / 10) + 'K' : String(Math.round(Math.abs(v))); return (v < 0 ? '−' : '+') + s; }
 
   function analyzeDota(m) {
     var pos = m.pos, core = pos <= 3, sup = pos >= 4;
@@ -182,25 +296,47 @@
     /* --- ФАРМ (только кор-позиции) --- */
     if (core && sc.gpm != null) {
       var srcLow = m.pct.gpm != null
-        ? 'ниже, чем у ' + (100 - pctText(m.pct.gpm)) + '% игроков на этом герое'
-        : 'про-ориентир для роли — около ' + pro.gpm;
+        ? ' — ниже, чем у ' + (100 - pctText(m.pct.gpm)) + '% игроков на этом герое'
+        : ' при про-ориентире для роли около ' + pro.gpm;
       var srcHigh = m.pct.gpm != null
-        ? 'выше, чем у ' + pctText(m.pct.gpm) + '% игроков на этом герое'
-        : 'про-ориентир для роли — около ' + pro.gpm;
+        ? ' — выше, чем у ' + pctText(m.pct.gpm) + '% игроков на этом герое'
+        : ' при про-ориентире для роли около ' + pro.gpm;
       if (sc.gpm < 0.4) {
         items.push(P('farm_gpm', (0.5 - sc.gpm) * 100 + 25,
           'Слабая экономика',
-          'GPM ' + m.gpm + ' — ' + srcLow + '. Для ' + posName.toLowerCase() + ' этого мало: предметы выходят поздно, и команде не хватает вашей силы в драках.',
+          'GPM ' + m.gpm + srcLow + '. Для ' + posName.toLowerCase() + ' этого мало: предметы выходят поздно, и команде не хватает вашей силы в драках.',
           'Фарм: в демо-режиме 10 минут на героя без соперника, цель — 60+ добитых крипов (керри) или 50+ (мид). Затем в игре между волнами забирайте ближайший лес и стакайте лагерь на :53.'));
       } else if (sc.gpm >= 0.75) {
         items.push(S('farm_gpm', sc.gpm * 100 - 40,
-          'Сильная экономика', 'GPM ' + m.gpm + ' — ' + srcHigh + '.'));
+          'Сильная экономика', 'GPM ' + m.gpm + srcHigh + '.'));
+      }
+    }
+    /* --- ЛИНИЯ ПРОТИВ ПРЯМОГО ОППОНЕНТА (распарсенный матч) --- */
+    var laneVsLost = false, laneGd = null;
+    if (core && m.opp && m.g10 != null && m.opp.g10 != null && m.durMin >= 12) {
+      laneGd = m.g10 - m.opp.g10;
+      var lhd = (m.lh10 != null && m.opp.lh10 != null) ? m.lh10 - m.opp.lh10 : null;
+      var xd = (m.x10 != null && m.opp.x10 != null) ? m.x10 - m.opp.x10 : null;
+      var oppRole = (DOTA_POS_NAMES[LANE_COUNTERPART[pos]] || 'соперник').toLowerCase();
+      var det = [];
+      if (lhd != null && lhd !== 0) det.push(Math.abs(lhd) + ' ' + plural(Math.abs(lhd), 'ластхит', 'ластхита', 'ластхитов'));
+      if (xd != null && Math.abs(xd) >= 300) det.push(Math.abs(Math.round(xd)) + ' опыта');
+      if (laneGd <= -1200 || (laneGd <= -700 && lhd != null && lhd <= -12)) {
+        laneVsLost = true;
+        items.push(P('lane_vs', 38 + Math.min(30, -laneGd / 100), 'Проигранная линия против ' + m.opp.hero,
+          'К 10-й минуте у вас на ' + Math.abs(Math.round(laneGd)) + ' золота' + (det.length ? ' и ' + det.join(', ') : '') + ' меньше, чем у ' + m.opp.hero + ' (' + oppRole + ' соперников). Отставание на линии тянется за вами всю игру.',
+          pos === 2 ? 'Мид: следите за руной каждые 2 минуты, не размениваетесь здоровьем без выгоды; если проигрываете дуэль — просите ротацию саппорта к 4–6-й минуте.'
+            : pos === 1 ? 'Керри: держитесь за линией своих крипов, добивайте и отходите. Если линия проиграна к 5-й минуте — не стойте под давлением, уходите на ближний лес и возвращайтесь на волну.'
+            : 'Оффлейн: ваша задача — не дать керри фармить, а не выиграть по золоту. Атакуйте его, когда он добивает крипа, и держите лагерь врага под стаком/блоком.'));
+      } else if (laneGd >= 1200) {
+        items.push(S('lane_vs', 48 + Math.min(20, laneGd / 200), 'Выигранная линия против ' + m.opp.hero,
+          'К 10-й минуте вы на ' + Math.round(laneGd) + ' золота впереди ' + m.opp.hero + (det.length && lhd > 0 ? ' (+' + det.join(', +') + ')' : '') + '.'));
       }
     }
     /* --- ЛАЙНИНГ (ластхиты на 10-й минуте) --- */
     if (core && m.lh10 != null && m.durMin >= 12) {
       var r10 = m.lh10 / pro.lh10;
-      if (r10 < 0.6) {
+      if (r10 < 0.6 && !laneVsLost) {
         items.push(P('lane_lh10', (0.8 - r10) * 100 + 20,
           'Проигранная лайн-стадия',
           'К 10-й минуте всего ' + m.lh10 + ' ластхитов при ориентире ' + pro.lh10 + ' — вы отстаёте примерно на ' + (pro.lh10 - m.lh10) + '. Именно здесь теряется основная масса золота и опыта.',
@@ -224,27 +360,43 @@
         'XPM ' + m.xpm + (m.pct.xpm != null ? ' (ниже, чем у ' + (100 - pctText(m.pct.xpm)) + '% игроков)' : '') + ' — ключевая способность приходит позже, чем должна.',
         'Не пропускайте драки в зоне доступа: опыт даётся за убийства и присутствие рядом с героями. Проверьте, нет ли долгих пауз на фарме, когда команда дерётся.'));
     }
+    /* --- РАННИЕ СМЕРТИ (распарсенный матч) --- */
+    if (m.deathTimes) {
+      var early = m.deathTimes.filter(function (t) { return t < 600; });
+      if (early.length >= (sup ? 4 : 3)) {
+        items.push(P('early_deaths', 40 + early.length * 5, 'Ранние смерти на линии',
+          'До 10-й минуты вы погибли ' + early.length + ' ' + plural(early.length, 'раз', 'раза', 'раз') + ' (' + early.map(mmss).join(', ') + '). Каждая ранняя смерть — это потерянные волны, опыт и золото для соперника.',
+          'Первые 10 минут: держите в голове, где вражеский саппорт. Пропал с линии — отходите за своих крипов. Не стойте у вражеской стороны реки без варда.'));
+      }
+    }
+    var deadNote = (m.deadPct != null && m.deadPct >= 0.1) ? ' Всего вы провели мёртвым ' + mmss(m.deadSec) + ' — ' + Math.round(m.deadPct * 100) + '% матча.' : '';
     /* --- СМЕРТИ --- */
     var dLimit = sup ? 4.5 : 3.5;
     if (dp10 >= dLimit && m.d >= 5) {
       var dp = Math.round(dp10 * 10) / 10;
       items.push(P('deaths', 30 + (dp10 - dLimit) * 18 + (m.won ? 0 : 10),
         'Слишком много смертей',
-        m.d + ' ' + plural(m.d, 'смерть', 'смерти', 'смертей') + ' за ' + Math.round(m.durMin) + ' мин (' + dp + ' на 10 минут). Каждая смерть на кор-позиции — это пауза в фарме и потеря темпа.',
+        m.d + ' ' + plural(m.d, 'смерть', 'смерти', 'смертей') + ' за ' + Math.round(m.durMin) + ' мин (' + dp + ' на 10 минут). Каждая смерть на кор-позиции — это пауза в фарме и потеря темпа.' + deadNote,
         'Перед каждой вылазкой задавайте себе вопрос: «Где вражеские герои на миникарте?» Если не видите 2+ героев — не заходите за реку и не идите в лес в одиночку. После первого же смертельного пика меняйте поведение.'));
+    } else if (m.deadPct != null && m.deadPct >= 0.15 && m.durMin >= 20) {
+      items.push(P('dead_time', 30 + (m.deadPct - 0.15) * 200, 'Много времени мёртвым',
+        'Вы провели мёртвым ' + mmss(m.deadSec) + ' — ' + Math.round(m.deadPct * 100) + '% матча. Смертей немного, но они дорогие: в поздней игре каждая стоит минуту без героя.',
+        'Во второй половине игры умирать нельзя первым: держитесь за инициатором, носите TP и выкуп (buyback) — копите на него после 30-й минуты.'));
     } else if (dp10 <= 1.4 && m.durMin >= 15) {
       items.push(S('deaths', 40, 'Хорошая выживаемость', m.d + ' ' + plural(m.d, 'смерть', 'смерти', 'смертей') + ' за ' + Math.round(m.durMin) + ' мин — вы редко отдаёте врагу золото.'));
     }
     /* --- УЧАСТИЕ В ДРАКАХ --- */
-    if (m.kp != null && m.teamKills >= 15) {
+    var part = m.tfp != null ? m.tfp * 100 : m.kp;
+    var partWhat = m.tfp != null ? 'Участие в командных драках' : 'Участие в убийствах команды';
+    if (part != null && m.teamKills >= 15) {
       var kpLow = sup ? 45 : 35;
-      if (m.kp < kpLow) {
-        items.push(P('kp', (kpLow - m.kp) * 1.4 + 25, 'Мало участия в драках',
-          'Участие в убийствах команды — ' + Math.round(m.kp) + '%. Вас не хватает в моменты, когда команда дерётся.',
+      if (part < kpLow) {
+        items.push(P('kp', (kpLow - part) * 1.4 + 25, 'Мало участия в драках',
+          partWhat + ' — ' + Math.round(part) + '%. Вас не хватает в моменты, когда команда дерётся.',
           sup ? 'Саппорт: держите ротацию к тиммейтам после установки варда; ждите кор-героя у линии боя.'
               : 'Следите за миникартой каждые 5 секунд; когда команда собирается на объект, телепортируйтесь/идите к ней раньше фарма.'));
-      } else if (m.kp >= 70) {
-        items.push(S('kp', 38, 'Присутствие в драках', 'Участие в ' + Math.round(m.kp) + '% убийств команды — вы там, где решается игра.'));
+      } else if (part >= 70) {
+        items.push(S('kp', 38, 'Присутствие в драках', partWhat + ' — ' + Math.round(part) + '%: вы там, где решается игра.'));
       }
     }
     /* --- КОНВЕРСИЯ: фарм есть, урона нет --- */
@@ -254,6 +406,37 @@
         'Разберите повтор: сколько драк вы пропустили или вступили слишком поздно? Цель — входить во 2–3 секунду драки и сфокусироваться на ближайшей цели.'));
     } else if (core && sc.hd != null && sc.hd >= 0.8) {
       items.push(S('hd', 42, 'Высокий урон', 'Урон по героям лучше, чем у ' + pctText(sc.hd) + '% игроков на этом герое.'));
+    }
+    /* --- ТЕМП ФАРМА ПОСЛЕ 20-Й МИНУТЫ (распарсенный матч) --- */
+    if (core && m.g10 != null && m.g20 != null && m.g30 != null && m.durMin >= 32) {
+      var r1 = (m.g20 - m.g10) / 10, r2 = (m.g30 - m.g20) / 10;
+      if (r1 > 0 && r2 < r1 * 0.85) {
+        items.push(P('farm_drop', 28 + Math.min(25, (1 - r2 / r1) * 80), 'Темп фарма упал после 20-й минуты',
+          'С 10-й по 20-ю минуту вы получали ~' + Math.round(r1) + ' золота в минуту, а с 20-й по 30-ю — ~' + Math.round(r2) + '. У кора доход должен расти, а не падать.',
+          'После 20-й минуты фармите там, где есть видение: подтолкнули линию → ближний лес → обратно к волне. Не ходите в лес врага без 2–3 тиммейтов рядом.'));
+      }
+    }
+    /* --- TELEPORT --- */
+    if (m.tp != null && m.durMin >= 28 && m.tp <= 2) {
+      items.push(P('tp', 22, 'Редко покупаете телепорт',
+        'За ' + Math.round(m.durMin) + ' мин куплено всего ' + m.tp + ' ' + plural(m.tp, 'свиток', 'свитка', 'свитков') + ' телепорта. Без TP вы не успеваете на драки и защиту башен.',
+        'TP всегда в слоте: использовали — сразу докупайте с курьером. Это дешевле любой проигранной драки.'));
+    }
+    /* --- ДЕВАРД (саппорты) --- */
+    if (sup && m.obsKills != null && m.durMin >= 25) {
+      if (m.obsKills === 0 && (m.sen == null || m.sen <= 2)) {
+        items.push(P('deward', 26, 'Нет девардинга',
+          'За игру вы не сняли ни одного вражеского обсервера' + (m.sen != null ? ' и поставили ' + m.sen + ' ' + plural(m.sen, 'сентри', 'сентри', 'сентри') : '') + '. Соперник видит каждое ваше движение.',
+          'Носите 1–2 сентри и проверяйте типичные места вардов у своих башен и лагерей. Снятый вард = 100+ золота и опыт команде.'));
+      } else if (m.obsKills >= 4) {
+        items.push(S('deward', 30, 'Активный девард', 'Вы сняли ' + m.obsKills + ' ' + plural(m.obsKills, 'вражеский вард', 'вражеских варда', 'вражеских вардов') + ' — соперник играл вслепую.'));
+      }
+    }
+    /* --- РУНЫ (мид) --- */
+    if (pos === 2 && m.runes != null && m.durMin >= 20 && m.runes < m.durMin / 5) {
+      items.push(P('runes', 18, 'Мало рун',
+        'Подобрано ' + m.runes + ' ' + plural(m.runes, 'руна', 'руны', 'рун') + ' за ' + Math.round(m.durMin) + ' мин. Для мида руны — главный источник ротаций и выигранных дуэлей.',
+        'Ставьте себе пометку на каждую чётную минуту: за 10–15 секунд до появления руны отводите волну и идите к реке.'));
     }
     /* --- ВЫШКИ --- */
     if (core && sc.td != null && m.durMin >= 25 && sc.td < 0.25) {
@@ -289,7 +472,8 @@
     var parts = [];
     ['gpm', 'xpm', 'hd', 'kills'].forEach(function (k) { if (sc[k] != null) parts.push(sc[k]); });
     parts.push(survScore);
-    if (m.kp != null) parts.push(clamp(m.kp / 70, 0, 1));
+    if (part != null) parts.push(clamp(part / 70, 0, 1));
+    if (laneGd != null) parts.push(clamp(0.5 + laneGd / 4000, 0, 1));
     if (sup && m.obs != null && m.sen != null) parts.push(clamp(((m.obs + m.sen) / m.durMin) / 0.55, 0, 1));
     if (core) { /* у кор-героев фарм важнее — учитываем GPM дважды */ if (sc.gpm != null) parts.push(sc.gpm); }
     var perf = parts.reduce(function (a, b) { return a + b; }, 0) / parts.length;
@@ -304,6 +488,20 @@
         'По сумме фарма, урона, опыта и участия в боях вы были одним из сильнейших игроков матча (' + score + ' из 100).'));
     }
 
+    /* --- ГДЕ РЕШИЛАСЬ ИГРА (золото команды) --- */
+    if (m.teamAdv && m.teamAdv.length >= 15) {
+      var adv = m.teamAdv, best = null;
+      for (var i = 0; i + 10 < adv.length; i++) {
+        var dlt = adv[i + 10] - adv[i];
+        if (m.won ? (best == null || dlt > best.d) : (best == null || dlt < best.d)) best = { i: i, d: dlt };
+      }
+      if (best && Math.abs(best.d) >= 5000) {
+        items.push(N('swing', m.won ? 'Где выиграна игра' : 'Где проиграна игра',
+          'С ' + best.i + '-й по ' + (best.i + 10) + '-ю минуту ваша команда ' + (best.d < 0 ? 'потеряла ' : 'набрала ') + Math.abs(Math.round(best.d / 100) / 10) + 'K золота преимущества (было ' + kfmt(adv[best.i]) + ', стало ' + kfmt(adv[best.i + 10]) + '). ' +
+          (m.won ? 'Посмотрите, что сработало в этом отрезке, — это ваш рецепт победы.' : 'Разбор повтора начните именно с этого отрезка: какие драки и объекты были отданы.')));
+      }
+    }
+
     if (!m.won && score >= 68) {
       items.push(N('context_loss', 'Поражение при сильных показателях',
         'Ваши цифры выше среднего, но матч проигран. По статистике упрекнуть себя не в чем — ищите причины в драфте, выборе моментов для драки и решениях команды.'));
@@ -315,7 +513,9 @@
     var res = finish(items, {
       title: 'Разбор тренера · ' + m.hero + ' · ' + posName,
       score: score,
-      foot: m.parsed ? '' : 'Матч не распарсен OpenDota — часть правил (лайнинг, предметы, фарм по минутам) недоступна. Запросите парсинг на opendota.com и повторите анализ.'
+      foot: m.parsed
+        ? (m.approxPos ? 'Позиция определена по фарму внутри команды и может быть неточной.' : '')
+        : 'Матч ещё не распарсен OpenDota: разбор построен на итоговой статистике, а позиция определена по фарму внутри команды. Лайнинг против соперника, ранние смерти, темп фарма и ход игры появятся после парсинга.'
     });
     res.summary = dotaSummary(res, m);
     return res;
@@ -752,6 +952,9 @@
     // Dota 2
     normalizeDotaPlayer: normalizeDotaPlayer,
     analyzeDota: analyzeDota,
+    isDotaParsed: isDotaParsed,
+    assignDotaPositions: assignDotaPositions,
+    findLaneOpponent: findLaneOpponent,
     analyzeDotaProfile: analyzeDotaProfile,
     // CS2
     normalizeCsStats: normalizeCsStats,
