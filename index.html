@@ -425,8 +425,8 @@
             .ga-logo-text { font-size: .8rem; letter-spacing: 0; }
             .ga-logo { gap: 8px; }
             .navbar-right { gap: 8px; }
-            .logout-btn { padding: 8px 12px; font-size: .85rem; }
-            .theme-btn-nav { padding: 6px 9px; }
+            .logout-btn { padding: 8px 12px; font-size: .85rem; min-height: 40px; }
+            .theme-btn-nav { padding: 6px 9px; min-height: 40px; min-width: 40px; }
             .hero-banner .hb-word { width: min(280px, 100%); margin: 0 auto; }
             .ga-mark { width: 28px; height: 33px; filter: none; }
             .feature-icon, .ga-mark, .hero-banner .hb-mark, .auth-logo .am { filter: none !important; }
@@ -497,16 +497,17 @@
         <div class="auth-logo"><svg class="am" viewBox="0 0 280 330" aria-hidden="true"><use href="#ga-mark"/></svg><svg class="aw" viewBox="0 0 500 156" role="img" aria-label="GamerAnalyzer"><use href="#ga-word"/></svg></div>
         <div class="auth-subtitle">Анализ матчей Dota 2 и CS 2</div>
         <div id="loginForm">
-            <div class="input-group"><label>Логин</label><input type="text" id="loginInput" placeholder="Введите логин"></div>
-            <div class="input-group"><label>Пароль</label><input type="password" id="passwordInput" placeholder="Введите пароль"></div>
+            <div class="input-group"><label for="loginInput">Email</label><input type="email" id="loginInput" placeholder="you@example.com" autocomplete="email"></div>
+            <div class="input-group"><label for="passwordInput">Пароль</label><input type="password" id="passwordInput" placeholder="Введите пароль" autocomplete="current-password"></div>
             <button class="auth-btn" id="loginBtn">Войти</button>
             <div id="loginError" class="msg-box msg-error"></div>
             <div class="auth-link">Нет аккаунта? <span id="goToRegister">Зарегистрироваться</span></div>
         </div>
         <div id="registerForm" style="display:none;">
-            <div class="input-group"><label>Придумайте логин</label><input type="text" id="regLoginInput" placeholder="Минимум 3 символа"></div>
-            <div class="input-group"><label>Придумайте пароль</label><input type="password" id="regPasswordInput" placeholder="Минимум 4 символа"></div>
-            <div class="input-group"><label>Подтвердите пароль</label><input type="password" id="regPasswordConfirm" placeholder="Повторите пароль"></div>
+            <div class="input-group"><label for="regEmailInput">Email</label><input type="email" id="regEmailInput" placeholder="you@example.com" autocomplete="email"></div>
+            <div class="input-group"><label for="regLoginInput">Придумайте логин</label><input type="text" id="regLoginInput" placeholder="Латиница, 3–24 символа" autocomplete="username"></div>
+            <div class="input-group"><label for="regPasswordInput">Придумайте пароль</label><input type="password" id="regPasswordInput" placeholder="Минимум 8 символов" autocomplete="new-password"></div>
+            <div class="input-group"><label for="regPasswordConfirm">Подтвердите пароль</label><input type="password" id="regPasswordConfirm" placeholder="Повторите пароль" autocomplete="new-password"></div>
             <button class="auth-btn" id="registerBtn">Зарегистрироваться</button>
             <div id="regError" class="msg-box msg-error"></div>
             <div id="regSuccess" class="msg-box msg-success"></div>
@@ -686,7 +687,7 @@
                     <div class="section-desc">Вставьте ссылку на матч (Dotabuff, Steam) или match_id — сервис проанализирует игру и выдаст персональный разбор с конкретными советами тренера.</div>
                     <div id="dotaLimitWarning"></div>
                     <div class="link-form">
-                        <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink"/>
+                        <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink" aria-label="Ссылка или ID матча Dota 2"/>
                         <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
                     </div>
                     <div class="progress-wrapper" id="dotaProgress">
@@ -726,7 +727,7 @@
                     <div class="section-title">Моя статистика</div>
                     <div class="section-desc">Введите ваш Steam ID — сервис выгрузит статистику за выбранный период.</div>
                     <div class="steam-form">
-                        <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль / friend code" id="steamInput"/>
+                        <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль / friend code" id="steamInput" aria-label="Steam ID или ссылка на профиль"/>
                         <div class="period-selector">
                             <div class="period-btn active" data-period="7">7 дней</div>
                             <div class="period-btn" data-period="30">30 дней</div>
@@ -761,7 +762,7 @@
                     <div class="section-desc">Вставьте ссылку на матч FACEIT — анализ запустится автоматически.</div>
                     <div id="csLimitWarning"></div>
                     <div class="link-form">
-                        <input type="text" class="link-input" placeholder="https://www.faceit.com/en/cs2/room/1-xxxxxxxx-..." id="csLink"/>
+                        <input type="text" class="link-input" placeholder="https://www.faceit.com/en/cs2/room/1-xxxxxxxx-..." id="csLink" aria-label="Ссылка на комнату матча FACEIT"/>
                         <div class="file-hint">Сейчас поддерживаются матчи FACEIT. Разбор .dem-файлов и других площадок — в разработке.</div>
                         <button class="analyze-btn" id="csAnalyzeBtn">Анализировать</button>
                     </div>
@@ -782,7 +783,7 @@
                     <div class="section-title">Моя статистика CS 2</div>
                     <div class="section-desc">Введите ваш Steam ID — сервис загрузит статистику вашего аккаунта в CS 2.</div>
                     <div class="steam-form">
-                        <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль" id="csSteamInput"/>
+                        <input type="text" class="steam-input" placeholder="Steam ID / ссылка на профиль" id="csSteamInput" aria-label="Steam ID или ссылка на профиль CS 2"/>
                         <button class="steam-btn" id="csSteamFetchBtn">Получить статистику</button>
                     </div>
                     <div class="steam-hint">Steam отдаёт статистику CS 2 за всё время игры. В Steam › Приватность профиля пункт «Игровые данные» должен быть «Открытый».</div>
@@ -800,7 +801,7 @@
                     <div class="section-desc">Вставьте ссылку на матч FACEIT — получите разбор тренера со сравнением с вашей личной нормой и с про-игроками 2026 года.</div>
                     <div id="faceitLimitWarning"></div>
                     <div class="link-form">
-                        <input type="text" class="link-input" placeholder="https://www.faceit.com/en/cs2/room/1-xxxxxxxx-..." id="faceitLink"/>
+                        <input type="text" class="link-input" placeholder="https://www.faceit.com/en/cs2/room/1-xxxxxxxx-..." id="faceitLink" aria-label="Ссылка на комнату матча FACEIT"/>
                         <button class="analyze-btn" id="faceitAnalyzeBtn">Анализировать</button>
                     </div>
                     <div class="progress-wrapper" id="faceitProgress">
@@ -881,24 +882,17 @@ var _chartP=null;
 function ensureChart(){if(window.Chart)return Promise.resolve();if(!_chartP){_chartP=new Promise(function(res,rej){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';s.onload=res;s.onerror=function(){_chartP=null;rej(new Error('chart'));};document.head.appendChild(s);});}return _chartP;}
 var _usageCache=null;
 async function getUsage(){var n=Date.now();if(_usageCache&&n-_usageCache.t<4000)return _usageCache.v;var v=await _getUsage();_usageCache={t:n,v:v};return v;}
-async function _getUsage() {
-    var u=getCurrentUser();if(!u)return{dota_today:0,cs_today:0};
-    var today=new Date().toISOString().split('T')[0];
-    if(supabaseClient){try{var r=await supabaseClient.from('usage_limits').select('*').eq('user_login',u.login).maybeSingle();if(r.data){if(r.data.last_reset!==today){await supabaseClient.from('usage_limits').update({dota_today:0,cs_today:0,last_reset:today}).eq('user_login',u.login);return{dota_today:0,cs_today:0};}return{dota_today:r.data.dota_today||0,cs_today:r.data.cs_today||0};}else{await supabaseClient.from('usage_limits').insert({user_login:u.login,dota_today:0,cs_today:0,last_reset:today});return{dota_today:0,cs_today:0};}}catch(e){return getLocalUsage();}}
-    return getLocalUsage();
-}
-function getLocalUsage(){var today=new Date().toISOString().split('T')[0];try{var d=JSON.parse(localStorage.getItem('ga_usage')||'{}');if(d.date!==today)return{dota_today:0,cs_today:0};return{dota_today:d.dota||0,cs_today:d.cs||0};}catch(e){return{dota_today:0,cs_today:0};}}
-async function incrementUsage(game){_usageCache=null;var u=getCurrentUser();if(!u)return;var today=new Date().toISOString().split('T')[0];if(supabaseClient){try{var cur=await getUsage();var upd=game==='dota'?{dota_today:(cur.dota_today||0)+1,last_reset:today}:{cs_today:(cur.cs_today||0)+1,last_reset:today};await supabaseClient.from('usage_limits').upsert({user_login:u.login,...upd});}catch(e){incrementLocalUsage(game);}}else{incrementLocalUsage(game);}}
-function incrementLocalUsage(game){var today=new Date().toISOString().split('T')[0];try{var d=JSON.parse(localStorage.getItem('ga_usage')||'{}');if(d.date!==today)d={date:today,dota:0,cs:0};if(game==='dota')d.dota++;else d.cs++;localStorage.setItem('ga_usage',JSON.stringify(d));}catch(e){}}
+function mskToday(){return new Date(Date.now()+3*3600000).toISOString().split('T')[0];}
+async function _getUsage(){var u=getCurrentUser();if(!u||!supabaseClient)return{dota_today:0,cs_today:0};try{var r=await supabaseClient.from('usage_daily').select('dota,cs').eq('day',mskToday()).maybeSingle();if(r.data)return{dota_today:r.data.dota||0,cs_today:r.data.cs||0};}catch(e){}return{dota_today:0,cs_today:0};}
+async function incrementUsage(game){_usageCache=null;if(!supabaseClient||!getCurrentUser())return;try{await supabaseClient.rpc('consume_analysis',{p_game:game});}catch(e){console.warn('consume_analysis',e&&e.message);}}
 async function checkLimit(game){var u=getCurrentUser();if(!u)return true;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];if(plan==='premium')return true;var usage=await getUsage();var used=game==='dota'?usage.dota_today:usage.cs_today;var max=game==='dota'?limits.dota:limits.cs;return used<max;}
 async function showLimitWarning(containerId,game){var u=getCurrentUser();if(!u)return;var plan=u.plan||'free';var limits=PLAN_LIMITS[plan]||PLAN_LIMITS['free'];var usage=await getUsage();var used=game==='dota'?usage.dota_today:usage.cs_today;var max=game==='dota'?limits.dota:limits.cs;var el=document.getElementById(containerId);if(!el)return;if(plan==='premium'){el.innerHTML='';return;}var pct=Math.min(100,Math.round(used/max*100));var isFull=used>=max;el.innerHTML=isFull?'<div class="limit-warning"><div class="limit-warning-title"><svg class="ico"><use href="#i-ban"/></svg> Лимит исчерпан</div><div class="limit-warning-text">Вы использовали все '+max+' анализов на сегодня ('+limits.label+').</div><div class="limit-warning-time">Обновление через: '+getTimeUntilMidnight()+' (в 00:00)</div></div>':'<div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#888;margin-bottom:6px;"><span>Анализов сегодня: '+used+' / '+max+'</span><span>'+pct+'%</span></div><div class="limit-bar"><div class="limit-bar-fill'+(pct>=80?' danger':'')+'" style="width:'+pct+'%"></div></div><div class="limit-reset-time">Обновление в 00:00 · осталось '+getTimeUntilMidnight()+'</div></div>';}
 
 // ============================================================
 // ИСТОРИЯ АНАЛИЗОВ
 // ============================================================
-async function saveAnalysis(game,matchId,summary,kd,adr,gpm,wr){var u=getCurrentUser();if(!u)return;var rec={user_login:u.login,game:game,match_id:matchId||'',result_summary:summary||'',kd:kd||0,adr:adr||0,gpm:gpm||0,wr:wr||0};if(supabaseClient){try{await supabaseClient.from('analyses').insert(rec);}catch(e){saveLocalAnalysis(rec);}}else{saveLocalAnalysis(rec);}}
-function saveLocalAnalysis(rec){try{var list=JSON.parse(localStorage.getItem('ga_analyses')||'[]');list.unshift({...rec,created_at:new Date().toISOString()});if(list.length>100)list=list.slice(0,100);localStorage.setItem('ga_analyses',JSON.stringify(list));}catch(e){}}
-async function loadAnalyses(game){var u=getCurrentUser();if(!u)return[];if(supabaseClient){try{var q=supabaseClient.from('analyses').select('*').eq('user_login',u.login).order('created_at',{ascending:false}).limit(50);if(game)q=q.eq('game',game);var r=await q;if(r.data)return r.data;}catch(e){}}var list=JSON.parse(localStorage.getItem('ga_analyses')||'[]');return game?list.filter(function(a){return a.game===game;}):list;}
+async function saveAnalysis(game,matchId,summary,kd,adr,gpm,wr){var u=getCurrentUser();if(!u||!supabaseClient)return;var rec={user_login:u.login,game:game,match_id:matchId||'',result_summary:summary||'',kd:kd||0,adr:adr||0,gpm:gpm||0,wr:wr||0};try{await supabaseClient.from('analyses').insert(rec);}catch(e){console.warn('saveAnalysis',e&&e.message);}}
+async function loadAnalyses(game){var u=getCurrentUser();if(!u||!supabaseClient)return[];try{var q=supabaseClient.from('analyses').select('*').order('created_at',{ascending:false}).limit(50);if(game)q=q.eq('game',game);var r=await q;if(r.data)return r.data;}catch(e){}return[];}
 function timeAgo(dateStr){var d=new Date(dateStr),now=new Date(),diff=Math.floor((now-d)/1000);if(diff<60)return'только что';if(diff<3600)return Math.floor(diff/60)+' мин назад';if(diff<86400)return Math.floor(diff/3600)+' ч назад';return Math.floor(diff/86400)+' дн назад';}
 function renderHistoryList(analyses,containerId,game){var el=document.getElementById(containerId);if(!el)return;if(!analyses||analyses.length===0){el.innerHTML='<div class="history-empty">История пуста. Проведите первый анализ!</div>';return;}var html=analyses.map(function(a){var icon=a.game==='dota2'?'<svg class="ico"><use href="#i-swords"/></svg>':'<svg class="ico"><use href="#i-crosshair"/></svg>';var badge=a.game==='dota2'?'<span class="history-badge dota">Dota 2</span>':'<span class="history-badge cs">CS 2</span>';var summary=a.result_summary||(a.game==='dota2'?'GPM: '+a.gpm:'KD: '+parseFloat(a.kd||0).toFixed(2));var mid=a.match_id?'Match: '+a.match_id.substring(0,12)+'...':'';return'<div class="history-item"><div class="history-game-icon">'+icon+'</div><div class="history-info"><div class="history-summary">'+summary+'</div><div class="history-match-id">'+mid+'</div></div>'+badge+'<div class="history-time">'+timeAgo(a.created_at)+'</div></div>';}).join('');el.innerHTML=html;}
 
@@ -1020,7 +1014,7 @@ async function runFaceitAnalysis(){
         }catch(e2){console.warn('Не удалось сохранить анализ:',e2);}
     }catch(err){
         txt.textContent='Ошибка: '+err.message;fill.style.width='0%';
-        setTimeout(function(){prog.classList.remove('visible');fill.style.width='0%';txt.textContent='Загрузка...';res.innerHTML='<div class="problem-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+err.message+'</div></div>';res.classList.add('visible');},3000);
+        setTimeout(function(){prog.classList.remove('visible');fill.style.width='0%';txt.textContent='Загрузка...';res.innerHTML='<div class="problem-block"><div class="problem-title">Ошибка</div><div class="problem-text">'+escHtml(err.message)+'</div></div>';res.classList.add('visible');},3000);
     }
 }
 
@@ -1042,12 +1036,10 @@ window.resetFaceitAnalysis=function(){document.getElementById('faceitResults').c
 // ============================================================
 // AUTH
 // ============================================================
-async function hashPassword(pw){var e=new TextEncoder(),d=e.encode(pw+'gameranalyzer_salt_2025'),h=await crypto.subtle.digest('SHA-256',d);return Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');}
-function getLocalUsers(){try{return JSON.parse(localStorage.getItem('ga_users')||'{}');}catch(e){return{};}}
-function saveLocalUsers(u){localStorage.setItem('ga_users',JSON.stringify(u));}
 function getCurrentUser(){try{return JSON.parse(localStorage.getItem('ga_current_user')||'null');}catch(e){return null;}}
-function setCurrentUser(u){localStorage.setItem('ga_current_user',JSON.stringify(u));}
-function clearCurrentUser(){localStorage.removeItem('ga_current_user');}
+function setCurrentUser(u){try{localStorage.setItem('ga_current_user',JSON.stringify(u));}catch(e){}}
+function clearCurrentUser(){try{localStorage.removeItem('ga_current_user');}catch(e){}}
+async function loadProfile(session){var r=await supabaseClient.from('profiles').select('login,plan').eq('id',session.user.id).maybeSingle();if(r.error||!r.data)return null;var u={id:session.user.id,login:r.data.login,plan:r.data.plan||'free'};setCurrentUser(u);return u;}
 function toggleTheme(){document.documentElement.classList.toggle('light-theme');localStorage.setItem('ga-theme',document.documentElement.classList.contains('light-theme')?'light':'dark');if(progressChartInstance){var m=currentChartMetric;progressChartInstance.destroy();progressChartInstance=null;renderProgressChart(m);}}
 function initTheme(){if(localStorage.getItem('ga-theme')==='light')document.documentElement.classList.add('light-theme');}
 initTheme();
@@ -1061,38 +1053,54 @@ document.getElementById('goToLogin').addEventListener('click',function(){documen
 document.getElementById('themeToggle').addEventListener('click',toggleTheme);
 document.getElementById('themeBtnNav').addEventListener('click',toggleTheme);
 
+function authErr(err){var m=String((err&&err.message)||err||'');
+    if(/Invalid login credentials/i.test(m))return'Неверный email или пароль';
+    if(/Email not confirmed/i.test(m))return'Подтвердите email по ссылке из письма и войдите снова';
+    if(/already registered|already been registered/i.test(m))return'Этот email уже зарегистрирован';
+    if(/rate limit|too many/i.test(m))return'Слишком много попыток. Подождите немного и повторите';
+    if(/Password should/i.test(m))return'Пароль слишком простой. Используйте не меньше 8 символов';
+    if(/Failed to fetch|NetworkError/i.test(m))return'Нет связи с сервером. Проверьте интернет';
+    return'Ошибка: '+m;}
 document.getElementById('registerBtn').addEventListener('click',async function(){
-    var login=document.getElementById('regLoginInput').value.trim().toLowerCase(),password=document.getElementById('regPasswordInput').value,confirm=document.getElementById('regPasswordConfirm').value;
+    var email=document.getElementById('regEmailInput').value.trim().toLowerCase(),login=document.getElementById('regLoginInput').value.trim().toLowerCase(),password=document.getElementById('regPasswordInput').value,confirm=document.getElementById('regPasswordConfirm').value;
     hideError('regError');hideSuccess('regSuccess');
-    if(!login||login.length<3){showError('regError','Логин не короче 3 символов');return;}
-    if(!password||password.length<4){showError('regError','Пароль не короче 4 символов');return;}
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){showError('regError','Введите корректный email');return;}
+    if(!/^[a-z0-9_.-]{3,24}$/.test(login)){showError('regError','Логин: 3–24 символа, латиница, цифры и _ . -');return;}
+    if(!password||password.length<8){showError('regError','Пароль не короче 8 символов');return;}
     if(password!==confirm){showError('regError','Пароли не совпадают');return;}
-    var useLocal=false;
-    if(supabaseClient){try{var ex=await supabaseClient.from('users').select('login').eq('login',login).maybeSingle();if(ex.error)throw ex.error;if(ex.data){showError('regError','Логин занят');return;}var hashed=await hashPassword(password);var ins=await supabaseClient.from('users').insert({login:login,password:hashed,plan:'free'});if(ins.error)throw ins.error;}catch(err){if(isRLSError(err)){useLocal=true;}else{showError('regError','Ошибка: '+(err.message||err));return;}}}else{useLocal=true;}
-    if(useLocal){var users=getLocalUsers();if(users[login]){showError('regError','Логин занят');return;}users[login]={password:await hashPassword(password),plan:'free'};saveLocalUsers(users);}
-    showSuccess('regSuccess','Аккаунт создан! Теперь войдите.');
-    document.getElementById('regLoginInput').value='';document.getElementById('regPasswordInput').value='';document.getElementById('regPasswordConfirm').value='';
-    setTimeout(function(){document.getElementById('registerForm').style.display='none';document.getElementById('loginForm').style.display='block';hideSuccess('regSuccess');document.getElementById('loginInput').value=login;},1500);
+    if(!supabaseClient){showError('regError','Нет связи с сервером. Попробуйте позже');return;}
+    try{
+        var av=await supabaseClient.rpc('login_available',{p_login:login});if(av.error)throw av.error;if(!av.data){showError('regError','Логин занят');return;}
+        var r=await supabaseClient.auth.signUp({email:email,password:password,options:{data:{login:login}}});if(r.error)throw r.error;
+        if(r.data&&r.data.session){var u=await loadProfile(r.data.session);if(u){enterApp();return;}}
+        showSuccess('regSuccess','Аккаунт создан! Если пришло письмо — подтвердите email, затем войдите.');
+    }catch(err){showError('regError',authErr(err));return;}
+    document.getElementById('regPasswordInput').value='';document.getElementById('regPasswordConfirm').value='';
+    setTimeout(function(){document.getElementById('registerForm').style.display='none';document.getElementById('loginForm').style.display='block';hideSuccess('regSuccess');document.getElementById('loginInput').value=email;},2500);
 });
 
 document.getElementById('loginBtn').addEventListener('click',async function(){
-    var login=document.getElementById('loginInput').value.trim().toLowerCase(),password=document.getElementById('passwordInput').value;
+    var email=document.getElementById('loginInput').value.trim().toLowerCase(),password=document.getElementById('passwordInput').value;
     hideError('loginError');
-    if(!login||!password){showError('loginError','Введите логин и пароль');return;}
-    var useLocal=false;
-    if(supabaseClient){try{var hashed=await hashPassword(password);var res=await supabaseClient.from('users').select('*').eq('login',login).maybeSingle();if(res.error)throw res.error;if(!res.data){showError('loginError','Логин не найден');return;}if(res.data.password!==hashed){showError('loginError','Пароль не совпадает');return;}setCurrentUser({login:res.data.login,plan:res.data.plan});enterApp();return;}catch(err){if(isRLSError(err)){useLocal=true;}else{showError('loginError','Ошибка: '+(err.message||err));return;}}}else{useLocal=true;}
-    if(useLocal){var users=getLocalUsers();if(!users[login]){showError('loginError','Логин не найден');return;}var hashed2=await hashPassword(password);if(users[login].password!==hashed2){showError('loginError','Пароль не совпадает');return;}setCurrentUser({login:login,plan:users[login].plan||'free'});enterApp();}
+    if(!email||!password){showError('loginError','Введите email и пароль');return;}
+    if(!supabaseClient){showError('loginError','Нет связи с сервером. Попробуйте позже');return;}
+    try{
+        var r=await supabaseClient.auth.signInWithPassword({email:email,password:password});if(r.error)throw r.error;
+        var u=await loadProfile(r.data.session);
+        if(!u){await supabaseClient.auth.signOut();showError('loginError','Профиль не найден. Зарегистрируйтесь заново');return;}
+        enterApp();
+    }catch(err){showError('loginError',authErr(err));}
 });
 
 function enterApp(){document.getElementById('authScreen').style.display='none';setTimeout(function(){document.getElementById('appWrapper').classList.add('active');updateUserInfo();updateSubscriptionUI();initLimitWarnings();},10);}
 async function initLimitWarnings(){await Promise.all([showLimitWarning('dotaLimitWarning','dota'),showLimitWarning('csLimitWarning','cs'),showLimitWarning('faceitLimitWarning','cs')]);}
 function updateUserInfo(){var u=getCurrentUser();if(!u)return;document.getElementById('userName').textContent=u.login;var pn={'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM'};document.getElementById('userPlan').textContent=pn[u.plan]||'Бесплатный';}
 function updateSubscriptionUI(){var u=getCurrentUser();if(!u)return;document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Выбрать тариф';bd.classList.remove('visible');});if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}}
-document.getElementById('logoutBtn').addEventListener('click',function(){clearCurrentUser();document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
+document.getElementById('logoutBtn').addEventListener('click',function(){clearCurrentUser();if(supabaseClient){supabaseClient.auth.signOut();}document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
 document.getElementById('btn-dota').addEventListener('click',function(){selectPlan('pro_dota2');});
 document.getElementById('btn-cs').addEventListener('click',function(){selectPlan('pro_cs2');});
 document.getElementById('btn-premium').addEventListener('click',function(){selectPlan('premium');});
-async function selectPlan(plan){var u=getCurrentUser();if(!u)return;u.plan=plan;setCurrentUser(u);if(supabaseClient){try{await supabaseClient.from('users').update({plan:plan}).eq('login',u.login);}catch(e){}}else{var us=getLocalUsers();if(us[u.login]){us[u.login].plan=plan;saveLocalUsers(us);}}updateUserInfo();updateSubscriptionUI();revealCards();await initLimitWarnings();}
+async function selectPlan(plan){alert('Оплата тарифов пока не подключена. Мы сообщим, когда она появится.');}
 
 // ============================================================
 // NAVIGATION
@@ -1671,7 +1679,7 @@ document.getElementById('csAnalyzeBtn').addEventListener('click',function(){
     res.classList.add('visible');
 });
 document.getElementById('faceitAnalyzeBtn').addEventListener('click',runFaceitAnalysis);
-window.addEventListener('load',function(){var u=getCurrentUser();if(u)enterApp();});
+window.addEventListener('load',async function(){if(!supabaseClient){clearCurrentUser();return;}try{var s=await supabaseClient.auth.getSession();if(s.data&&s.data.session){var u=await loadProfile(s.data.session);if(u){enterApp();return;}}}catch(e){}clearCurrentUser();});
 </script>
 </body>
 </html>
