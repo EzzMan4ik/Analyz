@@ -198,6 +198,12 @@
         .file-input { width: 100%; padding: 12px; border: 1px dashed rgba(99,102,241,0.3); border-radius: 8px; background-color: #222; color: #999; font-size: 0.9rem; cursor: pointer; }
         html.light-theme .file-input { background-color: #f9f9f9; color: #777; }
         .file-hint { color: #666; font-size: 0.85rem; margin-top: -8px; }
+        .demo-drop { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 34px 20px; margin: 18px 0 14px; border: 2px dashed rgba(99,102,241,0.45); border-radius: 14px; background: rgba(99,102,241,0.06); color: #cfd3ff; cursor: pointer; text-align: center; transition: background .2s, border-color .2s; }
+        .demo-drop:hover, .demo-drop.over { background: rgba(99,102,241,0.14); border-color: #22d3ee; }
+        .demo-drop .ico { stroke: #22d3ee; }
+        .demo-drop-title { font-weight: 600; font-size: 1.05rem; }
+        .demo-drop-sub { font-size: 0.85rem; color: #8b8b8b; }
+        html.light-theme .demo-drop { color: #3b3f8f; background: rgba(99,102,241,0.06); }
         .analyze-btn { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 16px; font-size: 1.05rem; cursor: pointer; font-weight: 600; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; align-self: flex-start; min-width: 200px; }
         .analyze-btn:hover { opacity: 0.9; box-shadow: 0 0 18px rgba(99,102,241,0.4); transform: translateY(-1px); }
         .progress-wrapper { display: none; margin-top: 24px; }
@@ -246,7 +252,7 @@
         .tl-row { display: flex; gap: 12px; align-items: baseline; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border-left: 3px solid rgba(148,163,184,0.5); font-size: 0.92rem; line-height: 1.5; }
         .tl-row.good { border-left-color: var(--green, #2ecc71); }
         .tl-row.bad { border-left-color: var(--red, #e74c3c); }
-        .tl-time { flex: 0 0 auto; min-width: 48px; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--neon, #22d3ee); }
+        .tl-time { flex: 0 0 auto; min-width: 48px; white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--neon, #22d3ee); }
         .tl-text { color: #ccc; }
         html.light-theme .tl-row { background: rgba(0,0,0,0.04); }
         html.light-theme .tl-text { color: #444; }
@@ -765,6 +771,7 @@
             <button class="back-home-btn btn-ico" data-back="home"><svg class="ico"><use href="#i-back"/></svg> На главную страницу</button>
             <div class="dota-subtabs" id="cs2Subtabs">
                 <div class="dota-subtab active" data-cs2subtab="analysis"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-crosshair"/></svg></span><span class="dota-subtab-text">Анализ матча</span></div>
+                <div class="dota-subtab" data-cs2subtab="demo"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-target"/></svg></span><span class="dota-subtab-text">Разбор демки</span></div>
                 <div class="dota-subtab" data-cs2subtab="history"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-clock"/></svg></span><span class="dota-subtab-text">История</span></div>
                 <div class="dota-subtab" data-cs2subtab="faceit"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-target"/></svg></span><span class="dota-subtab-text">FACEIT Анализ</span></div>
                 <div class="dota-subtab" data-cs2subtab="stats"><span class="dota-subtab-icon"><svg class="ico"><use href="#i-user"/></svg></span><span class="dota-subtab-text">Моя статистика</span></div>
@@ -785,6 +792,26 @@
                         <div class="progress-text" id="csProgressText">В очереди...</div>
                     </div>
                     <div class="results-wrapper" id="csResults"></div>
+                </div>
+            </div>
+            <div class="dota-subcontent" id="cs2Sub-demo">
+                <div class="game-block">
+                    <div class="game-icon"><svg class="ico"><use href="#i-target"/></svg></div>
+                    <div class="section-title">Разбор демо-записи CS 2</div>
+                    <div class="section-desc">Загрузите запись матча — сайт найдёт ошибки в разменах, позициях, гранатах и закупах. Разбор идёт прямо в вашем браузере: файл никуда не отправляется.</div>
+                    <div id="demoLimitWarning"></div>
+                    <label class="demo-drop" id="demoDrop" for="demoFile">
+                        <svg class="ico" style="width:34px;height:34px;"><use href="#i-target"/></svg>
+                        <span class="demo-drop-title">Перетащите файл сюда или нажмите для выбора</span>
+                        <span class="demo-drop-sub">.dem.zst (FACEIT), .dem, .dem.gz · до 900 МБ</span>
+                    </label>
+                    <input type="file" id="demoFile" accept=".dem,.zst,.gz,.bz2" style="display:none" aria-label="Файл демо-записи CS 2"/>
+                    <div class="file-hint">Где взять: на странице матча FACEIT нажмите «Скачать демо». Для матчей Premier и обычного матчмейкинга распакуйте архив .bz2 (7-Zip) и загрузите получившийся .dem.</div>
+                    <div class="progress-wrapper" id="demoProgress">
+                        <div class="progress-bar"><div class="progress-fill" id="demoProgressFill"></div></div>
+                        <div class="progress-text" id="demoProgressText">Загрузка…</div>
+                    </div>
+                    <div class="results-wrapper" id="demoResults"></div>
                 </div>
             </div>
             <div class="dota-subcontent" id="cs2Sub-history">
@@ -830,7 +857,9 @@
     </div>
 </div>
 
-<script src="analyzer.js?v=20261113"></script>
+<script src="analyzer.js?v=20261114"></script>
+<script src="cs2/cs2demo.js?v=20261114"></script>
+<script src="cs2/cs2ui.js?v=20261114" defer></script>
 <script>
 // Защита от старой/закэшированной версии analyzer.js: сайт продолжит работать, но без новых правил разбора
 (function(){var G=window.GA=window.GA||{};
@@ -1107,7 +1136,7 @@ document.getElementById('loginBtn').addEventListener('click',async function(){
 });
 
 function enterApp(){document.getElementById('authScreen').style.display='none';setTimeout(function(){document.getElementById('appWrapper').classList.add('active');updateUserInfo();updateSubscriptionUI();initLimitWarnings();},10);}
-async function initLimitWarnings(){await Promise.all([showLimitWarning('dotaLimitWarning','dota'),showLimitWarning('csLimitWarning','cs'),showLimitWarning('faceitLimitWarning','cs')]);}
+async function initLimitWarnings(){await Promise.all([showLimitWarning('dotaLimitWarning','dota'),showLimitWarning('csLimitWarning','cs'),showLimitWarning('demoLimitWarning','cs'),showLimitWarning('faceitLimitWarning','cs')]);}
 function updateUserInfo(){var u=getCurrentUser();if(!u)return;document.getElementById('userName').textContent=u.login;var pn={'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM'};document.getElementById('userPlan').textContent=pn[u.plan]||'Бесплатный';}
 function updateSubscriptionUI(){var u=getCurrentUser();if(!u)return;document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Скоро';bd.classList.remove('visible');});if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}}
 document.getElementById('logoutBtn').addEventListener('click',function(){clearCurrentUser();if(supabaseClient){supabaseClient.auth.signOut();}document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
