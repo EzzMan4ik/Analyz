@@ -237,6 +237,19 @@
         .recommendation-item .marker { color: var(--dark-gold); font-weight: bold; }
         .rec-exercise { margin-top: 8px; padding: 12px 16px; background-color: rgba(99,102,241,0.06); border-left: 3px solid #6366f1; border-radius: 0 6px 6px 0; color: #ccc; font-size: 0.92rem; }
         html.light-theme .rec-exercise { color: #555; }
+        /* Вердикт и таймлайн разбора */
+        .verdict-box { margin: 16px 0; padding: 16px 18px; border-radius: 12px; background: linear-gradient(135deg, rgba(34,211,238,0.08), rgba(124,58,237,0.10)); border: 1px solid rgba(99,102,241,0.28); }
+        .verdict-label { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--neon, #22d3ee); margin-bottom: 8px; }
+        .verdict-text { font-size: 1rem; line-height: 1.65; color: #e5e7ff; }
+        html.light-theme .verdict-text { color: #2b2f4a; }
+        .tl { display: flex; flex-direction: column; gap: 6px; position: relative; padding-left: 4px; }
+        .tl-row { display: flex; gap: 12px; align-items: baseline; padding: 8px 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border-left: 3px solid rgba(148,163,184,0.5); font-size: 0.92rem; line-height: 1.5; }
+        .tl-row.good { border-left-color: var(--green, #2ecc71); }
+        .tl-row.bad { border-left-color: var(--red, #e74c3c); }
+        .tl-time { flex: 0 0 auto; min-width: 48px; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--neon, #22d3ee); }
+        .tl-text { color: #ccc; }
+        html.light-theme .tl-row { background: rgba(0,0,0,0.04); }
+        html.light-theme .tl-text { color: #444; }
         .rec-exercise strong { color: #818cf8; }
         .new-analysis-btn { display: inline-block; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border: none; border-radius: 8px; padding: 14px 28px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; margin-bottom: 30px; transition: background-color .25s, border-color .25s, color .25s, transform .25s, box-shadow .25s, opacity .25s; }
         .new-analysis-btn:hover { opacity: 0.9; box-shadow: 0 0 16px rgba(99,102,241,0.4); }
@@ -629,43 +642,43 @@
         <div class="section" id="section-subscriptions">
             <button class="back-home-btn btn-ico" data-back="home"><svg class="ico"><use href="#i-back"/></svg> На главную страницу</button>
             <div class="section-title">Тарифы и подписки</div>
-            <div class="section-desc">Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
+            <div class="section-desc">Оплата тарифов подключается — пока доступен бесплатный режим. Выберите подходящий тариф. Бесплатный режим доступен всегда — подписки открывают расширенную аналитику и безлимитные анализы.</div>
             <div class="subscription-cards">
                 <div class="subscription-card" id="card-dota" data-plan="pro_dota2">
                     <div class="subscription-title">PRO DOTA 2</div>
-                    <div class="subscription-price">250 ₽</div>
+                    <div class="subscription-price">199 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">10 анализов матчей ежедневно</li>
                         <li class="benefit">Умный тренер с планом на неделю</li>
                         <li class="benefit">Лучшие паттерны фарма</li>
                         <li class="benefit">Тайминги всех действий, предметов</li>
                     </ul>
-                    <button class="card-btn" id="btn-dota">Выбрать тариф</button>
+                    <button class="card-btn" id="btn-dota">Скоро</button>
                     <div class="current-badge" id="badge-dota"><svg class="ico"><use href="#i-check"/></svg> Ваша текущая подписка</div>
                 </div>
                 <div class="subscription-card" id="card-cs" data-plan="pro_cs2">
                     <div class="subscription-title">PRO CS 2</div>
-                    <div class="subscription-price">250 ₽</div>
+                    <div class="subscription-price">199 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">10 анализов матчей ежедневно</li>
                         <li class="benefit">Умный тренер с планом на неделю</li>
                         <li class="benefit">Лайнапы гранат на всех картах</li>
                         <li class="benefit">FACEIT анализ с про-сравнением</li>
                     </ul>
-                    <button class="card-btn" id="btn-cs">Выбрать тариф</button>
+                    <button class="card-btn" id="btn-cs">Скоро</button>
                     <div class="current-badge" id="badge-cs"><svg class="ico"><use href="#i-check"/></svg> Ваша текущая подписка</div>
                 </div>
                 <div class="subscription-card" id="card-premium" data-plan="premium">
                     <div class="premium-badge"></div>
                     <div class="subscription-title"><svg class="ico"><use href="#i-star"/></svg> PREMIUM</div>
-                    <div class="subscription-price" style="font-size:2.6rem;">499 ₽</div>
+                    <div class="subscription-price" style="font-size:2.6rem;">349 ₽</div>
                     <ul class="benefits-list">
                         <li class="benefit">Всё из PRO DOTA 2 и PRO CS 2</li>
                         <li class="benefit">Безлимитное количество анализов</li>
                         <li class="benefit">Расширенный разбор с планом тренировок</li>
                         <li class="benefit">Более глубокий анализ ситуаций</li>
                     </ul>
-                    <button class="card-btn" id="btn-premium">Выбрать тариф</button>
+                    <button class="card-btn" id="btn-premium">Скоро</button>
                     <div class="current-badge" id="badge-premium"><svg class="ico"><use href="#i-check"/></svg> Ваша текущая подписка</div>
                 </div>
             </div>
@@ -690,6 +703,7 @@
                         <input type="text" class="link-input" placeholder="Вставьте ссылку на матч или match_id" id="dotaLink" aria-label="Ссылка или ID матча Dota 2"/>
                         <button class="analyze-btn" id="dotaAnalyzeBtn">Анализировать</button>
                     </div>
+                    <div class="section-desc" style="font-size:.85rem;margin:-4px 0 14px;">Пример: <b>7891234567</b> или ссылка вида dotabuff.com/matches/7891234567. Профиль игрока в Dota 2 должен быть открытым.</div>
                     <div class="progress-wrapper" id="dotaProgress">
                         <div class="progress-bar"><div class="progress-fill" id="dotaProgressFill"></div></div>
                         <div class="progress-text" id="dotaProgressText">В очереди...</div>
@@ -816,7 +830,7 @@
     </div>
 </div>
 
-<script src="analyzer.js?v=20261109"></script>
+<script src="analyzer.js?v=20261113"></script>
 <script>
 // Защита от старой/закэшированной версии analyzer.js: сайт продолжит работать, но без новых правил разбора
 (function(){var G=window.GA=window.GA||{};
@@ -1095,7 +1109,7 @@ document.getElementById('loginBtn').addEventListener('click',async function(){
 function enterApp(){document.getElementById('authScreen').style.display='none';setTimeout(function(){document.getElementById('appWrapper').classList.add('active');updateUserInfo();updateSubscriptionUI();initLimitWarnings();},10);}
 async function initLimitWarnings(){await Promise.all([showLimitWarning('dotaLimitWarning','dota'),showLimitWarning('csLimitWarning','cs'),showLimitWarning('faceitLimitWarning','cs')]);}
 function updateUserInfo(){var u=getCurrentUser();if(!u)return;document.getElementById('userName').textContent=u.login;var pn={'free':'Бесплатный','pro_dota2':'PRO DOTA 2','pro_cs2':'PRO CS 2','premium':'PREMIUM'};document.getElementById('userPlan').textContent=pn[u.plan]||'Бесплатный';}
-function updateSubscriptionUI(){var u=getCurrentUser();if(!u)return;document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Выбрать тариф';bd.classList.remove('visible');});if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}}
+function updateSubscriptionUI(){var u=getCurrentUser();if(!u)return;document.querySelectorAll('.subscription-card').forEach(function(c){c.classList.remove('active-plan');var b=c.querySelector('.card-btn'),bd=c.querySelector('.current-badge');b.classList.remove('current');b.textContent='Скоро';bd.classList.remove('visible');});if(u.plan&&u.plan!=='free'){var ac=document.querySelector('.subscription-card[data-plan="'+u.plan+'"]');if(ac){ac.classList.add('active-plan');ac.querySelector('.card-btn').classList.add('current');ac.querySelector('.card-btn').textContent='Активна';ac.querySelector('.current-badge').classList.add('visible');}}}
 document.getElementById('logoutBtn').addEventListener('click',function(){clearCurrentUser();if(supabaseClient){supabaseClient.auth.signOut();}document.getElementById('appWrapper').classList.remove('active');closeSidebar();document.getElementById('loginInput').value='';document.getElementById('passwordInput').value='';setTimeout(function(){document.getElementById('authScreen').style.display='flex';},300);});
 document.getElementById('btn-dota').addEventListener('click',function(){selectPlan('pro_dota2');});
 document.getElementById('btn-cs').addEventListener('click',function(){selectPlan('pro_cs2');});
@@ -1395,7 +1409,7 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
     var html='';
     html+=parseBannerHtml(String(matchId));
     html+='<div class="result-header"><div class="result-header-info"><h2>'+hName+' — '+posName+(approxPos?' <span style="font-size:.7em;color:var(--text-dim);font-weight:500;">(примерно)</span>':'')+'</h2><div class="result-header-meta">Длительность: '+durStr+' · '+(isRad?'Radiant':'Dire')+' · '+rs+':'+ds+'</div></div><div class="result-badge '+(won?'win':'lose')+'">'+(won?'Победа':'Поражение')+'</div></div>';
-    html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\''+matchId+'\')">'+playerOptions+'</select></div>';
+    html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" onchange="switchDotaPlayer(\''+matchId+'\')">'+playerOptions+'</select></div><!--COACH-->';
     html+='<div class="result-block"><div class="result-block-title">Базовые показатели</div><div class="metrics-grid">';
     html+='<div class="metric-card"><div class="metric-label">GPM</div><div class="metric-value">'+gpm+'</div><div class="metric-sub '+(gpm>=bm.gpm?'good':'bad')+'">Про: '+bm.gpm+'</div></div>';
     html+='<div class="metric-card"><div class="metric-label">XPM</div><div class="metric-value">'+xpm+'</div><div class="metric-sub '+(xpm>=bm.xpm?'good':'bad')+'">Про: '+bm.xpm+'</div></div>';
@@ -1414,7 +1428,7 @@ function buildDotaAnalysis(data,player,playerIndex,playerOptions){
         html+='</table></div>';
     }
     if(kp2.length>0){html+='<div class="result-block"><div class="result-block-title">Ключевые предметы</div><div class="item-timeline">';kp2.forEach(function(p){html+='<div class="item-chip">'+p.name+' — <span class="item-time">'+p.ts+'</span></div>';});html+='</div>';if(blink){var bm2=blink.time/60;if(bm2>bm.blink+3)html+='<div class="analysis-text"><strong style="color:var(--red);">Blink в '+blink.ts+'</strong> — поздновато.</div>';else if(bm2<=bm.blink+1)html+='<div class="analysis-text"><strong style="color:var(--green);">Blink в '+blink.ts+'</strong> — отлично.</div>';}html+='</div>';}
-    try{html+=GA.renderReport(GA.analyzeDota(GA.normalizeDotaPlayer(player,data,pos,hName,{opp:oi>=0?data.players[oi]:null,oppName:oi>=0?getHeroName(data.players[oi].hero_id):null,heroKey:hi&&hi.name,approxPos:approxPos})));}catch(e){console.error('Ошибка разбора:',e);}
+    var _h0=html;try{html+=GA.renderReport(GA.analyzeDota(GA.normalizeDotaPlayer(player,data,pos,hName,{opp:oi>=0?data.players[oi]:null,oppName:oi>=0?getHeroName(data.players[oi].hero_id):null,heroKey:hi&&hi.name,nameByKey:function(k){var h=tierlistData&&tierlistData.find(function(x){return x.name===k;});return h&&h.localized_name;},approxPos:approxPos})));}catch(e){console.error('Ошибка разбора:',e);}html=_h0.indexOf('<!--COACH-->')!==-1?_h0.replace('<!--COACH-->',function(){return html.slice(_h0.length);}):html;
     html+='<button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
     return html;
 }
@@ -1424,7 +1438,6 @@ function pickDotaPlayerIndex(data){var acc=myDotaAccount(),ps=data.players||[];i
 function generateDotaResultsFromAPI(data,preferIdx){var players=data.players||[],pi=(preferIdx!=null&&!isNaN(preferIdx)&&players[preferIdx])?preferIdx:pickDotaPlayerIndex(data),opts='';players.forEach(function(p,i){var side=p.player_slot<128?'Radiant':'Dire',hName=getHeroName(p.hero_id),nick=p.personaname||(p.account_id?'Игрок #'+p.account_id:'Аноним');opts+='<option value="'+i+'"'+(i===pi?' selected':'')+'>'+escHtml(hName+' — '+nick+' ('+side+') — '+p.kills+'/'+p.deaths+'/'+p.assists)+'</option>';});var player=players[pi];if(!player)return'<div class="problem-block"><div class="problem-text">Игрок не найден</div></div>';return buildDotaAnalysis(data,player,pi,opts);}
 window.switchDotaPlayer=async function(matchId){var rd=document.getElementById('dotaResults'),dd=rd.querySelector('.player-select-dropdown'),pi=parseInt(dd.value);try{var data=_dotaMatchCache[matchId];if(!data){var res=await fetch(DOTA_API+'matches/'+matchId);data=await res.json();_dotaMatchCache[matchId]=data;}if(!data.players||!data.players[pi])return;rd.innerHTML=generateDotaResultsFromAPI(data,pi);}catch(err){console.error(err);}};
 window.resetAnalysis=function(game){var p=game==='dota'?'dota':'cs';if(game==='dota'){stopParseWatch();document.getElementById('dotaResults').removeAttribute('data-match');}document.getElementById(p+'Results').classList.remove('visible');document.getElementById(p+'Results').innerHTML='';document.getElementById(p+'Progress').classList.remove('visible');document.getElementById(p+'ProgressFill').style.width='0%';document.getElementById(p+'Link').value='';if(game==='cs'){var fi=document.getElementById('csFile');if(fi)fi.value='';}};
-function generateCsResults(){return'<div class="result-header"><div class="result-header-info"><h2>Mirage — Entry Fragger</h2><div class="result-header-meta">Карта: de_mirage · 24 раунда</div></div><div class="result-badge lose">Поражение</div></div><div class="metrics-grid"><div class="metric-card"><div class="metric-label">ADR</div><div class="metric-value">62</div><div class="metric-sub bad">Про: 78</div></div><div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">0.85</div><div class="metric-sub bad">Про: 1.05</div></div><div class="metric-card"><div class="metric-label">HS%</div><div class="metric-value">48%</div><div class="metric-sub good">Норма: 45%+</div></div></div><div class="result-block"><div class="result-block-title">Рекомендации</div><div class="recommendation-item"><span class="marker">1.</span><div>Используйте FACEIT анализ для глубокого разбора.<div class="rec-exercise"><strong>Перейдите во вкладку FACEIT Анализ</strong></div></div></div></div><button class="new-analysis-btn" onclick="resetAnalysis(\'cs\')">Новый анализ</button>';}
 
 async function runAnalysis(game){
     var u=getCurrentUser();if(!u)return;
@@ -1475,17 +1488,6 @@ async function runAnalysis(game){
             r.scrollIntoView({behavior:'smooth',block:'start'});
             if(needParse)startParseWatch(matchId,{startTime:data.start_time});
             await finishDota(data);
-        }
-        if(game==='cs'){
-            f.style.width='50%';t.textContent='Разбор...';
-            await new Promise(function(r){setTimeout(r,1000);});
-            f.style.width='100%';t.textContent='Готово!';
-            await new Promise(function(r){setTimeout(r,400);});
-            w.classList.remove('visible');r.innerHTML=generateCsResults();r.classList.add('visible');
-            r.scrollIntoView({behavior:'smooth',block:'start'});
-            await incrementUsage('cs');
-            await saveAnalysis('cs2',matchId,'CS2 анализ · ADR: 62',0.85,62,0,0);
-            await showLimitWarning('csLimitWarning','cs');
         }
     }catch(err){t.textContent='Ошибка: '+err.message;setTimeout(function(){w.classList.remove('visible');f.style.width='0%';t.textContent='В очереди...';},3000);}
 }
