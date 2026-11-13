@@ -66,9 +66,9 @@
       score: opts.score == null ? null : { value: opts.score, label: scoreLabel(opts.score) },
       summary: opts.summary || '',
       main: problems[0] || null,
-      problems: problems.slice(0, 4),
-      strengths: strengths.slice(0, 3),
-      notes: notes.slice(0, 3),
+      problems: problems.slice(0, 5),
+      strengths: strengths.slice(0, 4),
+      notes: notes.slice(0, 4),
       plan: plan,
       foot: opts.foot || ''
     };
@@ -232,10 +232,12 @@
       tfp: isNum(p.teamfight_participation) ? clamp(num(p.teamfight_participation), 0, 1) : null,
       deadPct: isNum(p.life_state_dead) && dur > 0 ? clamp(num(p.life_state_dead) / dur, 0, 1) : null,
       deadSec: isNum(p.life_state_dead) ? num(p.life_state_dead) : null,
-      tp: p.purchase && isNum(p.purchase.tpscroll) ? num(p.purchase.tpscroll) : null,
+      // если у матча есть блок покупок, отсутствие ключа = 0 покупок (раньше это считалось «нет данных»)
+      tp: p.purchase && typeof p.purchase === 'object' ? num(p.purchase.tpscroll, 0) : null,
+      raw: p, match: match, nameByKey: typeof extra.nameByKey === 'function' ? extra.nameByKey : null,
       obsKills: isNum(p.observer_kills) ? num(p.observer_kills) : null,
       runes: isNum(p.rune_pickups) ? num(p.rune_pickups) : null,
-      smokes: p.purchase && isNum(p.purchase.smoke_of_deceit) ? num(p.purchase.smoke_of_deceit) : null,
+      smokes: p.purchase && typeof p.purchase === 'object' ? num(p.purchase.smoke_of_deceit, 0) : null,
       deathTimes: deathTimesOf(p, match, extra.heroKey),
       opp: extra.opp ? {
         hero: extra.oppName || ('Hero #' + extra.opp.hero_id),
@@ -276,6 +278,268 @@
   function pctText(p) { return Math.round(p * 100); }
   function mmss(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
   function kfmt(v) { var s = Math.abs(v) >= 1000 ? (Math.round(Math.abs(v) / 100) / 10) + 'K' : String(Math.round(Math.abs(v))); return (v < 0 ? '−' : '+') + s; }
+
+  /* ------------------------------------------------------------------ */
+  /* DOTA 2: глубокий разбор (нужен распарсенный матч OpenDota)          */
+  /* смерти, видение, предметы, драки, ключевые моменты, показатели роли */
+  /* ------------------------------------------------------------------ */
+  var KEY_ITEM_NAMES = {
+    black_king_bar: 'BKB', blink: 'Blink Dagger', aeon_disk: 'Aeon Disk', refresher: 'Refresher Orb',
+    sheepstick: 'Scythe of Vyse', satanic: 'Satanic', butterfly: 'Butterfly', travel_boots: 'Boots of Travel',
+    force_staff: 'Force Staff', glimmer_cape: 'Glimmer Cape', ghost: 'Ghost Scepter', lotus_orb: 'Lotus Orb',
+    aghanims_shard: "Aghanim's Shard", ultimate_scepter: "Aghanim's Scepter", assault: 'Assault Cuirass',
+    heart: 'Heart of Tarrasque', shivas_guard: "Shiva's Guard", radiance: 'Radiance', manta: 'Manta Style',
+    greater_crit: 'Daedalus', monkey_king_bar: 'Monkey King Bar', skadi: 'Eye of Skadi', mekansm: 'Mekansm',
+    guardian_greaves: 'Guardian Greaves', pipe: 'Pipe of Insight', crimson_guard: 'Crimson Guard'
+  };
+
+  function heroLabel(key, nameByKey) {
+    if (!key) return 'враг';
+    if (nameByKey) { var n = null; try { n = nameByKey(key); } catch (e) { n = null; } if (n) return n; }
+    return String(key).replace(/^npc_dota_hero_/, '').split('_').map(function (w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+  }
+  function timesText(arr, max) {
+    max = max || 6;
+    return arr.slice(0, max).map(mmss).join(', ') + (arr.length > max ? '…' : '');
+  }
+  function goldK(v) { return v >= 1000 ? (Math.round(v / 100) / 10) + 'K' : String(Math.round(v)); }
+
+  function deepDota(m, items) {
+    var out = { timeline: [], facts: [], penalty: 0 };
+    var startLen = items.length;
+    var p = m.raw, match = m.match || {};
+    if (!p || !m.parsed) return out;
+    var core = m.pos <= 3, sup = m.pos >= 4, durSec = m.durMin * 60;
+    var pro = DOTA_PRO[m.pos] || DOTA_PRO[1];
+    var posName = DOTA_POS_NAMES[m.pos] || 'Игрок';
+
+    var deaths = Array.isArray(p.deaths_log) ? p.deaths_log.filter(function (d) { return d && isNum(d.time); }).map(function (d) {
+      return { time: num(d.time), key: d.key, fed: num(d.gold_fed, 0), lost: num(d.gold_lost, 0), dead: num(d.time_dead, 0) };
+    }) : (m.deathTimes || []).map(function (t) { return { time: t, key: null, fed: 0, lost: 0, dead: 0 }; });
+    deaths.sort(function (a, b) { return a.time - b.time; });
+    var tfs = Array.isArray(match.teamfights) ? match.teamfights : [];
+    var idx = -1;
+    (match.players || []).forEach(function (q, i) { if (q && q.player_slot === p.player_slot) idx = i; });
+    var buys = Array.isArray(p.purchase_log) ? p.purchase_log : [];
+    function firstBuy(key) { var t = null; buys.forEach(function (b) { if (b && b.key === key && isNum(b.time) && (t == null || b.time < t)) t = num(b.time); }); return t; }
+    function uses(key) { return p.item_uses && isNum(p.item_uses[key]) ? num(p.item_uses[key]) : 0; }
+    var buybackTimes = (Array.isArray(p.buyback_log) ? p.buyback_log : []).filter(function (b) { return b && isNum(b.time); }).map(function (b) { return num(b.time); });
+    var cash = num(p.gold, 0);
+
+    /* 1. Один и тот же герой убивает снова и снова */
+    var byKiller = {}, topKey = null;
+    deaths.forEach(function (d) { if (d.key) { (byKiller[d.key] = byKiller[d.key] || []).push(d.time); } });
+    Object.keys(byKiller).forEach(function (k) { if (!topKey || byKiller[k].length > byKiller[topKey].length) topKey = k; });
+    if (topKey && byKiller[topKey].length >= 3 && byKiller[topKey].length >= deaths.length * 0.4) {
+      var kn = heroLabel(topKey, m.nameByKey), kt = byKiller[topKey];
+      items.push(P('repeat_killer', 42 + kt.length * 6, 'Один и тот же герой убивает вас снова и снова',
+        kn + ' убил вас ' + kt.length + ' ' + plural(kt.length, 'раз', 'раза', 'раз') + ' из ' + deaths.length + ' (' + timesText(kt) + '). Это не случайность: вы каждый раз попадаете в одну и ту же ситуацию.',
+        sup
+          ? 'Против ' + kn + ': держитесь на шаг позади кора, не заходите в туман войны первым, а перед выходом проверяйте, где он на миникарте. Ставьте вард на его маршрут.'
+          : 'Против ' + kn + ': как только он пропал с миникарты — отходите ближе к союзникам/башне и не фармите в одиночку на чужой половине. Закладывайте в сборку вещь против него (BKB, Linken, Ghost Scepter, Glimmer — по ситуации).'));
+    }
+
+    /* 2. Смерти в одиночку, вне командных драк */
+    if (tfs.length >= 3 && deaths.length >= 3) {
+      var picks = deaths.filter(function (d) {
+        return !tfs.some(function (tf) { return d.time >= num(tf.start) - 8 && d.time <= num(tf.end) + 8; });
+      });
+      if (picks.length >= 3 && picks.length >= deaths.length * 0.5) {
+        items.push(P('pickoffs', 30 + picks.length * 5, 'Смерти в одиночку, вне драк',
+          picks.length + ' из ' + deaths.length + ' смертей — вас ловили без командной драки (' + timesText(picks.map(function (d) { return d.time; })) + '). Каждая такая смерть — бесплатное золото врагу, а ваша команда остаётся в меньшинстве.',
+          'Правило: если рядом нет союзника и нет вашего варда на подходе — не идите в лес врага и за реку. Перед каждым выходом смотрите миникарту: пропавшие вражеские герои = осторожность.'));
+      }
+    }
+
+    /* 3. Дорогие смерти */
+    var fed = deaths.reduce(function (s, d) { return s + d.fed; }, 0);
+    var worst = deaths.reduce(function (b, d) { return !b || d.fed > b.fed ? d : b; }, null);
+    if (deaths.length >= 3 && (fed >= 3500 || (worst && worst.fed >= 1300))) {
+      items.push(P('costly_deaths', 24 + Math.min(26, fed / 250), 'Дорогие смерти',
+        'Ваши смерти принесли врагам ' + goldK(fed) + ' золота' + (worst && worst.fed >= 600 ? '; самая дорогая — на ' + mmss(worst.time) + ' (' + goldK(worst.fed) + ')' : '') + '. Чем больше у вас золота в вещах, тем дороже каждая ошибка.',
+        'После 25-й минуты вы — главная цель: перед дракой убедитесь, что есть TP/BKB, а в одиночку не показывайтесь на карте без видения.'));
+    }
+
+    /* 4. Смерти в решающем отрезке игры */
+    if (m.durMin >= 25) {
+      var lateD = deaths.filter(function (d) { return d.time >= durSec * 0.85; });
+      if (!m.won && lateD.length >= 2) {
+        items.push(P('late_deaths', 40 + lateD.length * 6, 'Смерти в конце игры',
+          'В решающем отрезке (' + timesText(lateD.map(function (d) { return d.time; })) + ') вы погибли ' + lateD.length + ' ' + plural(lateD.length, 'раз', 'раза', 'раз') + ' — игра закончилась вскоре после этого.',
+          'В поздней игре смерть — это не пауза, а шанс врагу сломать строения. Держите деньги на выкуп и выходите на драку только рядом с союзниками, а не раньше их.'));
+      }
+    }
+
+    /* 5. Золото, которое не превратилось в предметы */
+    if (m.durMin >= 15 && cash >= (core ? 2500 : 1500) && (!m.won || cash >= 4000)) {
+      items.push(P('unspent_gold', 22 + Math.min(24, cash / 400) - (m.won ? 14 : 0), 'Золото в кармане',
+        'К концу матча у вас осталось ' + cash + ' золота — это почти целый предмет, который не работал в драках' + (m.buybacks > 0 ? '. Часть могла быть отложена на выкуп, но остаток всё равно лежал без дела.' : '.'),
+        'Покупайте предметы сразу при возвращении на базу или через курьера; копите только на конкретную вещь и не дольше пары минут.'));
+    }
+
+    /* 6. Выкупы */
+    if (buybackTimes.length >= 2 && !m.won) {
+      items.push(N('buybacks', 'Выкупы',
+        'Вы выкупались ' + buybackTimes.length + ' ' + plural(buybackTimes.length, 'раз', 'раза', 'раз') + ' (' + timesText(buybackTimes) + '), но матч проигран. Выкуп стоит дорого: используйте его, когда смерть сразу отдаёт барак/Рошана, а не просто чтобы вернуться в бой.'));
+    }
+
+    /* 7. Пропущенные драки (кор-герои) */
+    if (core && tfs.length >= 8 && idx >= 0) {
+      var miss = [];
+      tfs.forEach(function (tf) {
+        var e = tf.players && tf.players[idx];
+        if (e && num(e.damage, 0) < 150 && num(e.deaths, 0) === 0) miss.push(num(tf.start));
+      });
+      if (miss.length >= Math.max(3, tfs.length * 0.25)) {
+        items.push(P('missed_fights', 22 + miss.length * 3, 'Пропущенные драки',
+          'В ' + miss.length + ' из ' + tfs.length + ' командных драк вы почти не нанесли урона (' + timesText(miss) + ') — вас не было там, где решалась игра.',
+          'Когда команда собирается на объект или идёт драка, телепортируйтесь или идите к ней раньше, чем закончите фарм: золото вы доберёте после выигранной драки.'));
+      }
+    }
+
+    /* 8. Видение и вспомогательные дела (саппорты) */
+    var obsT = (Array.isArray(p.obs_log) ? p.obs_log : []).filter(function (w) { return w && isNum(w.time); }).map(function (w) { return num(w.time); }).sort(function (a, b) { return a - b; });
+    var senT = (Array.isArray(p.sen_log) ? p.sen_log : []).filter(function (w) { return w && isNum(w.time); }).map(function (w) { return num(w.time); }).sort(function (a, b) { return a - b; });
+    if (sup && m.durMin >= 20) {
+      if (obsT.length && obsT[0] > 480) {
+        items.push(P('first_ward', 34 + Math.min(20, (obsT[0] - 480) / 60 * 2), 'Поздний первый обсервер',
+          'Первый обсервер вы поставили на ' + mmss(obsT[0]) + '. До этого команда не видела ни рун, ни лес, ни подходы врагов — это ранние смерти и упущенные ганки.',
+          'Закупайте 2 обсервера в первую же закупку и ставьте их до 4-й минуты на руны и в лес врага; потом обновляйте раз в 6–7 минут.'));
+      } else if (!obsT.length && m.obs === 0) {
+        items.push(P('no_obs', 38, 'Ни одного обсервера',
+          'За ' + Math.round(m.durMin) + ' мин вы не поставили ни одного обсервера — враг двигался по карте свободно.',
+          'Каждую закупку берите 1–2 обсервера: вард, поставленный заранее, окупается первой же спасённой жизнью.'));
+      }
+      if (m.stacked != null && m.stacked <= 1 && m.durMin >= 20) {
+        items.push(P('no_stacks', 20, 'Почти нет стаков',
+          'Всего ' + m.stacked + ' ' + plural(m.stacked, 'стак', 'стака', 'стаков') + ' за ' + Math.round(m.durMin) + ' мин. Стак в окне «нечего делать на карте» — бесплатное золото для кора и опыт для вас.',
+          'Стакайте лагерь на 53–57 секунде каждой минуты, когда ничего не происходит: у «треугольника» это самое выгодное место.'));
+      }
+      if (m.pos === 4 && m.runes != null && m.runes === 0 && m.durMin >= 20) {
+        items.push(P('sup_runes', 18, 'Руны не подбираются',
+          'За матч не подобрано ни одной руны. Саппорт у реки к руне помогает мидеру и даёт вам бесплатные ресурсы.',
+          'К каждой чётной минуте проверяйте, не нужно ли вам забрать руну мощи/воды у реки, пока кор фармит.'));
+      }
+      var earlyD = deaths.filter(function (d) { return d.time < 720; });
+      if (earlyD.length >= 2) {
+        items.push(P('early_sup_deaths', 36 + earlyD.length * 4, 'Ранние смерти саппорта',
+          'До 12-й минуты вы погибли ' + earlyD.length + ' ' + plural(earlyD.length, 'раз', 'раза', 'раз') + ' (' + timesText(earlyD.map(function (d) { return d.time; })) + '). Саппорт, который умирает на линии, отдаёт кору опыт и золото и сам остаётся без предметов.',
+          'Ранняя игра: покупайте ресурсы на линию (ветки, мангo, клярити), не стойте AFK, а при потере здоровья отходите за союзного крипа и берите курьера с предметами.'));
+      }
+    }
+
+    /* 9. Предметы: BKB и Blink */
+    var bkbT = firstBuy('black_king_bar');
+    if (core && m.durMin >= 28) {
+      if (bkbT != null && bkbT > 1440 && m.durMin >= 35) {
+        var before = deaths.filter(function (d) { return d.time < bkbT; }).length;
+        items.push(P('late_bkb', 28 + Math.min(18, (bkbT - 1440) / 120), 'Поздний BKB',
+          'BKB куплен на ' + mmss(bkbT) + (before > 0 ? ' — из ' + deaths.length + ' смертей ' + before + ' ' + plural(before, 'пришлась', 'пришлись', 'пришлись') + ' на время до него' : '') + '. Без BKB вас выключают одним станом, и вы теряете драку, не успев ничего сделать.',
+          'К 20–25 минуте у кора должен быть BKB (или Ghost/Linken по ситуации). Не покупайте дорогую слабую вещь, пока нет защиты от контроля.'));
+      } else if (bkbT == null && m.durMin >= 32 && m.d >= 6) {
+        items.push(P('no_bkb', 30, 'Нет BKB',
+          'За ' + Math.round(m.durMin) + ' мин BKB так и не куплен, при этом ' + m.d + ' смертей. Против контроля это самая важная вещь кора.',
+          'Если у врага станы и контроль — BKB берётся раньше всего остального дорогого.'));
+      }
+      if (bkbT != null && tfs.length >= 6) {
+        var after = tfs.filter(function (tf) { return num(tf.start) > bkbT; }).length;
+        if (after >= 4 && uses('black_king_bar') < Math.max(2, after * 0.35)) {
+          items.push(P('bkb_unused', 24, 'BKB почти не используется',
+            'BKB куплен на ' + mmss(bkbT) + ', но за ' + after + ' драк после этого нажат ' + uses('black_king_bar') + ' ' + plural(uses('black_king_bar'), 'раз', 'раза', 'раз') + '. Вещь за 4 000 золота стоит без дела.',
+            'Нажимайте BKB в начале драки, а не после первого стана — тогда он и работает как защита.'));
+        }
+      }
+    }
+    var blinkT = firstBuy('blink');
+    if (blinkT != null && uses('blink') === 0 && m.durMin >= 20) {
+      items.push(P('blink_unused', 20, 'Blink куплен, но не используется', 'Blink Dagger куплен на ' + mmss(blinkT) + ', но за матч не использован ни разу.',
+        'Blink — это инициация и побег: назначьте себе кнопку и используйте в каждой драке.'));
+    }
+
+    /* 10. Сводка по золоту: вы тащили, а команда проиграла */
+    if (match.players && idx >= 0 && !m.won) {
+      var rad = isRadiantSlot(p);
+      var mates = match.players.filter(function (q) { return isRadiantSlot(q) === rad; });
+      var foes = match.players.filter(function (q) { return isRadiantSlot(q) !== rad; });
+      var myNw = num(p.net_worth, 0);
+      var top = mates.every(function (q) { return num(q.net_worth, 0) <= myNw; });
+      var foeNw = foes.map(function (q) { return num(q.net_worth, 0); }).sort(function (a, b) { return b - a; });
+      if (top && foeNw[0] >= myNw * 0.95 && foeNw[1] >= myNw * 0.7) {
+        items.push(N('carry_alone', 'Вы тащили почти в одиночку',
+          'Ваш нетворс ' + goldK(myNw) + ' — первый в команде, но у соперников двое с ' + goldK(foeNw[0]) + ' и ' + goldK(foeNw[1]) + '. Одного сильного кора мало: исход решает баланс золота у всей пятёрки и то, кто умирает в ключевых драках.'));
+      }
+    }
+
+    /* Сильные стороны саппорта/оффлейнера: контроль и девард */
+    if (!core || sup) {
+      var stunSec = num(p.stuns, 0);
+      if (stunSec >= (sup ? 45 : 35)) {
+        items.push(S('control', 32 + Math.min(14, (stunSec - 45) / 5), 'Много контроля',
+          'Ваши станы и ограничения держали врагов около ' + Math.round(stunSec) + ' секунд — именно это даёт команде возможность выигрывать драки.'));
+      }
+      var wardKills = num(p.observer_kills, 0) + num(p.sentry_kills, 0);
+      if (sup && wardKills >= 5) {
+        items.push(S('deward_total', 34, 'Вы чистите карту от вардов', 'Снято вражеских вардов: ' + wardKills + ' — враги играли с меньшим видением.'));
+      }
+    }
+
+    /* Штраф к оценке за найденные глубокие ошибки */
+    out.penalty = Math.min(25, items.slice(startLen).reduce(function (s, i) {
+      return s + (i.kind === 'problem' ? Math.max(0, i.severity - 35) * 0.35 : 0);
+    }, 0));
+
+    /* Ключевые моменты (таймлайн) */
+    var tl = out.timeline;
+    deaths.forEach(function (d) {
+      tl.push({ t: d.time, tone: 'bad', text: 'Смерть' + (d.key ? ' от ' + heroLabel(d.key, m.nameByKey) : '') + (d.fed >= 400 ? ' (враги получили ' + goldK(d.fed) + ' золота)' : '') });
+    });
+    buybackTimes.forEach(function (t) { tl.push({ t: t, tone: 'neutral', text: 'Выкуп' }); });
+    Object.keys(KEY_ITEM_NAMES).forEach(function (k) {
+      var t = firstBuy(k);
+      if (t != null && t > 0 && ['black_king_bar', 'blink', 'aeon_disk', 'refresher', 'sheepstick', 'satanic', 'butterfly', 'travel_boots', 'aghanims_shard', 'ultimate_scepter', 'ghost', 'glimmer_cape', 'force_staff'].indexOf(k) !== -1) {
+        tl.push({ t: t, tone: 'good', text: 'Куплено: ' + KEY_ITEM_NAMES[k] });
+      }
+    });
+    (Array.isArray(match.objectives) ? match.objectives : []).forEach(function (o) {
+      if (!o) return;
+      if (o.type === 'CHAT_MESSAGE_FIRSTBLOOD' && (o.player_slot === p.player_slot || o.victim_player_slot === p.player_slot)) {
+        tl.push({ t: num(o.time), tone: o.player_slot === p.player_slot ? 'good' : 'bad', text: o.player_slot === p.player_slot ? 'Первая кровь на вашем счету' : 'Первая кровь — вы стали жертвой' });
+      }
+      if (o.type === 'CHAT_MESSAGE_ROSHAN_KILL') {
+        var ours = (o.team === 2) === isRadiantSlot(p);
+        tl.push({ t: num(o.time), tone: ours ? 'good' : 'bad', text: ours ? 'Ваша команда убила Рошана' : 'Рошан убит врагами' });
+      }
+    });
+    if (tfs.length && idx >= 0) {
+      var bestTf = null;
+      tfs.forEach(function (tf) { var e = tf.players && tf.players[idx]; if (e && (!bestTf || num(e.damage, 0) > bestTf.dmg)) bestTf = { t: num(tf.start), dmg: num(e.damage, 0) }; });
+      if (bestTf && bestTf.dmg >= 2500) tl.push({ t: bestTf.t, tone: 'good', text: 'Ваша лучшая драка: ' + goldK(bestTf.dmg) + ' урона' });
+    }
+    tl.sort(function (a, b) { return a.t - b.t; });
+    if (tl.length > 16) {
+      // оставляем смерти и самые важные события, чтобы блок оставался читаемым
+      tl = tl.filter(function (e, i) { return e.tone === 'bad' || e.tone === 'neutral' || i % 2 === 0; }).slice(0, 16);
+    }
+    out.timeline = tl;
+
+    /* Показатели роли */
+    var f = out.facts;
+    var deadPctTxt = m.deadPct != null ? Math.round(m.deadPct * 100) + '%' : null;
+    if (core) {
+      if (m.lh10 != null) f.push({ label: 'Ластхиты к 10:00', value: String(m.lh10), sub: 'Про: ' + pro.lh10, tone: m.lh10 >= pro.lh10 * 0.9 ? 'good' : (m.lh10 < pro.lh10 * 0.6 ? 'bad' : '') });
+      f.push({ label: 'Золото в запасе', value: String(cash), sub: cash >= 2500 ? 'Лежит без дела' : 'Нормально', tone: cash >= 2500 ? 'bad' : 'good' });
+      f.push({ label: 'Смертей', value: String(m.d), sub: fed > 0 ? 'Отдали ' + goldK(fed) + ' золота' : '', tone: m.d / m.durMin * 10 >= 3.5 ? 'bad' : (m.d / m.durMin * 10 <= 1.4 ? 'good' : '') });
+      if (bkbT != null) f.push({ label: 'BKB куплен', value: mmss(bkbT), sub: bkbT <= 1440 ? 'Вовремя' : 'Поздновато', tone: bkbT <= 1440 ? 'good' : 'bad' });
+    } else {
+      f.push({ label: 'Варды', value: (m.obs != null && m.sen != null) ? (m.obs + '+' + m.sen) : '—', sub: obsT.length ? 'Первый обсервер: ' + mmss(obsT[0]) : 'Обсерверы + сентри', tone: obsT.length && obsT[0] <= 480 ? 'good' : (obsT.length ? 'bad' : '') });
+      f.push({ label: 'TP-свитки', value: m.tp != null ? String(m.tp) : '—', sub: m.tp != null && m.tp <= 2 && m.durMin >= 20 ? 'Слишком мало' : 'В норме', tone: m.tp != null && m.tp <= 2 && m.durMin >= 20 ? 'bad' : 'good' });
+      f.push({ label: 'Стаки', value: m.stacked != null ? String(m.stacked) : '—', sub: m.stacked != null && m.stacked <= 1 && m.durMin >= 20 ? 'Почти нет' : '', tone: m.stacked != null && m.stacked <= 1 && m.durMin >= 20 ? 'bad' : (m.stacked >= 3 ? 'good' : '') });
+      f.push({ label: 'Смертей', value: String(m.d), sub: deaths.length ? 'Первая на ' + mmss(deaths[0].time) : '', tone: m.d / m.durMin * 10 >= 4.5 ? 'bad' : '' });
+    }
+    if (deadPctTxt) f.push({ label: 'Время мёртвым', value: deadPctTxt, sub: mmss(m.deadSec || 0), tone: m.deadPct >= 0.15 ? 'bad' : (m.deadPct <= 0.07 ? 'good' : '') });
+    if (m.tfp != null) f.push({ label: 'Участие в драках', value: Math.round(m.tfp * 100) + '%', sub: '', tone: m.tfp >= 0.7 ? 'good' : (m.tfp < (sup ? 0.45 : 0.35) ? 'bad' : '') });
+    return out;
+  }
 
   function analyzeDota(m) {
     var pos = m.pos, core = pos <= 3, sup = pos >= 4;
@@ -417,8 +681,9 @@
       }
     }
     /* --- TELEPORT --- */
-    if (m.tp != null && m.durMin >= 28 && m.tp <= 2) {
-      items.push(P('tp', 22, 'Редко покупаете телепорт',
+    var hasBoT = m.items.some(function (x) { return x.key === 'travel_boots' || x.key === 'travel_boots_2'; });
+    if (m.tp != null && m.durMin >= 28 && m.tp <= 2 && !hasBoT) {
+      items.push(P('tp', m.tp === 0 ? 36 : 22, (m.tp === 0 ? 'Ни одного телепорта' : 'Редко покупаете телепорт'),
         'За ' + Math.round(m.durMin) + ' мин куплено всего ' + m.tp + ' ' + plural(m.tp, 'свиток', 'свитка', 'свитков') + ' телепорта. Без TP вы не успеваете на драки и защиту башен.',
         'TP всегда в слоте: использовали — сразу докупайте с курьером. Это дешевле любой проигранной драки.'));
     }
@@ -468,6 +733,7 @@
           'Планируйте покупку: после ботинок и основной вещи сразу собирайте 2250 золота на Blink и откладывайте дорогую слабую вещь.'));
       }
     }
+    var deep = deepDota(m, items);
     /* --- КОНТЕКСТ РЕЗУЛЬТАТА --- */
     var parts = [];
     ['gpm', 'xpm', 'hd', 'kills'].forEach(function (k) { if (sc[k] != null) parts.push(sc[k]); });
@@ -477,7 +743,7 @@
     if (sup && m.obs != null && m.sen != null) parts.push(clamp(((m.obs + m.sen) / m.durMin) / 0.55, 0, 1));
     if (core) { /* у кор-героев фарм важнее — учитываем GPM дважды */ if (sc.gpm != null) parts.push(sc.gpm); }
     var perf = parts.reduce(function (a, b) { return a + b; }, 0) / parts.length;
-    var score = Math.round(clamp(perf, 0, 1) * 100);
+    var score = Math.max(5, Math.round(clamp(perf, 0, 1) * 100 - deep.penalty));
 
     /* --- ОБЩИЙ ВКЛАД В МАТЧ (собственный индекс на данных OpenDota) --- */
     if (parts.length >= 3) {
@@ -502,7 +768,8 @@
       }
     }
 
-    if (!m.won && score >= 68) {
+    var hasMajor = items.some(function (i) { return i.kind === 'problem' && i.severity >= 40; });
+    if (!m.won && score >= 68 && !hasMajor) {
       items.push(N('context_loss', 'Поражение при сильных показателях',
         'Ваши цифры выше среднего, но матч проигран. По статистике упрекнуть себя не в чем — ищите причины в драфте, выборе моментов для драки и решениях команды.'));
     } else if (m.won && score < 40) {
@@ -518,7 +785,23 @@
         : 'Матч ещё не распарсен OpenDota: разбор построен на итоговой статистике, а позиция определена по фарму внутри команды. Лайнинг против соперника, ранние смерти, темп фарма и ход игры появятся после парсинга.'
     });
     res.summary = dotaSummary(res, m);
+    res.verdict = dotaVerdict(res, m);
+    res.timeline = deep.timeline;
+    res.facts = deep.facts;
     return res;
+  }
+
+  // Вердикт: 2–3 предложения о том, что решило матч для этого игрока
+  function dotaVerdict(r, m) {
+    if (!m.parsed) return '';
+    var parts = [];
+    var strong = r.strengths[0], probs = r.problems;
+    parts.push((m.won ? 'Победа' : 'Поражение') + ' на ' + m.hero + ': ' + m.k + '/' + m.d + '/' + m.a + ', ' + m.gpm + ' GPM.');
+    if (strong) parts.push('Лучшее в вашей игре — ' + lowerFirst(strong.title) + '.');
+    if (probs.length >= 2) parts.push('Главные точки роста: «' + probs[0].title + '» и «' + probs[1].title + '» — с них стоит начать работу.');
+    else if (probs.length === 1) parts.push('Главная точка роста: «' + probs[0].title + '».');
+    else parts.push('Крупных ошибок алгоритм не нашёл, ищите резерв в деталях ниже.');
+    return parts.join(' ');
   }
 
   function dotaSummary(r, m) {
@@ -905,7 +1188,16 @@
       var cls = r.score.value >= 60 ? 'good' : (r.score.value < 40 ? 'bad' : '');
       h += '<div class="metrics-grid"><div class="metric-card"><div class="metric-label">Оценка матча</div><div class="metric-value">' + r.score.value + '<span style="font-size:0.9rem;color:#888;"> / 100</span></div><div class="metric-sub ' + cls + '">' + esc(r.score.label) + '</div></div></div>';
     }
-    if (r.summary) h += '<div class="analysis-text">' + esc(r.summary) + '</div>';
+    if (r.verdict) h += '<div class="verdict-box"><div class="verdict-label"><svg class="ico"><use href="#i-bulb"/></svg> Вердикт тренера</div><div class="verdict-text">' + esc(r.verdict) + '</div></div>';
+    else if (r.summary) h += '<div class="analysis-text">' + esc(r.summary) + '</div>';
+    if (r.facts && r.facts.length) {
+      h += '<div class="analysis-section"><div class="analysis-section-title"><svg class="ico"><use href="#i-target"/></svg> Показатели вашей роли</div><div class="metrics-grid">';
+      r.facts.forEach(function (f) {
+        h += '<div class="metric-card"><div class="metric-label">' + esc(f.label) + '</div><div class="metric-value">' + esc(f.value) + '</div>' +
+          (f.sub ? '<div class="metric-sub ' + (f.tone === 'good' || f.tone === 'bad' ? f.tone : '') + '">' + esc(f.sub) + '</div>' : '') + '</div>';
+      });
+      h += '</div></div>';
+    }
     if (r.main) {
       h += '<div class="problem-block" style="margin-top:16px;"><div class="problem-title">Главная проблема: ' + esc(r.main.title) + '</div><div class="problem-text">' + esc(r.main.text) + '</div>' +
         (r.main.drill ? '<div class="rec-exercise" style="margin-top:12px;"><strong>Упражнение:</strong> ' + esc(r.main.drill) + '</div>' : '') + '</div>';
@@ -918,6 +1210,13 @@
           (p.drill ? '<div class="rec-exercise"><strong>Упражнение:</strong> ' + esc(p.drill) + '</div>' : '') + '</div>';
       });
       h += '</div>';
+    }
+    if (r.timeline && r.timeline.length) {
+      h += '<div class="analysis-section"><div class="analysis-section-title"><svg class="ico"><use href="#i-clock"/></svg> Ключевые моменты матча</div><div class="tl">';
+      r.timeline.forEach(function (e) {
+        h += '<div class="tl-row ' + (e.tone === 'good' || e.tone === 'bad' ? e.tone : '') + '"><span class="tl-time">' + esc(mmss(e.t)) + '</span><span class="tl-text">' + esc(e.text) + '</span></div>';
+      });
+      h += '</div></div>';
     }
     if (r.strengths.length) {
       h += '<div class="analysis-section"><div class="analysis-section-title"><svg class="ico"><use href="#i-check"/></svg> Сильные стороны</div>';
