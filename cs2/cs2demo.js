@@ -16,7 +16,7 @@
 
   var TRADE_SEC = 5;            // окно размена, секунд
   var ISOLATED_DIST = 1100;     // дальше этого от ближайшего живого напарника = «в одиночку» (юниты карты)
-  var SPOT_RADIUS = 450;        // радиус «одного и того же места»
+  var SPOT_RADIUS = 300;       // радиус «одного и того же места»
   var NADE_ITEMS = { 'flashbang': 'flash', 'he grenade': 'he', 'smoke grenade': 'smoke', 'molotov': 'molly', 'incendiary grenade': 'molly' };
   var AWP = { awp: 1, ssg08: 1 };
 
@@ -33,6 +33,15 @@
   function P(id, sev, title, text, drill) { return { id: id, kind: 'problem', severity: Math.round(sev), title: title, text: text, drill: drill }; }
   function S(id, sev, title, text) { return { id: id, kind: 'strength', severity: Math.round(sev), title: title, text: text }; }
   function N(id, title, text) { return { id: id, kind: 'note', severity: 0, title: title, text: text }; }
+  // P(X >= k) для биномиального распределения (n попыток, вероятность p)
+  function binomTail(n, k, p) {
+    var s = 0, c = 1;
+    for (var i = 0; i <= n; i++) {
+      if (i > 0) c = c * (n - i + 1) / i;
+      if (i >= k) s += c * Math.pow(p, i) * Math.pow(1 - p, n - i);
+    }
+    return s;
+  }
   function roundsText(list) { return list.slice(0, 6).map(function (n) { return n; }).join(', ') + (list.length > 6 ? '…' : ''); }
 
   /* ------------------------------------------------------------------ */
@@ -133,7 +142,11 @@
       });
     });
 
+    var earlyAll = kills.filter(function (k) { return k.enemy && k.t < 25; }).length;
+    var enemyKillsAll = kills.filter(function (k) { return k.enemy; }).length;
+
     return {
+      earlyRate: enemyKillsAll ? earlyAll / enemyKillsAll : 0.25,
       tradeRate: enemyDeaths ? tradedAll / enemyDeaths : 0.2,
       map: (raw.header && raw.header.map_name) || '', tickrate: tickrate, rounds: rounds, roundAt: roundAt, roundAtBuy: roundAtBuy,
       players: players, side: side, equip: equip, kills: kills, killsByRound: killsByRound,
@@ -174,7 +187,9 @@
       isolated: [], earlyDeaths: [], killers: {}, deathPos: [], clutch: { att: 0, won: 0, best: 0 }, multi: { k3: 0, k4: 0, k5: 0 },
       flashes: 0, flashEff: 0, flashEnemyBlinds: 0, teamFlashes: [], heDmg: 0, mollyDmg: 0, utilDmg: 0, nades: { flash: 0, he: 0, smoke: 0, molly: 0 },
       unusedDeaths: [], overbuy: [], pistolDeaths: 0, firstDeaths: 0, equipFull: 0, equipEco: 0, rWon: 0, rLost: 0,
-      moments: [], plants: 0, defuses: 0, perRound: {}
+      moments: [], plants: 0, defuses: 0, perRound: {},
+      awpDeaths: [], smokeDeaths: [], blindDeaths: [], side: { T: { r: 0, dmg: 0, k: 0, d: 0 }, CT: { r: 0, dmg: 0, k: 0, d: 0 } },
+      half: [{ r: 0, dmg: 0 }, { r: 0, dmg: 0 }], passiveLost: []
     };
 
     // --- по раундам ---
@@ -206,6 +221,8 @@
         if (k.vic === id) {
           st.deaths++; pr.died = true; pr.survived = false; pr.deathT = k.t;
           if (k.atk && k.enemy) st.killers[k.atk] = (st.killers[k.atk] || 0) + 1;
+          if (k.enemy && k.weapon === 'awp') st.awpDeaths.push(r.n);
+          if (k.enemy && k.thrusmoke) st.smokeDeaths.push(r.n);
           if (firstKill && firstKill === k) { st.openLoss++; }
           // размен моей смерти
           var tradedBy = ks.filter(function (p) { return p.enemy && p.atk && p.vic === k.atk && p.atkSide === my && p.tick > k.tick && p.tick - k.tick <= tw; })[0];
@@ -282,6 +299,25 @@
       else if (dur >= 1.5) st.teamFlashes.push({ round: r.n, dur: dur, tick: b.tick });
     });
     st.flashEff = Object.keys(effTicks).length;
+
+    // --- смерти от ослепления: враг ослепил меня, и я погиб, пока был слеп ---
+    M.blinds.forEach(function (b) {
+      if (String(b.user_steamid) !== id) return;
+      var dur = num(b.blind_duration, 0); if (dur < 1.2) return;
+      var r = M.roundAt(b.tick); if (!r) return;
+      var my = M.side[r.n][id], as = M.side[r.n][String(b.attacker_steamid)];
+      if (!my || !as || my === as) return;
+      var dead = st.deathPos.filter(function (d) { return d.round === r.n && d.tick >= b.tick && d.tick <= b.tick + (dur + 0.4) * tr; })[0];
+      if (dead && st.blindDeaths.indexOf(r.n) === -1) st.blindDeaths.push(r.n);
+    });
+
+    // --- стороны, половины, пассивность в проигранных раундах ---
+    M.rounds.forEach(function (r) {
+      var my = M.side[r.n][id], pr = st.perRound[r.n]; if (!my || !pr) return;
+      var sd = st.side[my]; sd.r++; sd.dmg += pr.dmg; sd.k += pr.kills; if (pr.died) sd.d++;
+      var h = st.half[r.n <= 12 ? 0 : 1]; h.r++; h.dmg += pr.dmg;
+      if (r.winner !== my && pr.dmg < 15 && pr.kills === 0 && !pr.assisted) st.passiveLost.push(r.n);
+    });
 
     // --- гранаты: купленные, но не брошенные, при смерти ---
     var bought = {};
@@ -362,15 +398,69 @@
     var untradedPct = pct(st.untradedDeaths, enemyDeaths);
 
     /* --- повторный убийца --- */
-    var killerIds = Object.keys(st.killers).filter(function (kid) { var n = st.killers[kid]; return n >= 3 && n / Math.max(1, D) >= 0.25; })
-      .sort(function (a, b) { return st.killers[b] - st.killers[a]; });
+    // Один и тот же убийца — только если это НЕ случайность: при 5 соперниках каждый в среднем убивает 20% смертей,
+    // поэтому требуем хотя бы 4 убийства, ≥40% смертей и маленькую вероятность случайного совпадения.
+    var killerIds = Object.keys(st.killers).filter(function (kid) {
+      var n = st.killers[kid];
+      return n >= 4 && n / Math.max(1, D) >= 0.4 && binomTail(D, n, 0.2) < 0.03;
+    }).sort(function (a, b) { return st.killers[b] - st.killers[a]; });
     if (killerIds.length) {
       var kid0 = killerIds[0], n0 = st.killers[kid0];
       var rs0k = st.deathPos.filter(function (d) { return d.atk === kid0; }).map(function (d) { return d.round; });
-      var extra = killerIds.length > 1 ? ' Ещё ' + nameOf(killerIds[1]) + ' убил вас ' + st.killers[killerIds[1]] + ' ' + plural(st.killers[killerIds[1]], 'раз', 'раза', 'раз') + '.' : '';
-      items.push(P('repeat_killer', 42 + n0 * 6, 'Один и тот же соперник убивает вас снова и снова',
-        nameOf(kid0) + ' убил вас ' + n0 + ' ' + plural(n0, 'раз', 'раза', 'раз') + ' из ' + D + ' (раунды ' + roundsText(rs0k) + '). Вы каждый раз попадаете в одну и ту же ситуацию против него.' + extra,
+      items.push(P('repeat_killer', 34 + n0 * 4 + Math.round((n0 / Math.max(1, D) - 0.4) * 30), 'Один соперник «читает» вас',
+        nameOf(kid0) + ' убил вас ' + n0 + ' ' + plural(n0, 'раз', 'раза', 'раз') + ' из ' + D + ' (раунды ' + roundsText(rs0k) + ') — это заметно больше случайного: в среднем каждый соперник забирает около пятой части ваших смертей.',
         'Против ' + nameOf(kid0) + ' меняйте тайминг и позицию: не выходите на него первым, просите флешку или разведите его гранатой и играйте второй волной вместе с напарником.'));
+    }
+
+    /* --- смерти от AWP --- */
+    if (st.awpDeaths.length >= 3 && st.awpDeaths.length / Math.max(1, D) >= 0.25) {
+      items.push(P('awp_deaths', 36 + st.awpDeaths.length * 4, 'Вас часто убивает AWP',
+        st.awpDeaths.length + ' из ' + D + ' ' + plural(D, 'смерти', 'смертей', 'смертей') + ' — от AWP (раунды ' + roundsText(st.awpDeaths) + '). Вы выходите в открытую на линию снайпера.',
+        'Против AWP не держите длинную линию: разрывайте обзор дымом, пикайте с напарником (один показывает цель, второй добивает) и не выходите в проём без флешки.'));
+    }
+
+    /* --- смерти в дыму и от ослепления --- */
+    if (st.smokeDeaths.length >= 2) {
+      items.push(P('smoke_deaths', 34 + st.smokeDeaths.length * 5, 'Вас убивают через дым',
+        st.smokeDeaths.length + ' ' + plural(st.smokeDeaths.length, 'раз', 'раза', 'раз') + ' вас убили через дымовую завесу (раунды ' + roundsText(st.smokeDeaths) + '): вы стоите у края дыма или в нём.',
+        'Не стойте у кромки дыма и не пересиживайте в нём: после броска дыма отходите в сторону или назад — вас простреливают на слух и по моделям.'));
+    }
+    if (st.blindDeaths.length >= 3) {
+      items.push(P('blind_deaths', 34 + st.blindDeaths.length * 4, 'Погибаете ослеплёнными',
+        'В ' + st.blindDeaths.length + ' ' + plural(st.blindDeaths.length, 'раунде', 'раундах', 'раундах') + ' вы погибли, пока были ослеплены флешкой соперника (раунды ' + roundsText(st.blindDeaths) + ').',
+        'Слышите «флеш» или видите бросок — отворачивайтесь и уходите за угол до взрыва, не стойте на линии. Просите напарников коротко говорить «флеш» при броске.'));
+    }
+
+    /* --- слабая сторона --- */
+    var sT = st.side.T, sC = st.side.CT;
+    if (sT.r >= 8 && sC.r >= 8) {
+      var aT = sT.dmg / sT.r, aC = sC.dmg / sC.r, hi = Math.max(aT, aC), lo = Math.min(aT, aC);
+      if (hi - lo >= 28 && lo / hi <= 0.72) {
+        var weak = aT < aC ? 'атаку' : 'защиту', weakS = aT < aC ? sT : sC, strongS = aT < aC ? sC : sT;
+        items.push(P('weak_side', 38 + (hi - lo) * 0.5, 'Провал за ' + weak,
+          'Урон за раунд за ' + weak + ' — ' + Math.round(lo) + ', за ' + (aT < aC ? 'защиту' : 'атаку') + ' — ' + Math.round(hi) + ' (' + weakS.k + ' убийств и ' + weakS.d + ' смертей за ' + weakS.r + ' ' + plural(weakS.r, 'раунд', 'раунда', 'раундов') + ').',
+          aT < aC ? 'За атаку не выходите первым без гранат: договаривайтесь о выходе на сайт, берите флешку от напарника и держите дистанцию размена.'
+                  : 'За защиту займите позицию, где вас труднее убить, и играйте от информации: сначала слушайте и подсвечивайте, потом дуэль. Меняйте точки от раунда к раунду.'));
+      }
+    }
+
+    /* --- спад / разгон к концу матча --- */
+    if (st.half[0].r >= 9 && st.half[1].r >= 7) {
+      var h1 = st.half[0].dmg / st.half[0].r, h2 = st.half[1].dmg / st.half[1].r;
+      if (h2 / Math.max(1, h1) <= 0.68 && h1 - h2 >= 22) {
+        items.push(P('fade', 36 + (h1 - h2) * 0.5, 'Спад во второй половине',
+          'Урон за раунд упал с ' + Math.round(h1) + ' в первой половине до ' + Math.round(h2) + ' во второй. К концу матча вы теряете концентрацию или темп.',
+          'Следите за паузами: пейте воду, между раундами делайте 10 секунд тишины без разговоров. В длинных матчах играйте проще и надёжнее — берите те дуэли, где есть поддержка.'));
+      } else if (h2 / Math.max(1, h1) >= 1.4 && h2 - h1 >= 22) {
+        items.push(S('rise', 36, 'Вы разгоняетесь к концу матча', 'Урон за раунд вырос с ' + Math.round(h1) + ' до ' + Math.round(h2) + ' — вы хорошо адаптируетесь по ходу игры.'));
+      }
+    }
+
+    /* --- пассивность в проигранных раундах --- */
+    if (st.rLost >= 6 && st.passiveLost.length >= 5 && st.passiveLost.length / st.rLost >= 0.4) {
+      items.push(P('passive_lost', 34 + st.passiveLost.length * 2, 'Нет вклада в проигранных раундах',
+        'В ' + st.passiveLost.length + ' из ' + st.rLost + ' проигранных раундов вы не нанесли и 15 урона и ничего не сделали для команды (раунды ' + roundsText(st.passiveLost) + ').',
+        'Даже при отходе наносите урон и разведывайте: пара выстрелов или флешка вовремя часто превращает проигранный раунд в размен или экономию. Не ждите пассивно в углу.'));
     }
 
     /* --- смерти в одиночку без размена --- */
@@ -389,16 +479,17 @@
     var cl = clusters(st.deathPos.filter(function (d) { return d.enemy; }));
     if (cl.length && cl[0].items.length >= 3) {
       var c0 = cl[0], rs0 = c0.items.map(function (d) { return d.round; });
-      items.push(P('spot', 38 + c0.items.length * 5, 'Смерти в одной и той же точке',
+      items.push(P('spot', 32 + c0.items.length * 5, 'Смерти в одной и той же точке',
         c0.items.length + ' ' + plural(c0.items.length, 'раз', 'раза', 'раз') + ' вы погибли в одном и том же месте карты за ' + (c0.side === 'T' ? 'атаку' : 'защиту') + ' (раунды ' + roundsText(rs0) + '). Соперники знают эту позицию.',
         'Меняйте позицию и тайминг: после смерти в точке не возвращайтесь туда тем же способом. Выманите гранаты первым броском и займите угол второй волной, либо смените позицию на ту, где вас труднее убить.'));
     }
 
     /* --- ранние смерти --- */
-    if (st.earlyDeaths.length >= 4 && st.earlyDeaths.length / Math.max(1, D) >= 0.25) {
+    var earlyShare = st.earlyDeaths.length / Math.max(1, D);
+    if (st.earlyDeaths.length >= 4 && earlyShare >= 0.3 && earlyShare - M.earlyRate >= 0.15) {
       var el = st.earlyDeaths.map(function (x) { return x.round; });
-      items.push(P('early', 40 + st.earlyDeaths.length * 3, 'Ранние смерти',
-        st.earlyDeaths.length + ' ' + plural(st.earlyDeaths.length, 'раз', 'раза', 'раз') + ' вы погибли в первые 25 секунд раунда (раунды ' + roundsText(el) + ') — до того, как команда получила информацию.',
+      items.push(P('early', 36 + st.earlyDeaths.length * 2 + Math.round((earlyShare - M.earlyRate) * 40), 'Ранние смерти',
+        st.earlyDeaths.length + ' ' + plural(st.earlyDeaths.length, 'раз', 'раза', 'раз') + ' (' + Math.round(earlyShare * 100) + '% ваших смертей, в среднем по матчу ' + Math.round(M.earlyRate * 100) + '%) вы погибли в первые 25 секунд раунда — раунды ' + roundsText(el) + ' — до того, как команда получила информацию.',
         'В первые секунды собирайте информацию, а не дуэли: слушайте, подсвечивайте угол гранатой, выходите только с поддержкой. Умерли за ничто — потеряли и фраг, и темп команды.'));
     }
 
@@ -429,8 +520,8 @@
     }
 
     /* --- гранаты: неиспользованные при смерти --- */
-    if (st.unusedDeaths.length >= 3) {
-      items.push(P('unused', 36 + st.unusedDeaths.length * 3, 'Умираете с гранатами в инвентаре',
+    if (st.unusedDeaths.length >= 5 && st.unusedDeaths.length / Math.max(1, D) >= 0.4) {
+      items.push(P('unused', 34 + st.unusedDeaths.length * 2, 'Умираете с гранатами в инвентаре',
         'В ' + st.unusedDeaths.length + ' ' + plural(st.unusedDeaths.length, 'раунде', 'раундах', 'раундах') + ' вы погибли, не использовав купленные гранаты (раунды ' + roundsText(st.unusedDeaths.map(function (x) { return x.round; })) + '). Это потраченные впустую деньги.',
         'Тратьте гранаты до первого контакта или при отходе: бросок флешки или дыма вместе с напарником почти всегда полезнее, чем гибель с гранатой в руке.'));
     }
@@ -478,7 +569,7 @@
     });
     r.verdict = verdict(r, st, res, M, adr, kast);
     r.facts = facts(st, adr, kast, kd, hsPct, isAwp, openAtt, openPct, untradedPct, R, Math.round((1 - M.tradeRate) * 100));
-    r.timeline = timeline(st, M, items, nameOf);
+    r.timeline = timeline(st, M, items, nameOf, killerIds.length ? killerIds[0] : null);
     r.summary = r.verdict;
     r.stats = { rounds: R, kills: K, deaths: D, assists: st.assists, adr: Math.round(adr), kast: kast, hs: hsPct, won: res.won, lost: res.lost, name: st.name };
     return r;
@@ -523,15 +614,15 @@
     return f;
   }
 
-  function timeline(st, M, items, nameOf) {
+  function timeline(st, M, items, nameOf, repeatId) {
     var ev = [];
     st.moments.forEach(function (m) { ev.push({ round: m.round, imp: m.imp, tone: m.tone, text: m.text, t: 0 }); });
-    var repeatId = null, repeatN = 0;
-    Object.keys(st.killers).forEach(function (k) { if (st.killers[k] >= 3 && st.killers[k] > repeatN) { repeatN = st.killers[k]; repeatId = k; } });
     st.deathPos.forEach(function (d) {
       var line = 'Смерть' + (d.atk ? ' от ' + nameOf(d.atk) : '') + ', ' + mmss(d.t) + ' от начала раунда';
       var imp = 10, tone = 'bad';
       if (d.atk && d.atk === repeatId) { imp = 35; line += ' — снова он.'; }
+      else if (st.awpDeaths.indexOf(d.round) !== -1 && st.awpDeaths.length >= 3) { imp = 30; line += ' (AWP).'; }
+      else if (st.blindDeaths.indexOf(d.round) !== -1 && st.blindDeaths.length >= 3) { imp = 30; line += ' — вас ослепили перед смертью.'; }
       else if (d.enemy && !d.traded && d.mateDist != null && d.mateDist > ISOLATED_DIST) { imp = 32; line += ' — в одиночку, напарники далеко (≈' + Math.round(d.mateDist) + ' юн.), размена нет.'; }
       else if (d.t < 25 && d.enemy) { imp = 26; line += ' — слишком рано, до информации.'; }
       else { line += d.traded ? ' (размен есть).' : '.'; imp = d.traded ? 5 : 12; if (d.traded) tone = ''; }
