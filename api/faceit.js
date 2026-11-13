@@ -20,6 +20,17 @@ module.exports = async function handler(req, res) {
         ? path.join('/') 
         : (path || '');
 
+    // Защита ключа: разрешены только нужные сайту GET-запросы к FACEIT,
+    // иначе этот прокси можно использовать как открытый доступ к API по вашему ключу.
+    const ALLOWED = [
+        /^matches\/[A-Za-z0-9-]{1,64}(\/stats)?$/,
+        /^players(\/[A-Za-z0-9-]{1,64}(\/(stats\/cs2|games\/cs2\/stats|history))?)?$/,
+        /^search\/players$/
+    ];
+    if (req.method !== 'GET' || !ALLOWED.some(re => re.test(pathStr))) {
+        return res.status(400).json({ error: 'Недопустимый путь запроса' });
+    }
+
     const params = { ...req.query };
     delete params.path;
     const qs = new URLSearchParams(params).toString();
