@@ -44,7 +44,10 @@ onmessage = async function (e) {
     say(35, 'Разбираю убийства, гранаты и закупы… (до 10 секунд)');
     var names = ['player_death', 'round_end', 'round_freeze_end', 'player_hurt', 'player_blind', 'item_purchase',
       'flashbang_detonate', 'hegrenade_detonate', 'smokegrenade_detonate', 'inferno_startburn', 'bomb_planted', 'bomb_defused'];
-    var events = conv(wb.parseEvents(data, names, ['X', 'Y', 'team_num'], []));
+    var events;
+    // last_place_name — название зоны карты («Connector», «BombsiteA»): нужно для разбора «где вы умираете»
+    try { events = conv(wb.parseEvents(data, names, ['X', 'Y', 'team_num', 'last_place_name'], [])); }
+    catch (e1) { events = conv(wb.parseEvents(data, names, ['X', 'Y', 'team_num'], [])); }
 
     say(70, 'Считаю позиции игроков и закупы…');
     var tickSet = {};
