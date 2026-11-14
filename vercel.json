@@ -3,6 +3,10 @@
     {
       "source": "/api/dota/:path*",
       "destination": "https://api.opendota.com/api/:path*"
+    },
+    {
+      "source": "/sb/:path*",
+      "destination": "https://nkzxnjixxcuxyziprbdg.supabase.co/:path*"
     }
   ]
 }
