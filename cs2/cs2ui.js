@@ -92,7 +92,7 @@
     try { buf = await file.arrayBuffer(); }
     catch (e) { busy = false; hideProg(); showMsg('Не хватило памяти', 'Не удалось прочитать файл. Закройте лишние вкладки и попробуйте ещё раз.'); return; }
     stopWorker();
-    try { worker = new Worker('cs2/cs2worker.js?v=20261113'); }
+    try { worker = new Worker('cs2/cs2worker.js?v=20261116'); }
     catch (e) { busy = false; hideProg(); showMsg('Браузер не поддерживается', 'Для разбора нужен современный браузер (Chrome, Edge, Firefox).'); return; }
     worker.onmessage = function (ev) {
       var m = ev.data;
