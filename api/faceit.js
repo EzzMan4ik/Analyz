@@ -1,11 +1,7 @@
-module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const { guard } = require('./_guard');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
+module.exports = async function handler(req, res) {
+    if (!guard(req, res, 'faceit', 40)) return;
 
     const FACEIT_KEY = process.env.FACEIT_API_KEY;
 
@@ -31,8 +27,12 @@ module.exports = async function handler(req, res) {
         return res.status(400).json({ error: 'Недопустимый путь запроса' });
     }
 
-    const params = { ...req.query };
-    delete params.path;
+    // Передаём дальше только безопасные числовые параметры (сайт использует limit/offset)
+    const params = {};
+    for (const k of ['limit', 'offset']) {
+        const v = Array.isArray(req.query[k]) ? req.query[k][0] : req.query[k];
+        if (v != null && /^\d{1,3}$/.test(String(v))) params[k] = String(v);
+    }
     const qs = new URLSearchParams(params).toString();
 
     const url = `https://open.faceit.com/data/v4/${pathStr}${qs ? '?' + qs : ''}`;
@@ -49,6 +49,7 @@ module.exports = async function handler(req, res) {
         return res.status(response.status).json(data);
 
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        console.error('faceit proxy error:', err && err.message);
+        return res.status(502).json({ error: 'FACEIT не отвечает. Попробуйте позже.' });
     }
 }

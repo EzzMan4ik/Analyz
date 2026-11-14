@@ -60,12 +60,10 @@ async function gql(token, query, variables) {
     return last;
 }
 
+const { guard } = require('./_guard');
+
 async function main(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+    if (!guard(req, res, 'stratz', 30)) return;
 
     const TOKEN = process.env.STRATZ_TOKEN;
     if (!TOKEN) return res.status(500).json({ error: 'STRATZ_TOKEN не настроен в Vercel Environment Variables (после добавления нужен Redeploy)' });
@@ -75,7 +73,7 @@ async function main(req, res) {
         try {
             const r = await gql(TOKEN, '{ __typename }', {});
             const e = r.body && r.body.errors && r.body.errors[0] && r.body.errors[0].message;
-            return res.status(200).json({ tokenSet: true, tokenLength: TOKEN.length, stratzHttp: r.status, ok: r.ok && !e, error: e || (r.ok ? null : 'HTTP ' + r.status), cloudflare: /cloudflare|just a moment|attention required/i.test(r.raw || ''), answer: String(r.raw || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) });
+            return res.status(200).json({ tokenSet: true, stratzHttp: r.status, ok: r.ok && !e, error: e || (r.ok ? null : 'HTTP ' + r.status), cloudflare: /cloudflare|just a moment|attention required/i.test(r.raw || ''), answer: String(r.raw || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) });
         } catch (err) { return res.status(200).json({ tokenSet: true, ok: false, error: err.name === 'AbortError' ? 'таймаут' : err.message }); }
     }
 

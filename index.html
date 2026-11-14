@@ -1003,7 +1003,7 @@ function detectPlayStyle(stats){var er=(stats.entryKills||0)/(stats.kills||1);if
 function findSimilarPro(style,stats){var cands=PRO_PLAYERS_2026.filter(function(p){return p.role===style;});if(!cands.length)cands=PRO_PLAYERS_2026;cands=cands.map(function(p){var s=100-Math.abs((stats.adr||70)-p.adr)*0.5-Math.abs((stats.hs||50)-p.hs)*0.3-Math.abs((stats.kd||1)-p.kd)*20;return{pro:p,score:Math.max(0,s)};});cands.sort(function(a,b){return b.score-a.score;});var best=cands[0],pct=Math.min(95,Math.max(25,Math.round(best.score)));return{pro:best.pro,matchPct:pct,level:pct>=70?'high':pct>=45?'medium':'low'};}
 
 function buildDeepAnalysis(playerStats,matchData){
-    var nick=playerStats.nickname||'Игрок',kills=parseInt(playerStats.kills)||0,deaths=parseInt(playerStats.deaths)||0,assists=parseInt(playerStats.assists)||0;
+    var nick=escHtml(playerStats.nickname||'Игрок'),kills=parseInt(playerStats.kills)||0,deaths=parseInt(playerStats.deaths)||0,assists=parseInt(playerStats.assists)||0;
     var hs=parseFloat(playerStats.headshots_percentage)||0,adr=parseFloat(playerStats.adr)||0,kd=deaths>0?(kills/deaths):kills;
     var mvp=parseInt(playerStats.mvps)||0,entryKills=parseInt(playerStats.entry_count)||0,entryWins=parseInt(playerStats.entry_wins)||0;
     var utilDmg=parseInt(playerStats.utility_damage)||0,flashAssists=parseInt(playerStats.flash_assists)||0,rounds=matchData.rounds||24;
@@ -1011,7 +1011,7 @@ function buildDeepAnalysis(playerStats,matchData){
     var pm=findSimilarPro(sty,{hs,adr,kd,kills,entryKills,utilDmg}),pro=pm.pro;
     var styleLabels={awp:'AWPer',entry:'Entry Fragger',support:'Support',igl:'IGL',lurk:'Lurker',rifler:'Rifler'};
     var html='';
-    html+='<div class="result-header"><div class="result-header-info"><h2>'+nick+' — '+(styleLabels[sty]||'Rifler')+'</h2><div class="result-header-meta">Карта: '+(matchData.map||'?')+' · Счёт: '+(matchData.score||'—')+' · '+rounds+' раундов</div></div><div class="result-badge '+(matchData.won?'win':'lose')+'">'+(matchData.won?'Победа':'Поражение')+'</div></div>';
+    html+='<div class="result-header"><div class="result-header-info"><h2>'+nick+' — '+(styleLabels[sty]||'Rifler')+'</h2><div class="result-header-meta">Карта: '+escHtml(matchData.map||'?')+' · Счёт: '+escHtml(matchData.score||'—')+' · '+(parseInt(rounds)||0)+' раундов</div></div><div class="result-badge '+(matchData.won?'win':'lose')+'">'+(matchData.won?'Победа':'Поражение')+'</div></div>';
     if(matchData.playerOptions)html+='<div class="player-select"><div class="player-select-label">Игрок:</div><select class="player-select-dropdown" id="faceitPlayerSelect" onchange="switchFaceitPlayer()">'+matchData.playerOptions+'</select></div>';
     html+='<div class="result-block"><div class="result-block-title"><svg class="ico"><use href="#i-chart"/></svg> Основные показатели</div><div class="metrics-grid">';
     html+='<div class="metric-card"><div class="metric-label">K/D</div><div class="metric-value">'+kd.toFixed(2)+'</div><div class="metric-sub '+(kd>=1?'good':'bad')+'">Про: '+pro.kd+'</div></div>';
@@ -1062,7 +1062,7 @@ async function runFaceitAnalysis(){
         var ps={};
         if(sd&&sd.rounds&&sd.rounds[0]){(sd.rounds[0].teams||[]).forEach(function(tm){(tm.players||[]).forEach(function(p){ps[p.player_id]=p.player_stats||{};ps[p.player_id]._nick=p.nickname;});});}
         var opts='';
-        allP.forEach(function(p,i){var pst=ps[p.player_id]||{};var k=pst.Kills||pst.kills||'?',d=pst.Deaths||pst.deaths||'?';opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+p.nickname+' ('+p._team+') — '+k+'/'+d+'</option>';});
+        allP.forEach(function(p,i){var pst=ps[p.player_id]||{};var k=pst.Kills||pst.kills||'?',d=pst.Deaths||pst.deaths||'?';opts+='<option value="'+i+'"'+(i===0?' selected':'')+'>'+escHtml(p.nickname)+' ('+escHtml(p._team)+') — '+escHtml(k)+'/'+escHtml(d)+'</option>';});
         var fp=allP[0],fs=ps[fp&&fp.player_id]||{};
         fs.nickname=fp&&fp.nickname||'Игрок';
         var ns=normalizeStats(fs);ns.player_id=fp&&fp.player_id;ns.level=fp&&fp.game_skill_level;
@@ -1363,7 +1363,7 @@ function getMatchPosition(p){var lr=p.lane_role||0,h=tierlistData?tierlistData.f
 
 function heroInfoById(id){if(!tierlistData)return null;var h=tierlistData.find(function(x){return parseInt(x.id)===parseInt(id);});return h||null;}
 function dotaPositions(data){if(!data._pos){try{data._pos=GA.assignDotaPositions(data.players||[],heroInfoById);}catch(e){data._pos=(data.players||[]).map(function(p){return{pos:getMatchPosition(p),approx:true};});}}return data._pos;}
-function extractMatchId(link){var s=String(link||'').trim(),m=s.match(/matches\/(\d{6,13})/i)||s.match(/(\d{6,13})/);return m?m[1]:s;}
+function extractMatchId(link){var s=String(link||'').trim(),m=s.match(/matches\/(\d{6,13})/i)||s.match(/(\d{6,13})/);return m?m[1]:'';}
 var _dotaMatchCache={};
 
 // ---------- Парсинг матча через OpenDota ----------
@@ -1387,7 +1387,7 @@ function parseBannerHtml(matchId){
     var s=_parseState[matchId];if(!s)return'';
     var ico=s.status==='done'?'check':(s.status==='error'||s.status==='timeout'?'warn':'clock');
     var spin=s.status==='wait'?' parse-spin':'';
-    var btn=s.status==='timeout'||s.status==='error'?'<button class="pb-btn" onclick="startParseWatch(\''+matchId+'\')">Проверить ещё раз</button>':'';
+    var btn=s.status==='timeout'||s.status==='error'?'<button class="pb-btn" onclick="startParseWatch(\''+String(matchId).replace(/\D/g,'')+'\')">Проверить ещё раз</button>':'';
     return'<div class="parse-banner '+(s.status==='wait'?'':s.status)+'" id="dotaParseBanner"><span class="pb-ico"><svg class="ico'+spin+'"><use href="#i-'+ico+'"/></svg></span><div><div class="pb-title">'+s.title+'</div><div class="pb-text">'+s.text+'</div>'+btn+'</div></div>';
 }
 function setParseState(matchId,status,title,text){
@@ -1526,7 +1526,7 @@ async function runAnalysis(game){
                 await new Promise(function(r){setTimeout(r,400);});
                 w.classList.remove('visible');
                 _parseState[matchId]={status:'wait',title:'Запрашиваем матч у OpenDota…',text:''};
-                r.innerHTML=parseBannerHtml(String(matchId))+'<div class="analysis-text" style="color:var(--text-dim);">Матч '+matchId+' пока не обработан OpenDota. Мы запросили загрузку и парсинг — разбор появится здесь автоматически.</div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
+                r.innerHTML=parseBannerHtml(String(matchId))+'<div class="analysis-text" style="color:var(--text-dim);">Матч '+escHtml(matchId)+' пока не обработан OpenDota. Мы запросили загрузку и парсинг — разбор появится здесь автоматически.</div><button class="new-analysis-btn" onclick="resetAnalysis(\'dota\')">Новый анализ</button>';
                 r.classList.add('visible');r.scrollIntoView({behavior:'smooth',block:'start'});
                 startParseWatch(matchId,{onDone:finishDota});
                 return;

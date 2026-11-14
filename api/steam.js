@@ -1,12 +1,10 @@
 // Steam Web API: поиск профиля по имени и статистика CS 2.
 // Нужна переменная окружения STEAM_API_KEY (бесплатно: https://steamcommunity.com/dev/apikey)
 const STEAM = 'https://api.steampowered.com';
+const { guard } = require('./_guard');
 
 module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (!guard(req, res, 'steam', 20)) return;
 
     const key = process.env.STEAM_API_KEY;
     if (!key) return res.status(500).json({ error: 'STEAM_API_KEY не настроен в Vercel Environment Variables' });
@@ -21,7 +19,10 @@ module.exports = async function handler(req, res) {
             }
             const r = await fetch(`${STEAM}/ISteamUser/ResolveVanityURL/v1/?key=${key}&vanityurl=${encodeURIComponent(vanity)}`);
             const j = await r.json();
-            if (j.response && j.response.success === 1) return res.status(200).json({ steamid: j.response.steamid });
+            if (j.response && j.response.success === 1) {
+                res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+                return res.status(200).json({ steamid: j.response.steamid });
+            }
             return res.status(404).json({ error: 'Профиль не найден' });
         }
 
@@ -68,6 +69,7 @@ module.exports = async function handler(req, res) {
 
         return res.status(400).json({ error: 'Неизвестное действие' });
     } catch (e) {
-        return res.status(500).json({ error: 'Ошибка сервера Steam: ' + e.message });
+        console.error('steam api error:', e && e.message);
+        return res.status(500).json({ error: 'Ошибка сервера Steam. Попробуйте позже.' });
     }
 };
